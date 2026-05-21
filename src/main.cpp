@@ -57,29 +57,17 @@ int main() {
 	v_arr.enable(1);
 
 
-	const char* VertexShaderSource =
-		"#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"layout (location = 1) in vec3 aColor;"
-		"out vec3 vertexColor;"
-		"void main() {\n"
-		"gl_Position = vec4(aPos, 1.0);\n"
-		"vertexColor = aColor;"
-		"}"
-		;
+	std::string VertexShaderSource;
+	std::string FragmentShaderSource;
 
-	const char* FragmentShaderSource =
-		"#version 330 core\n"
-		"in vec3 vertexColor;"
-		"out vec4 FragColor;\n"
-		"void main() {\n"
-		"FragColor = vec4(vertexColor, 1.0);\n"
-		"}"
-		;
+	ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource);
+	ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource);
 
+	const char* v_src = VertexShaderSource.c_str();
+	const char* f_src = FragmentShaderSource.c_str();
 
-	ShaderVertex vertex_shader(&VertexShaderSource);
-	ShaderFragment fragment_shader(&FragmentShaderSource);
+	ShaderVertex vertex_shader(&v_src);
+	ShaderFragment fragment_shader(&f_src);
 
 	ShaderProgram shader_program(vertex_shader, fragment_shader);
 

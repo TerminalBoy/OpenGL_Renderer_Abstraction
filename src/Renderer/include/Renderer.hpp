@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <array>
 #include <cassert>
+#include <fstream>
+#include <string>
 #include <glad/glad.h>
 #include <glfw3.h>
 
@@ -232,3 +234,24 @@ public:
 		return _id;
 	}
 };
+
+namespace ShaderInput {
+
+	bool ReadFromFile(const std::string& path, std::string& destination_string) {
+		std::ifstream shader_file(path);
+
+		if (!shader_file) {
+			std::cout << "Error Opening file: " << path << std::endl;
+			return false;
+		}
+
+		std::string line;
+
+		while (std::getline(shader_file, line)) {
+			destination_string += line + '\n';
+		}
+
+		return true;
+	}
+
+}
