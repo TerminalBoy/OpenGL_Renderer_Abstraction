@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="OpenGL_Renderer_Abstraction.vcxproj" Id="f4b5ef4c-ac7f-4ab0-97ed-ac1c2f64f00a" />
+</Solution>

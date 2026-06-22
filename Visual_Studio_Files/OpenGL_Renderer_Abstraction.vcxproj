@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;$(SolutionDir)..\dependencies\stb_image\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,7 +123,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;$(SolutionDir)..\dependencies\stb_image\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,7 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dependencies\GLAD\include\glad.c" />
+    <ClCompile Include="..\dependencies\GLAD\src\glad.c" />
+    <ClCompile Include="..\dependencies\stb_image\src\stb_image.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

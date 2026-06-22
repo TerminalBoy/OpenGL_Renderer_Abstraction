@@ -6,7 +6,7 @@
 #include <fstream>
 #include <string>
 #include <glad/glad.h>
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 
 void clear_gl_errors() {
 	while (glGetError() != GL_NO_ERROR) {}
@@ -211,7 +211,7 @@ public:
 	unsigned int id() const {
 		return EBO;
 	}
-};
+}; 
 
 class ShaderProgram {
 private:

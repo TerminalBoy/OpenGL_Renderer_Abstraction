@@ -12,6 +12,7 @@
 !/Visual_Studio_Files/**/
 
 # Unignore all the VS files at any level
-!/Visual_Studio_Files/**/*.sln 
+!/Visual_Studio_Files/**/*.sln
+!/Visual_Studio_Files/**/*.slnx 
 !/Visual_Studio_Files/**/*.vcxproj 
 !/Visual_Studio_Files/**/*.vcxproj.filters 

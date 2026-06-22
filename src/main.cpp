@@ -1,6 +1,6 @@
 #include <iostream>
 #include <glad/glad.h>
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 #include <array>
 #include "Renderer/include/Renderer.hpp"
 
