@@ -26,11 +26,11 @@ int main() {
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	std::array Hello_Triangle_Vertices = { // x,y,z,r,g,b
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
-		 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // 2
-		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 3
+	std::array Hello_Triangle_Vertices = { // x,y,z,Tx,Ty,r,g,b
+		-0.5f, -0.5f, 0.0f,        0.0f, 0.0f,            1.0f, 0.0f, 0.0f, // 0
+		 0.5f, -0.5f, 0.0f,        1.0f, 0.0f,            0.0f, 1.0f, 0.0f, // 1
+		 0.5f,  0.5f, 0.0f,        1.0f, 1.0f,            0.0f, 0.0f, 1.0f, // 2
+		-0.5f,  0.5f, 0.0f,        0.0f, 1.0f,            0.0f, 1.0f, 0.0f // 3
 	};
 
 	std::array index_buffer = {
@@ -50,11 +50,13 @@ int main() {
 	e_buff.bind();
 	e_buff.set_data(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
 
-	v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
-	v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 3 * sizeof(float));
+	v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+	v_arr.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 3 * sizeof(float));
+	v_arr.push_arrtib_pointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 5 * sizeof(float));
 
 	v_arr.enable(0);
 	v_arr.enable(1);
+	v_arr.enable(2);
 
 
 	std::string VertexShaderSource;
@@ -74,6 +76,11 @@ int main() {
 	VALIDATE_GL_(glDeleteShader(vertex_shader.id()));
 	VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
 
+	shader_program.Bind();
+	Texture texture("Assets/hellotexture.png");
+	texture.Bind();
+	shader_program.SetUniform1i("u_Texture", 0);
+
 	while (!glfwWindowShouldClose(window)) {
 
 
@@ -84,8 +91,12 @@ int main() {
 		VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
 
 
-		VALIDATE_GL_(glUseProgram(shader_program.id()));
-		VALIDATE_GL_(glBindVertexArray(v_arr.id()));
+		//VALIDATE_GL_(glUseProgram(shader_program.id()));
+		shader_program.Bind();
+		
+		//VALIDATE_GL_(glBindVertexArray(v_arr.id()));
+		v_arr.bind();
+
 		VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 		glfwSwapBuffers(window);
 		glfwPollEvents();

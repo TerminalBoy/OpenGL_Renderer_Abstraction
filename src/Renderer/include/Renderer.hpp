@@ -7,6 +7,8 @@
 #include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <unordered_map>
+#include "../../../dependencies/stb_image/include/stb_image.h"
 
 void clear_gl_errors() {
 	while (glGetError() != GL_NO_ERROR) {}
@@ -162,6 +164,7 @@ public:
 		_id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
 	}
 
+
 	unsigned int id() const{
 		return _id;
 	}
@@ -216,6 +219,8 @@ public:
 class ShaderProgram {
 private:
 	unsigned int _id;
+	std::unordered_map<std::string, int> uniform_location_cache;
+
 public:
 
 	ShaderProgram() : _id(0) {
@@ -230,9 +235,126 @@ public:
 		_id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
 	}
 
+	void Bind() {
+		VALIDATE_GL_(glUseProgram(_id));
+	}
+
+	void UnBind() {
+		VALIDATE_GL_(glUseProgram(0));
+	}
+
 	unsigned int id() {
 		return _id;
 	}
+
+	void SetUniform1i(const std::string& uniform_name, int v0) {
+		VALIDATE_GL_(glUniform1i(GetUniformLocation(uniform_name), v0));
+	}
+
+	void SetUniform2i(const std::string& uniform_name, int v0, int v1) {
+		VALIDATE_GL_(glUniform2i(GetUniformLocation(uniform_name), v0, v1));
+	}
+
+	void SetUniform3i(const std::string& uniform_name, int v0, int v1, int v2) {
+		VALIDATE_GL_(glUniform3i(GetUniformLocation(uniform_name), v0, v1, v2));
+	}
+
+	void SetUniform4i(const std::string& uniform_name, int v0, int v1, int v2, int v3) {
+		VALIDATE_GL_(glUniform4i(GetUniformLocation(uniform_name), v0, v1, v2, v3));
+	}
+
+
+
+	void SetUniform1f(const std::string& uniform_name, float v0) {
+		VALIDATE_GL_(glUniform1f(GetUniformLocation(uniform_name), v0));
+	}
+
+	void SetUniform2f(const std::string& uniform_name, float v0, float v1) {
+		VALIDATE_GL_(glUniform2f(GetUniformLocation(uniform_name), v0, v1));
+	}
+
+	void SetUniform3f(const std::string& uniform_name, float v0, float v1, float v2) {
+		VALIDATE_GL_(glUniform3f(GetUniformLocation(uniform_name), v0, v1, v2));
+	}
+
+	void SetUniform4f(const std::string& uniform_name, float v0, float v1, float v2, float v3) {
+		VALIDATE_GL_(glUniform4f(GetUniformLocation(uniform_name), v0, v1, v2, v3));
+	}
+
+
+
+private:
+
+	int GetUniformLocation(const std::string name) {
+		if (uniform_location_cache.find(name) != uniform_location_cache.end()) {
+			return uniform_location_cache[name];
+		}
+		
+		int uniform_location{};
+		VALIDATE_GL_(uniform_location = glGetUniformLocation(_id, name.c_str()));
+		if (uniform_location == -1) {
+			std::cout << "Uniform " << name << " does not exist \n";
+			assert(0);
+		}
+		else {
+			uniform_location_cache[name] = uniform_location;
+		}
+
+		return uniform_location;
+	}
+};
+
+class Texture {
+private:
+	unsigned int _id;
+	std::string filepath;
+	std::int32_t width;
+	std::int32_t height;
+	std::int32_t bits_per_pixel;
+	unsigned char* local_buffer;
+
+public:
+
+	Texture(const std::string& path) 
+		: _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
+	{
+
+		stbi_set_flip_vertically_on_load(1);
+		local_buffer = stbi_load(path.c_str(), &width, &height, &bits_per_pixel, 4);
+
+		VALIDATE_GL_(glGenTextures(1, &_id));
+		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
+
+		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+		
+		VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer));
+		
+		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+		
+		if (local_buffer) {
+			stbi_image_free(local_buffer);
+		}
+
+	}
+
+	~Texture() {
+		VALIDATE_GL_(glDeleteTextures(1, &_id));
+	}
+
+	void Bind(unsigned int slot = 0) {	
+		
+		VALIDATE_GL_(glActiveTexture(GL_TEXTURE0 + slot));
+		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
+
+	}
+
+	void UnBind() {
+		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+	}
+
 };
 
 namespace ShaderInput {
