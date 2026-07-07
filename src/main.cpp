@@ -13,7 +13,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(900, 600, "Learn OpenGL", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Learn OpenGL", nullptr, nullptr);
 	if (window == nullptr) {
 		std::cout << "Failed to create a window\n";
 		glfwTerminate();
@@ -44,6 +44,11 @@ int main() {
 	VertexArray v_arr;
 	VertexBuffer v_buff;
 	ElementBuffer e_buff;
+
+	glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-1.f , 0.0f, 0.0f));
+
+	glm::mat4 mvp = proj * view;
 
 	v_arr.bind();
 
@@ -83,6 +88,7 @@ int main() {
 	Texture texture("Assets/hellotexture.png");
 	texture.Bind();
 	shader_program.SetUniform1i("u_Texture", 0);
+	shader_program.SetUniformMat4f("u_MVP", mvp);
 
 	while (!glfwWindowShouldClose(window)) {
 

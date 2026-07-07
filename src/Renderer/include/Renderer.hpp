@@ -9,6 +9,9 @@
 #include <GLFW/glfw3.h>
 #include <unordered_map>
 #include "../../../dependencies/stb_image/include/stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 
 void clear_gl_errors() {
 	while (glGetError() != GL_NO_ERROR) {}
@@ -281,6 +284,10 @@ public:
 		VALIDATE_GL_(glUniform4f(GetUniformLocation(uniform_name), v0, v1, v2, v3));
 	}
 
+
+	void SetUniformMat4f(const std::string& uniform_name, const glm::mat4& matrix) {
+		VALIDATE_GL_(glUniformMatrix4fv(GetUniformLocation(uniform_name), 1, GL_FALSE, &matrix[0][0]));
+	}
 
 
 private:
