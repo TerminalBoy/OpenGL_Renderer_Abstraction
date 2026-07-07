@@ -287,7 +287,7 @@ public:
 
 	void SetUniformMat4f(const std::string& uniform_name, const glm::mat4& matrix) {
 		VALIDATE_GL_(glUniformMatrix4fv(GetUniformLocation(uniform_name), 1, GL_FALSE, &matrix[0][0]));
-	}
+	} 
 
 
 private:
