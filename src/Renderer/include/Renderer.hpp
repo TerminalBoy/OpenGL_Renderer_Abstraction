@@ -14,26 +14,26 @@
 
 
 void clear_gl_errors() {
-	while (glGetError() != GL_NO_ERROR) {}
+  while (glGetError() != GL_NO_ERROR) {}
 }
 
 void log_gl_errors(const char* expression, std::size_t line, const char* file_name) {
 
-	int error_code = glGetError();
-	bool loop_ran = false;
+  int error_code = glGetError();
+  bool loop_ran = false;
 
-	while (error_code != GL_NO_ERROR) {
-		std::cout << "OpenGL Error on: " << expression
-			<< "\nBreakpoint trigger:"
-			<< "\nAt line: " << line
-			<< "\nFile: " << file_name
-			<< "\nError Code: " << error_code;
-		error_code = glGetError();
-		loop_ran = true;
+  while (error_code != GL_NO_ERROR) {
+    std::cout << "OpenGL Error on: " << expression
+      << "\nBreakpoint trigger:"
+      << "\nAt line: " << line
+      << "\nFile: " << file_name
+      << "\nError Code: " << error_code;
+    error_code = glGetError();
+    loop_ran = true;
 
-	}
+  }
 
-	if (loop_ran) __debugbreak(); // some opengl error occured // check call stack and terminal
+  if (loop_ran) __debugbreak(); // some opengl error occured // check call stack and terminal
 }
 
 #define VALIDATE_GL_(expr_gl) do {                             \
@@ -43,51 +43,51 @@ log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 } while(0)
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
+  glViewport(0, 0, width, height);
 }
 
 void processInput(GLFWwindow* window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
 }
 
 unsigned int CreateShader(unsigned int shader_type_gl, char const* const* const shader_src_string_array, unsigned int src_count) {
-	unsigned int shader;
-	shader = glCreateShader(shader_type_gl);
+  unsigned int shader;
+  shader = glCreateShader(shader_type_gl);
 
-	VALIDATE_GL_(glShaderSource(shader, src_count, shader_src_string_array, nullptr));
-	VALIDATE_GL_(glCompileShader(shader));
+  VALIDATE_GL_(glShaderSource(shader, src_count, shader_src_string_array, nullptr));
+  VALIDATE_GL_(glCompileShader(shader));
 
-	int success;
-	char infolog[512];
-	VALIDATE_GL_(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
+  int success;
+  char infolog[512];
+  VALIDATE_GL_(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
 
-	if (!success) {
-		VALIDATE_GL_(glGetShaderInfoLog(shader, 512, nullptr, infolog));
-		std::cout << "Error compiling shader: \n" << infolog << std::endl;
-	}
+  if (!success) {
+    VALIDATE_GL_(glGetShaderInfoLog(shader, 512, nullptr, infolog));
+    std::cout << "Error compiling shader: \n" << infolog << std::endl;
+  }
 
-	return shader;
+  return shader;
 }
 
 unsigned int CreateShaderProgram(unsigned int VertexShader, unsigned int FragmentShader) {
-	unsigned int ShaderProgram;
-	ShaderProgram = glCreateProgram();
+  unsigned int ShaderProgram;
+  ShaderProgram = glCreateProgram();
 
-	VALIDATE_GL_(glAttachShader(ShaderProgram, VertexShader));
-	VALIDATE_GL_(glAttachShader(ShaderProgram, FragmentShader));
-	VALIDATE_GL_(glLinkProgram(ShaderProgram));
+  VALIDATE_GL_(glAttachShader(ShaderProgram, VertexShader));
+  VALIDATE_GL_(glAttachShader(ShaderProgram, FragmentShader));
+  VALIDATE_GL_(glLinkProgram(ShaderProgram));
 
-	int success;
-	char infolog[512];
+  int success;
+  char infolog[512];
 
-	VALIDATE_GL_(glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success));
-	if (!success) {
-		VALIDATE_GL_(glGetProgramInfoLog(ShaderProgram, 512, nullptr, infolog));
-		std::cout << "Error linking : \n" << infolog << std::endl;
-	}
-	return ShaderProgram;
+  VALIDATE_GL_(glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success));
+  if (!success) {
+    VALIDATE_GL_(glGetProgramInfoLog(ShaderProgram, 512, nullptr, infolog));
+    std::cout << "Error linking : \n" << infolog << std::endl;
+  }
+  return ShaderProgram;
 }
 
 
@@ -95,292 +95,292 @@ unsigned int CreateShaderProgram(unsigned int VertexShader, unsigned int Fragmen
 
 class VertexArray {
 private:
-	unsigned int VAO;
+  unsigned int VAO;
 public:
-	
-	VertexArray() {
-		VALIDATE_GL_(glGenVertexArrays(1, &VAO));
-	}
-	
-	void bind() const {
-		VALIDATE_GL_(glBindVertexArray(VAO));
-	}
+  
+  VertexArray() {
+    VALIDATE_GL_(glGenVertexArrays(1, &VAO));
+  }
+  
+  void bind() const {
+    VALIDATE_GL_(glBindVertexArray(VAO));
+  }
 
-	void push_arrtib_pointer(std::size_t index, std::size_t element_count_per_vertex_arrtib, unsigned int type_type_GLenum,
-		int normalise, std::size_t stride_count, std::size_t vertex_element_offset_size_bytes) {
-		VALIDATE_GL_(glVertexAttribPointer(
+  void push_arrtib_pointer(std::size_t index, std::size_t element_count_per_vertex_arrtib, unsigned int type_type_GLenum,
+    int normalise, std::size_t stride_count, std::size_t vertex_element_offset_size_bytes) {
+    VALIDATE_GL_(glVertexAttribPointer(
 
-			index, element_count_per_vertex_arrtib, type_type_GLenum, normalise, stride_count, reinterpret_cast<void*>(vertex_element_offset_size_bytes)
+      index, element_count_per_vertex_arrtib, type_type_GLenum, normalise, stride_count, reinterpret_cast<void*>(vertex_element_offset_size_bytes)
 
-		));
+    ));
 
-	}
-	
-	void enable(std::size_t index) {
-		VALIDATE_GL_(glEnableVertexAttribArray(index));
-	}
+  }
+  
+  void enable(std::size_t index) {
+    VALIDATE_GL_(glEnableVertexAttribArray(index));
+  }
 
-	unsigned int id() const{
-		return VAO;
-	}
+  unsigned int id() const{
+    return VAO;
+  }
 
 };
 
 class VertexBuffer {
 private:
-	unsigned int VBO;
+  unsigned int VBO;
 public:
-	
-	VertexBuffer() {
-		VALIDATE_GL_(glGenBuffers(1, &VBO));
-	}
+  
+  VertexBuffer() {
+    VALIDATE_GL_(glGenBuffers(1, &VBO));
+  }
 
-	void bind(unsigned int target_type_GLenum) {
-		VALIDATE_GL_(glBindBuffer(target_type_GLenum, VBO));
-	}
-	
-	template <typename T, std::size_t buffer_size>
-	void set_data(unsigned int target_type_GLenum, const std::array<T, buffer_size>& buffer, unsigned int usage_type_GLenum) {
-		VALIDATE_GL_(glBufferData(target_type_GLenum, sizeof(T) * buffer_size, buffer.data(), usage_type_GLenum));
-	}
+  void bind(unsigned int target_type_GLenum) {
+    VALIDATE_GL_(glBindBuffer(target_type_GLenum, VBO));
+  }
+  
+  template <typename T, std::size_t buffer_size>
+  void set_data(unsigned int target_type_GLenum, const std::array<T, buffer_size>& buffer, unsigned int usage_type_GLenum) {
+    VALIDATE_GL_(glBufferData(target_type_GLenum, sizeof(T) * buffer_size, buffer.data(), usage_type_GLenum));
+  }
 
-	unsigned int id() const{
-		return VBO;
-	}
+  unsigned int id() const{
+    return VBO;
+  }
 };
 
 class ShaderVertex {
 
 private:
-	unsigned int _id;
+  unsigned int _id;
 
 public:
-	ShaderVertex() : _id(0) {
-	}
-	
-	ShaderVertex(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
-		_id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
-	}
+  ShaderVertex() : _id(0) {
+  }
+  
+  ShaderVertex(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
+    _id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
+  }
 
-	void CompileShader_seperately(const char* const* const shader_src_string_array, std::size_t str_array_size) {
-		assert(_id == 0 && "id already has a compiled shader");
-		_id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
-	}
+  void CompileShader_seperately(const char* const* const shader_src_string_array, std::size_t str_array_size) {
+    assert(_id == 0 && "id already has a compiled shader");
+    _id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
+  }
 
 
-	unsigned int id() const{
-		return _id;
-	}
+  unsigned int id() const{
+    return _id;
+  }
 };
 
 class ShaderFragment {
 
 private:
-	unsigned int _id;
+  unsigned int _id;
 
 public:
-	ShaderFragment() : _id(0) {
-	}
+  ShaderFragment() : _id(0) {
+  }
 
-	ShaderFragment(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
-		_id = CreateShader(GL_FRAGMENT_SHADER, shader_src_string_array, str_array_size);
-	}
+  ShaderFragment(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
+    _id = CreateShader(GL_FRAGMENT_SHADER, shader_src_string_array, str_array_size);
+  }
 
-	void CompileShader_seperately(const char* const* const shader_src_string_array, std::size_t str_array_size) {
-		assert(_id == 0 && "id already has a compiled shader");
-		_id = CreateShader(GL_FRAGMENT_SHADER, shader_src_string_array, str_array_size);
-	}
+  void CompileShader_seperately(const char* const* const shader_src_string_array, std::size_t str_array_size) {
+    assert(_id == 0 && "id already has a compiled shader");
+    _id = CreateShader(GL_FRAGMENT_SHADER, shader_src_string_array, str_array_size);
+  }
 
-	unsigned int id() const{
-		return _id;
-	}
+  unsigned int id() const{
+    return _id;
+  }
 };
 
 class ElementBuffer {
 private:
-	unsigned int EBO;
+  unsigned int EBO;
 
 public:
-	ElementBuffer() {
-		VALIDATE_GL_(glGenBuffers(1, &EBO));
-	}
+  ElementBuffer() {
+    VALIDATE_GL_(glGenBuffers(1, &EBO));
+  }
 
-	template <typename T, std::size_t buffer_size>
-	void set_data(unsigned int target_type_GLenum, const std::array<T, buffer_size>& buffer, unsigned int usage_type_GLenum) {
-		VALIDATE_GL_(glBufferData(target_type_GLenum, sizeof(T) * buffer_size, buffer.data(), usage_type_GLenum));
-	}
-	
-	void bind() {
-		VALIDATE_GL_(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
-	}
+  template <typename T, std::size_t buffer_size>
+  void set_data(unsigned int target_type_GLenum, const std::array<T, buffer_size>& buffer, unsigned int usage_type_GLenum) {
+    VALIDATE_GL_(glBufferData(target_type_GLenum, sizeof(T) * buffer_size, buffer.data(), usage_type_GLenum));
+  }
+  
+  void bind() {
+    VALIDATE_GL_(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+  }
 
-	unsigned int id() const {
-		return EBO;
-	}
+  unsigned int id() const {
+    return EBO;
+  }
 }; 
 
 class ShaderProgram {
 private:
-	unsigned int _id;
-	std::unordered_map<std::string, int> uniform_location_cache;
+  unsigned int _id;
+  std::unordered_map<std::string, int> uniform_location_cache;
 
 public:
 
-	ShaderProgram() : _id(0) {
+  ShaderProgram() : _id(0) {
 
-	}
+  }
 
-	ShaderProgram(ShaderVertex VertexShader, ShaderFragment FragmentShader) {
-		_id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
-	}
+  ShaderProgram(ShaderVertex VertexShader, ShaderFragment FragmentShader) {
+    _id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
+  }
 
-	void CreateProgram_seperately(ShaderVertex VertexShader, ShaderFragment FragmentShader) {
-		_id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
-	}
+  void CreateProgram_seperately(ShaderVertex VertexShader, ShaderFragment FragmentShader) {
+    _id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
+  }
 
-	void Bind() {
-		VALIDATE_GL_(glUseProgram(_id));
-	}
+  void Bind() {
+    VALIDATE_GL_(glUseProgram(_id));
+  }
 
-	void UnBind() {
-		VALIDATE_GL_(glUseProgram(0));
-	}
+  void UnBind() {
+    VALIDATE_GL_(glUseProgram(0));
+  }
 
-	unsigned int id() {
-		return _id;
-	}
+  unsigned int id() {
+    return _id;
+  }
 
-	void SetUniform1i(const std::string& uniform_name, int v0) {
-		VALIDATE_GL_(glUniform1i(GetUniformLocation(uniform_name), v0));
-	}
+  void SetUniform1i(const std::string& uniform_name, int v0) {
+    VALIDATE_GL_(glUniform1i(GetUniformLocation(uniform_name), v0));
+  }
 
-	void SetUniform2i(const std::string& uniform_name, int v0, int v1) {
-		VALIDATE_GL_(glUniform2i(GetUniformLocation(uniform_name), v0, v1));
-	}
+  void SetUniform2i(const std::string& uniform_name, int v0, int v1) {
+    VALIDATE_GL_(glUniform2i(GetUniformLocation(uniform_name), v0, v1));
+  }
 
-	void SetUniform3i(const std::string& uniform_name, int v0, int v1, int v2) {
-		VALIDATE_GL_(glUniform3i(GetUniformLocation(uniform_name), v0, v1, v2));
-	}
+  void SetUniform3i(const std::string& uniform_name, int v0, int v1, int v2) {
+    VALIDATE_GL_(glUniform3i(GetUniformLocation(uniform_name), v0, v1, v2));
+  }
 
-	void SetUniform4i(const std::string& uniform_name, int v0, int v1, int v2, int v3) {
-		VALIDATE_GL_(glUniform4i(GetUniformLocation(uniform_name), v0, v1, v2, v3));
-	}
-
-
-
-	void SetUniform1f(const std::string& uniform_name, float v0) {
-		VALIDATE_GL_(glUniform1f(GetUniformLocation(uniform_name), v0));
-	}
-
-	void SetUniform2f(const std::string& uniform_name, float v0, float v1) {
-		VALIDATE_GL_(glUniform2f(GetUniformLocation(uniform_name), v0, v1));
-	}
-
-	void SetUniform3f(const std::string& uniform_name, float v0, float v1, float v2) {
-		VALIDATE_GL_(glUniform3f(GetUniformLocation(uniform_name), v0, v1, v2));
-	}
-
-	void SetUniform4f(const std::string& uniform_name, float v0, float v1, float v2, float v3) {
-		VALIDATE_GL_(glUniform4f(GetUniformLocation(uniform_name), v0, v1, v2, v3));
-	}
+  void SetUniform4i(const std::string& uniform_name, int v0, int v1, int v2, int v3) {
+    VALIDATE_GL_(glUniform4i(GetUniformLocation(uniform_name), v0, v1, v2, v3));
+  }
 
 
-	void SetUniformMat4f(const std::string& uniform_name, const glm::mat4& matrix) {
-		VALIDATE_GL_(glUniformMatrix4fv(GetUniformLocation(uniform_name), 1, GL_FALSE, &matrix[0][0]));
-	} 
+
+  void SetUniform1f(const std::string& uniform_name, float v0) {
+    VALIDATE_GL_(glUniform1f(GetUniformLocation(uniform_name), v0));
+  }
+
+  void SetUniform2f(const std::string& uniform_name, float v0, float v1) {
+    VALIDATE_GL_(glUniform2f(GetUniformLocation(uniform_name), v0, v1));
+  }
+
+  void SetUniform3f(const std::string& uniform_name, float v0, float v1, float v2) {
+    VALIDATE_GL_(glUniform3f(GetUniformLocation(uniform_name), v0, v1, v2));
+  }
+
+  void SetUniform4f(const std::string& uniform_name, float v0, float v1, float v2, float v3) {
+    VALIDATE_GL_(glUniform4f(GetUniformLocation(uniform_name), v0, v1, v2, v3));
+  }
+
+
+  void SetUniformMat4f(const std::string& uniform_name, const glm::mat4& matrix) {
+    VALIDATE_GL_(glUniformMatrix4fv(GetUniformLocation(uniform_name), 1, GL_FALSE, &matrix[0][0]));
+  } 
 
 
 private:
 
-	int GetUniformLocation(const std::string name) {
-		if (uniform_location_cache.find(name) != uniform_location_cache.end()) {
-			return uniform_location_cache[name];
-		}
-		
-		int uniform_location{};
-		VALIDATE_GL_(uniform_location = glGetUniformLocation(_id, name.c_str()));
-		if (uniform_location == -1) {
-			std::cout << "Uniform " << name << " does not exist \n";
-			assert(0);
-		}
-		else {
-			uniform_location_cache[name] = uniform_location;
-		}
+  int GetUniformLocation(const std::string name) {
+    if (uniform_location_cache.find(name) != uniform_location_cache.end()) {
+      return uniform_location_cache[name];
+    }
+    
+    int uniform_location{};
+    VALIDATE_GL_(uniform_location = glGetUniformLocation(_id, name.c_str()));
+    if (uniform_location == -1) {
+      std::cout << "Uniform " << name << " does not exist \n";
+      assert(0);
+    }
+    else {
+      uniform_location_cache[name] = uniform_location;
+    }
 
-		return uniform_location;
-	}
+    return uniform_location;
+  }
 };
 
 class Texture {
 private:
-	unsigned int _id;
-	std::string filepath;
-	std::int32_t width;
-	std::int32_t height;
-	std::int32_t bits_per_pixel;
-	unsigned char* local_buffer;
+  unsigned int _id;
+  std::string filepath;
+  std::int32_t width;
+  std::int32_t height;
+  std::int32_t bits_per_pixel;
+  unsigned char* local_buffer;
 
 public:
 
-	Texture(const std::string& path) 
-		: _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
-	{
+  Texture(const std::string& path) 
+    : _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
+  {
 
-		stbi_set_flip_vertically_on_load(1);
-		local_buffer = stbi_load(path.c_str(), &width, &height, &bits_per_pixel, 4);
+    stbi_set_flip_vertically_on_load(1);
+    local_buffer = stbi_load(path.c_str(), &width, &height, &bits_per_pixel, 4);
 
-		VALIDATE_GL_(glGenTextures(1, &_id));
-		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
+    VALIDATE_GL_(glGenTextures(1, &_id));
+    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
 
-		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-		VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-		
-		VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer));
-		
-		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
-		
-		if (local_buffer) {
-			stbi_image_free(local_buffer);
-		}
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    
+    VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer));
+    
+    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+    
+    if (local_buffer) {
+      stbi_image_free(local_buffer);
+    }
 
-	}
+  }
 
-	~Texture() {
-		VALIDATE_GL_(glDeleteTextures(1, &_id));
-	}
+  ~Texture() {
+    VALIDATE_GL_(glDeleteTextures(1, &_id));
+  }
 
-	void Bind(unsigned int slot = 0) {	
-		
-		VALIDATE_GL_(glActiveTexture(GL_TEXTURE0 + slot));
-		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
+  void Bind(unsigned int slot = 0) {	
+    
+    VALIDATE_GL_(glActiveTexture(GL_TEXTURE0 + slot));
+    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
 
-	}
+  }
 
-	void UnBind() {
-		VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
-	}
+  void UnBind() {
+    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+  }
 
 };
 
 namespace ShaderInput {
 
-	bool ReadFromFile(const std::string& path, std::string& destination_string) {
-		std::ifstream shader_file(path);
+  bool ReadFromFile(const std::string& path, std::string& destination_string) {
+    std::ifstream shader_file(path);
 
-		if (!shader_file) {
-			std::cout << "Error Opening file: " << path << std::endl;
-			return false;
-		}
+    if (!shader_file) {
+      std::cout << "Error Opening file: " << path << std::endl;
+      return false;
+    }
 
-		std::string line;
+    std::string line;
 
-		while (std::getline(shader_file, line)) {
-			destination_string += line + '\n';
-		}
+    while (std::getline(shader_file, line)) {
+      destination_string += line + '\n';
+    }
 
-		return true;
-	}
+    return true;
+  }
 
 }
