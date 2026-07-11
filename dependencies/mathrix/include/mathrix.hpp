@@ -19,21 +19,18 @@ namespace mrix {
     template <typename task_lambda_ARGS_index>
     void for_each_row(task_lambda_ARGS_index&& callable) {
       for (std::size_t i{}; i < row; ++i) {
-        callabe(i);
+        callable(i);
       }
     }
 
     template <typename task_lambda_ARGS_index>
     void for_each_column(task_lambda_ARGS_index&& callable) {
       for (std::size_t i{}; i < column; ++i) {
-        callabe(i);
+        callable(i);
       }
     }
 
     std::size_t cm_index(std::size_t row_index, std::size_t column_index) { // column major index
-      assert(row_index < row && "Row index out of bounds");
-      assert(column_index < column && "Column index out of bounds");
-
       return (column_index * row) + row_index;
     }
 
@@ -41,7 +38,8 @@ namespace mrix {
     mat() : size(row * column), array(size) {}
     
     mat(type identity_value) : size(row * column), array(size) {
-    // make an identity matrix
+      static_assert(row == column, "Identity matrix is only possible in square matrices");
+      // make an identity matrix
       for_each_row(
         [this, identity_value](std::size_t row_index) {
           array[cm_index(row_index, row_index)] = identity_value;
@@ -49,12 +47,23 @@ namespace mrix {
       );
     }
 
-    mat(std::initializer_list<type> matrix_elements) : size(row* column), array(size) {
-      std::size_t offset{};
+    mat(std::initializer_list<type> matrix_elements) : size(row * column), array(size) {
+      static_assert(matrix_elements.size() == row * column, "Matrix initialization has wrong number of elements");
       for (std::size_t i{}; i < matrix_elements.size(); ++i) {
-        array[i] = matrix_elements[i + offset];
-        offset = column;
+        std::size_t _row = i / row;
+        std::size_t _col = i % row;
+
+        array[cm_index(_row, _col)] = matrix_elements[i];
       }
+    }
+
+    type* data() const{
+      return array.data();
+    }
+
+    type& at(std::size_t row_index, std::size_t column_index) {
+      assert((row_index < row && column_index < column) && "Matrix coordinates out of bounds");
+      return array[cm_index(row_index, column_index)];
     }
 
   };
