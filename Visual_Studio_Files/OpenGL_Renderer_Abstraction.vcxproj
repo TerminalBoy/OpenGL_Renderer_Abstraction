@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;$(SolutionDir)..\dependencies\stb_image\include;$(SolutionDir)..\dependencies\glm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;$(SolutionDir)..\dependencies\stb_image\include;$(SolutionDir)..\dependencies\glm\include;$(SolutionDir)..\dependencies\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,7 +123,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;$(SolutionDir)..\dependencies\stb_image\include;$(SolutionDir)..\dependencies\glm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\;$(SolutionDir)..\dependencies\GLAD\include;$(SolutionDir)..\dependencies\GLFW\include;$(SolutionDir)..\src\Renderer\include;$(SolutionDir)..\dependencies\stb_image\include;$(SolutionDir)..\dependencies\glm\include;$(SolutionDir)..\dependencies\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +134,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dependencies\GLAD\src\glad.c" />
+    <ClCompile Include="..\dependencies\imgui\include\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\dependencies\imgui\include\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\dependencies\imgui\include\imgui.cpp" />
+    <ClCompile Include="..\dependencies\imgui\include\imgui_demo.cpp" />
+    <ClCompile Include="..\dependencies\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="..\dependencies\imgui\include\imgui_tables.cpp" />
+    <ClCompile Include="..\dependencies\imgui\include\imgui_widgets.cpp" />
     <ClCompile Include="..\dependencies\stb_image\src\stb_image.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
