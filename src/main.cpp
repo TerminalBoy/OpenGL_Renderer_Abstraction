@@ -19,7 +19,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Learn OpenGL", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(1600, 900, "Learn OpenGL", nullptr, nullptr);
   if (window == nullptr) {
     std::cout << "Failed to create a window\n";
     glfwTerminate();
@@ -32,7 +32,7 @@ int main() {
     return -1;
   }
 
-  glViewport(0, 0, 800, 600);
+  glViewport(0, 0, 1600, 900);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
@@ -62,11 +62,9 @@ int main() {
   VertexBuffer v_buff;
   ElementBuffer e_buff;
 
-  glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
-  glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-1.f , 0.0f, 0.0f));
-
-  glm::mat4 mvp = proj * view;
-
+  glm::mat4 proj = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, -1.0f, 1.0f);
+  //glm::mat4 proj(1.f);
+  
   v_arr.bind();
 
   v_buff.bind(GL_ARRAY_BUFFER);
@@ -105,7 +103,10 @@ int main() {
   Texture texture("Assets/hellotexture.png");
   texture.Bind();
   shader_program.SetUniform1i("u_Texture", 0);
-  shader_program.SetUniformMat4f("u_MVP", mvp);
+
+  float camera_x{};
+  float camera_y{};
+
 
   while (!glfwWindowShouldClose(window)) {
 
@@ -120,6 +121,16 @@ int main() {
     //VALIDATE_GL_(glUseProgram(shader_program.id()));
     shader_program.Bind();
     
+    
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(camera_x * 8.f, camera_y * 4.5f, 0.0f));
+
+    glm::mat4 mvp = proj * view;
+
+    
+    shader_program.SetUniformMat4f("u_MVP", mvp);
+    
+    
+    
     //VALIDATE_GL_(glBindVertexArray(v_arr.id()));
     v_arr.bind();
 
@@ -131,7 +142,9 @@ int main() {
     ImGui::NewFrame();
 
     ImGui::Begin("Debug");
-    ImGui::Button("hellow");
+    ImGui::SliderFloat("camera x", &camera_x, -1.f, 1.f);
+    ImGui::SliderFloat("camera y", &camera_y, -1.f, 1.f);
+
 
     
     ImGui::End();
