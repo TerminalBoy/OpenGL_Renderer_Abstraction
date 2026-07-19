@@ -1,6 +1,6 @@
 /dependencies/GLFW
 /dependencies/GLAD
-
+imgui.ini
 # Ignore the folder at root and all its contents and subfolders
 /Visual_Studio_Files/**
 
