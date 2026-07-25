@@ -104,8 +104,11 @@ int main() {
   texture.Bind();
   shader_program.SetUniform1i("u_Texture", 0);
 
-  float camera_x{};
-  float camera_y{};
+  float cameraA_x{};
+  float cameraA_y{};
+
+  float cameraB_x{};
+  float cameraB_y{};
 
 
   while (!glfwWindowShouldClose(window)) {
@@ -119,22 +122,41 @@ int main() {
 
 
     //VALIDATE_GL_(glUseProgram(shader_program.id()));
-    shader_program.Bind();
-    
-    
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(camera_x * 8.f, camera_y * 4.5f, 0.0f));
+    {
+      shader_program.Bind();
 
-    glm::mat4 mvp = proj * view;
 
+      glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraA_x * 8.f, cameraA_y * 4.5f, 0.0f));
+
+      glm::mat4 mvp = proj * view;
+
+
+      shader_program.SetUniformMat4f("u_MVP", mvp);
+
+      v_arr.bind();
+
+      VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+    }
+
+    {
+      shader_program.Bind();
+      glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraB_x * 8.f, cameraB_y * 4.5f, 0.0f));
+
+      glm::mat4 mvp = proj * view;
+
+
+      shader_program.SetUniformMat4f("u_MVP", mvp);
+      v_arr.bind();
+
+      VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
     
-    shader_program.SetUniformMat4f("u_MVP", mvp);
+    }
+
     
     
     
     //VALIDATE_GL_(glBindVertexArray(v_arr.id()));
-    v_arr.bind();
-
-    VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+    
 
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -142,8 +164,18 @@ int main() {
     ImGui::NewFrame();
 
     ImGui::Begin("Debug");
-    ImGui::SliderFloat("camera x", &camera_x, -1.f, 1.f);
-    ImGui::SliderFloat("camera y", &camera_y, -1.f, 1.f);
+
+    ImGui::SliderFloat("cameraA x", &cameraA_x, -1.f, 1.f);
+    ImGui::SliderFloat("cameraA y", &cameraA_y, -1.f, 1.f);
+
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Spacing();
+
+
+    ImGui::SliderFloat("cameraB x", &cameraB_x, -1.f, 1.f);
+    ImGui::SliderFloat("cameraB y", &cameraB_y, -1.f, 1.f);
 
 
     
