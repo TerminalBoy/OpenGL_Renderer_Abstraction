@@ -10,7 +10,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-
+#include "../dependencies/test/include/test.hpp"
 
  
 int main() {
@@ -36,6 +36,9 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
+  test::TestClearColor bg(0.1f, 0.1f, 0.1f);
+
+
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
@@ -46,69 +49,6 @@ int main() {
   ImGui_ImplOpenGL3_Init("#version 330");
 
 
-  std::array Hello_Triangle_Vertices = { // x,y,z,Tx,Ty,r,g,b
-    -0.5f, -0.5f, 0.0f,        0.0f, 0.0f,            1.0f, 0.0f, 0.0f, // 0
-     0.5f, -0.5f, 0.0f,        1.0f, 0.0f,            0.0f, 1.0f, 0.0f, // 1
-     0.5f,  0.5f, 0.0f,        1.0f, 1.0f,            0.0f, 0.0f, 1.0f, // 2
-    -0.5f,  0.5f, 0.0f,        0.0f, 1.0f,            0.0f, 1.0f, 0.0f // 3
-  };
-
-  std::array index_buffer = {
-    0, 1, 2, 2, 3, 0
-  };
-
-
-  VertexArray v_arr;
-  VertexBuffer v_buff;
-  ElementBuffer e_buff;
-
-  glm::mat4 proj = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, -1.0f, 1.0f);
-  //glm::mat4 proj(1.f);
-  
-  v_arr.bind();
-
-  v_buff.bind(GL_ARRAY_BUFFER);
-  v_buff.set_data(GL_ARRAY_BUFFER, Hello_Triangle_Vertices, GL_STATIC_DRAW);
-
-  e_buff.bind();
-  e_buff.set_data(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
-
-  v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
-  v_arr.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 3 * sizeof(float));
-  v_arr.push_arrtib_pointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 5 * sizeof(float));
-
-  v_arr.enable(0);
-  v_arr.enable(1);
-  v_arr.enable(2);
-
-
-  std::string VertexShaderSource;
-  std::string FragmentShaderSource;
-
-  ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource);
-  ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource);
-
-  const char* v_src = VertexShaderSource.c_str();
-  const char* f_src = FragmentShaderSource.c_str();
-
-  ShaderVertex vertex_shader(&v_src);
-  ShaderFragment fragment_shader(&f_src);
-
-  ShaderProgram shader_program(vertex_shader, fragment_shader);
-
-  VALIDATE_GL_(glDeleteShader(vertex_shader.id()));
-  VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
-
-  shader_program.Bind();
-  Texture texture("Assets/hellotexture.png");
-  texture.Bind();
-  shader_program.SetUniform1i("u_Texture", 0);
-
-  float cameraA_x{};
-  float cameraA_y{};
-
-  float cameraB_x{};
-  float cameraB_y{};
 
 
   while (!glfwWindowShouldClose(window)) {
@@ -117,45 +57,9 @@ int main() {
 
     processInput(window);
 
-    VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
-    VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+    bg.ClearColor();
 
 
-    //VALIDATE_GL_(glUseProgram(shader_program.id()));
-    {
-      shader_program.Bind();
-
-
-      glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraA_x * 8.f, cameraA_y * 4.5f, 0.0f));
-
-      glm::mat4 mvp = proj * view;
-
-
-      shader_program.SetUniformMat4f("u_MVP", mvp);
-
-      v_arr.bind();
-
-      VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
-    }
-
-    {
-      shader_program.Bind();
-      glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraB_x * 8.f, cameraB_y * 4.5f, 0.0f));
-
-      glm::mat4 mvp = proj * view;
-
-
-      shader_program.SetUniformMat4f("u_MVP", mvp);
-      v_arr.bind();
-
-      VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
-    
-    }
-
-    
-    
-    
-    //VALIDATE_GL_(glBindVertexArray(v_arr.id()));
     
 
 
@@ -165,19 +69,7 @@ int main() {
 
     ImGui::Begin("Debug");
 
-    ImGui::SliderFloat("cameraA x", &cameraA_x, -1.f, 1.f);
-    ImGui::SliderFloat("cameraA y", &cameraA_y, -1.f, 1.f);
-
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
-
-
-    ImGui::SliderFloat("cameraB x", &cameraB_x, -1.f, 1.f);
-    ImGui::SliderFloat("cameraB y", &cameraB_y, -1.f, 1.f);
-
-
+    bg.OnImGuiRender();
     
     ImGui::End();
 
