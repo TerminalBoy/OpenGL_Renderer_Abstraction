@@ -36,8 +36,8 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-  test::TestClearColor bg(0.1f, 0.1f, 0.1f);
-
+  //test::TestClearColor bg(0.1f, 0.1f, 0.1f);
+  test::TestMultipleTexture mt;
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -57,8 +57,8 @@ int main() {
 
     processInput(window);
 
-    bg.ClearColor();
-
+    //bg.ClearColor();
+    mt.OnOpenGLRender();
 
     
 
@@ -69,8 +69,8 @@ int main() {
 
     ImGui::Begin("Debug");
 
-    bg.OnImGuiRender();
-    
+    //bg.OnImGuiRender();
+    mt.OnImGuiRender();
     ImGui::End();
 
     ImGui::Render();
