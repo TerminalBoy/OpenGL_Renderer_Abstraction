@@ -220,8 +220,8 @@ namespace test {
 
     {
 
-      std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
-      std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
+      //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
+      //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
 
 
       v_arr.bind();
@@ -245,11 +245,100 @@ namespace test {
     
     void OnOpenGLRender() {
 
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+
       shader_program.Bind();;
       v_arr.bind();
       VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 
       
+    }
+
+    void OnImGuiRender() {}
+
+  };
+
+  class TestTriangle {
+
+    std::array<float, 18> Hello_Triangle_Vertices = { // x,y,z,r,g,b
+     0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // 2
+    };
+
+    std::array<unsigned int, 3> index_buffer = {
+      0, 1, 2
+    };
+
+
+    VertexArray v_arr;
+    VertexBuffer v_buff;
+    ElementBuffer e_buff;
+
+
+    std::string VertexShaderSource;
+    std::string FragmentShaderSource;
+
+    bool VertexShaderSource_read_status;
+    bool FragmentShaderSource_read_status;
+
+    const char* v_src;
+    const char* f_src;
+
+    ShaderVertex vertex_shader;
+    ShaderFragment fragment_shader;
+
+    ShaderProgram shader_program;
+
+  public:
+
+    TestTriangle()
+      : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
+        FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
+
+        v_src(VertexShaderSource.c_str()),
+        f_src(FragmentShaderSource.c_str()),
+
+        vertex_shader(&v_src),
+        fragment_shader(&f_src),
+
+        shader_program(vertex_shader, fragment_shader)
+
+    {
+
+      //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
+      //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
+
+
+      v_arr.bind();
+
+      v_buff.bind(GL_ARRAY_BUFFER);
+      v_buff.set_data(GL_ARRAY_BUFFER, Hello_Triangle_Vertices, GL_STATIC_DRAW);
+
+      e_buff.bind();
+      e_buff.set_data(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
+
+      v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
+      v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 3 * sizeof(float));
+
+      v_arr.enable(0);
+      v_arr.enable(1);
+
+      VALIDATE_GL_(glDeleteShader(vertex_shader.id()));
+      VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
+
+    }
+
+    void OnOpenGLRender() {
+
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+      shader_program.Bind();;
+      v_arr.bind();
+      VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+
+
     }
 
     void OnImGuiRender() {}

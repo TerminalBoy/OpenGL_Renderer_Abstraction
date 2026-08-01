@@ -38,7 +38,8 @@ int main() {
 
   //test::TestClearColor bg(0.1f, 0.1f, 0.1f);
   //test::TestMultipleTexture mt;
-  test::TestRectangle rt;
+  //test::TestRectangle rt;
+  test::TestTriangle tr;
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -60,8 +61,8 @@ int main() {
 
     //bg.ClearColor();
     //mt.OnOpenGLRender();
-    rt.OnOpenGLRender();
-    
+    //rt.OnOpenGLRender();
+    tr.OnOpenGLRender();
 
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -72,7 +73,8 @@ int main() {
 
     //bg.OnImGuiRender();
     //mt.OnImGuiRender();
-    rt.OnImGuiRender();
+    //rt.OnImGuiRender();
+    tr.OnImGuiRender();
     ImGui::End();
 
     ImGui::Render();
