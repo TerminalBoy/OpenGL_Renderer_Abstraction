@@ -2,6 +2,8 @@
 #include <cstddef>
 #include <iostream>
 #include <imgui.h>
+#include <tuple>
+#include <utility>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include "Renderer/include/Renderer.hpp"
@@ -11,8 +13,8 @@ namespace test {
   class TestClearColor {
   public:
     float color[3];
-    
-    TestClearColor(float red, float green, float blue) 
+
+    TestClearColor(float red, float green, float blue)
       : color{ red, green, blue }
     {
 
@@ -60,7 +62,7 @@ namespace test {
 
     ShaderProgram shader_program;
     Texture texture;
-  public: 
+  public:
 
     TestMultipleTexture()
       : Hello_Triangle_Vertices{ // x,y,z,Tx,Ty,r,g,b
@@ -78,8 +80,8 @@ namespace test {
 
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource)),
-      
-      vertex_shader(&v_src), 
+
+      vertex_shader(&v_src),
       fragment_shader(&f_src),
 
       shader_program(vertex_shader, fragment_shader),
@@ -88,8 +90,8 @@ namespace test {
     {
 
 
-      std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
-      std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
+      //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
+      //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
 
 
       v_arr.bind();
@@ -107,13 +109,13 @@ namespace test {
       v_arr.enable(1);
       v_arr.enable(2);
 
-      
+
 
       VALIDATE_GL_(glDeleteShader(vertex_shader.id()));
       VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
 
       shader_program.Bind();
-      
+
       texture.Bind();
       shader_program.SetUniform1i("u_Texture", 0);
 
@@ -123,7 +125,7 @@ namespace test {
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
-      
+
       {
         shader_program.Bind();
 
@@ -172,7 +174,7 @@ namespace test {
   };
 
   class TestRectangle {
-    
+
     std::array<float, 24> Hello_Triangle_Vertices = { // x,y,z,r,g,b
     -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
      0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
@@ -188,11 +190,11 @@ namespace test {
     VertexArray v_arr;
     VertexBuffer v_buff;
     ElementBuffer e_buff;
-    
-    
+
+
     std::string VertexShaderSource;
     std::string FragmentShaderSource;
-    
+
     bool VertexShaderSource_read_status;
     bool FragmentShaderSource_read_status;
 
@@ -206,17 +208,17 @@ namespace test {
 
   public:
 
-    TestRectangle() 
+    TestRectangle()
       : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
-        FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
-        
-        v_src(VertexShaderSource.c_str()),
-        f_src(FragmentShaderSource.c_str()),
-         
-        vertex_shader(&v_src),
-        fragment_shader(&f_src),
+      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
 
-        shader_program(vertex_shader, fragment_shader)
+      v_src(VertexShaderSource.c_str()),
+      f_src(FragmentShaderSource.c_str()),
+
+      vertex_shader(&v_src),
+      fragment_shader(&f_src),
+
+      shader_program(vertex_shader, fragment_shader)
 
     {
 
@@ -237,12 +239,12 @@ namespace test {
 
       v_arr.enable(0);
       v_arr.enable(1);
-      
+
       VALIDATE_GL_(glDeleteShader(vertex_shader.id()));
       VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
 
     }
-    
+
     void OnOpenGLRender() {
 
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -252,7 +254,7 @@ namespace test {
       v_arr.bind();
       VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 
-      
+
     }
 
     void OnImGuiRender() {}
@@ -295,15 +297,15 @@ namespace test {
 
     TestTriangle()
       : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
-        FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
+      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
 
-        v_src(VertexShaderSource.c_str()),
-        f_src(FragmentShaderSource.c_str()),
+      v_src(VertexShaderSource.c_str()),
+      f_src(FragmentShaderSource.c_str()),
 
-        vertex_shader(&v_src),
-        fragment_shader(&f_src),
+      vertex_shader(&v_src),
+      fragment_shader(&f_src),
 
-        shader_program(vertex_shader, fragment_shader)
+      shader_program(vertex_shader, fragment_shader)
 
     {
 
@@ -345,5 +347,47 @@ namespace test {
 
   };
 
+  template <typename... Tests>
+  class TestMenu {
 
+    static_assert(sizeof...(Tests) != 0, "Cannot create a test menu with zero tests");
+
+    const std::size_t MenuHome{ std::numeric_limits<std::size_t>::max() };
+    std::size_t CurrentTest{ MenuHome };
+
+    std::tuple<Tests...> tests;
+
+
+    template <std::size_t... indexes>
+    void internal_OnOpenGLRender(std::index_sequence<indexes...>) {
+      ((CurrentTest == indexes ? std::get<indexes>(tests).OnOpenGLRender() : void()), ...);
+    }
+
+    template <std::size_t... indexes>
+    void internal_OnImGuiRender(std::index_sequence<indexes...>) {
+      ((CurrentTest == indexes ? std::get<indexes>(tests).OnImGuiRender() : void()), ...);
+    }
+      
+    public:
+    TestMenu() 
+    {
+      CurrentTest = 0;
+    }
+
+    void OnOpenGLRender() {
+      internal_OnOpenGLRender(std::index_sequence_for<Tests...>{});
+    }
+  
+    void OnImGuiRender() {
+      if (CurrentTest != MenuHome) {
+        if (ImGui::Button("< Back")) CurrentTest = MenuHome;
+        internal_OnImGuiRender(std::index_sequence_for<Tests...>{});
+      }
+      else {
+
+      }
+      
+    }
+
+  };
 }
