@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <iostream>
+#include <string>
 #include <imgui.h>
 #include <tuple>
 #include <utility>
@@ -11,6 +12,8 @@
 namespace test {
 
   class TestClearColor {
+    std::string NameString = "Clear Color";
+
   public:
     float color[3];
 
@@ -28,9 +31,15 @@ namespace test {
     void OnImGuiRender() {
       ImGui::ColorEdit3("Clear Color", color);
     }
+
+    std::string NameLableString() {
+      return NameString;
+    }
   };
 
   class TestMultipleTexture {
+
+    std::string NameString = "Multiple Textures";
 
     std::array<float, 32> Hello_Triangle_Vertices;
 
@@ -171,9 +180,16 @@ namespace test {
       ImGui::SliderFloat("cameraB x", &cameraB_x, -1.f, 1.f);
       ImGui::SliderFloat("cameraB y", &cameraB_y, -1.f, 1.f);
     }
+
+    std::string NameLableString() {
+      return NameString;
+    }
+
   };
 
   class TestRectangle {
+
+    std::string NameString = "Rectangle";
 
     std::array<float, 24> Hello_Triangle_Vertices = { // x,y,z,r,g,b
     -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
@@ -259,9 +275,15 @@ namespace test {
 
     void OnImGuiRender() {}
 
+    std::string NameLableString() {
+      return NameString;
+    }
+
   };
 
   class TestTriangle {
+
+    std::string NameString = "Triangle";
 
     std::array<float, 18> Hello_Triangle_Vertices = { // x,y,z,r,g,b
      0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
@@ -345,6 +367,10 @@ namespace test {
 
     void OnImGuiRender() {}
 
+    std::string NameLableString() {
+      return NameString;
+    }
+
   };
 
   template <typename... Tests>
@@ -367,24 +393,50 @@ namespace test {
     void internal_OnImGuiRender(std::index_sequence<indexes...>) {
       ((CurrentTest == indexes ? std::get<indexes>(tests).OnImGuiRender() : void()), ...);
     }
+    
+    template <std::size_t... indexes>
+    void internal_MenuRender(std::index_sequence<indexes...>) {
+      (
+        (
+          ImGui::Button(std::get<indexes>(tests).NameLableString().c_str())
+          ? (CurrentTest = indexes, void()) 
+          : void()
+        ), 
+        ...
+      );
+    }
+
+    void RenderMenu() {
+      internal_MenuRender(std::index_sequence_for<Tests...>{});
+    }
+
       
     public:
     TestMenu() 
     {
-      CurrentTest = 0;
+      //CurrentTest = 0;
     }
 
     void OnOpenGLRender() {
-      internal_OnOpenGLRender(std::index_sequence_for<Tests...>{});
+      if (CurrentTest != MenuHome) {
+        internal_OnOpenGLRender(std::index_sequence_for<Tests...>{});
+      }
+      else {
+        VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.f));
+        VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+
+      }
     }
   
+    
+
     void OnImGuiRender() {
       if (CurrentTest != MenuHome) {
         if (ImGui::Button("< Back")) CurrentTest = MenuHome;
         internal_OnImGuiRender(std::index_sequence_for<Tests...>{});
       }
       else {
-
+        RenderMenu();
       }
       
     }

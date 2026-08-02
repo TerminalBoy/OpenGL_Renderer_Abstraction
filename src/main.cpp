@@ -41,7 +41,7 @@ int main() {
   //test::TestRectangle rt;
   //test::TestTriangle tr;
 
-  test::TestMenu<test::TestMultipleTexture> menu;
+  test::TestMenu<test::TestMultipleTexture, test::TestTriangle> menu;
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -60,6 +60,7 @@ int main() {
 
 
     processInput(window);
+    
 
     //bg.ClearColor();
     //mt.OnOpenGLRender();
