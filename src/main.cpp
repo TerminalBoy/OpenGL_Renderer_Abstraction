@@ -41,7 +41,7 @@ int main() {
   //test::TestRectangle rt;
   //test::TestTriangle tr;
 
-  test::TestMenu<test::TestMultipleTexture, test::TestTriangle> menu;
+  test::TestMenu<test::TestMultipleTexture, test::TestTriangle, test::TestClearColor, test::TestRectangle> menu;
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();

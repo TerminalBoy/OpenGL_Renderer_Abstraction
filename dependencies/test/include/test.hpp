@@ -2,9 +2,11 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <imgui.h>
 #include <tuple>
 #include <utility>
+#include <optional>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include "Renderer/include/Renderer.hpp"
@@ -12,7 +14,12 @@
 namespace test {
 
   class TestClearColor {
-    std::string NameString = "Clear Color";
+  public:
+    static constexpr std::string_view NameString{ "Clear Color" };
+
+  private:
+
+
 
   public:
     float color[3];
@@ -23,7 +30,17 @@ namespace test {
 
     }
 
-    void ClearColor() {
+    TestClearColor()
+      : color{ 0.5f, 0.5f, 0.5f }
+    {
+      std::cout << "TestClearColor constructed \n";
+    }
+
+    ~TestClearColor() {
+      std::cout << "TestClearColor Destructed \n";
+    }
+
+    void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(color[0], color[1], color[2], 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
     }
@@ -32,15 +49,13 @@ namespace test {
       ImGui::ColorEdit3("Clear Color", color);
     }
 
-    std::string NameLableString() {
-      return NameString;
-    }
+    
   };
 
   class TestMultipleTexture {
-
-    std::string NameString = "Multiple Textures";
-
+  public:
+    static constexpr std::string_view NameString{ "Multiple Textures" };
+  private:
     std::array<float, 32> Hello_Triangle_Vertices;
 
     std::array<int, 6> index_buffer;
@@ -97,7 +112,7 @@ namespace test {
       texture("Assets/hellotexture.png")
 
     {
-
+      std::cout << "TestMultipleTexture constructed \n";
 
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
@@ -129,6 +144,10 @@ namespace test {
       shader_program.SetUniform1i("u_Texture", 0);
 
 
+    }
+
+    ~TestMultipleTexture() {
+      std::cout << "TestMultipleTexture Deconstructed \n";
     }
 
     void OnOpenGLRender() {
@@ -181,16 +200,14 @@ namespace test {
       ImGui::SliderFloat("cameraB y", &cameraB_y, -1.f, 1.f);
     }
 
-    std::string NameLableString() {
-      return NameString;
-    }
+    
 
   };
 
   class TestRectangle {
-
-    std::string NameString = "Rectangle";
-
+  public:
+    static constexpr std::string_view NameString{ "Rectangle" };
+  private:
     std::array<float, 24> Hello_Triangle_Vertices = { // x,y,z,r,g,b
     -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
      0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
@@ -237,7 +254,7 @@ namespace test {
       shader_program(vertex_shader, fragment_shader)
 
     {
-
+      std::cout << "TestRectangle constructed \n";
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
 
@@ -261,6 +278,10 @@ namespace test {
 
     }
 
+    ~TestRectangle() {
+      std::cout << "TestRectangle Destructed \n";
+    }
+
     void OnOpenGLRender() {
 
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -275,16 +296,14 @@ namespace test {
 
     void OnImGuiRender() {}
 
-    std::string NameLableString() {
-      return NameString;
-    }
 
   };
 
   class TestTriangle {
-
-    std::string NameString = "Triangle";
-
+  public:
+    static constexpr std::string_view NameString{ "Triangle" };
+  
+  private:
     std::array<float, 18> Hello_Triangle_Vertices = { // x,y,z,r,g,b
      0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
      0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
@@ -333,6 +352,7 @@ namespace test {
 
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
+      std::cout << "TestTriangle constructed \n";
 
 
       v_arr.bind();
@@ -353,6 +373,10 @@ namespace test {
       VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
 
     }
+    
+    ~TestTriangle() {
+      std::cout << "TestTriangle Destructed \n";
+    }
 
     void OnOpenGLRender() {
 
@@ -367,9 +391,6 @@ namespace test {
 
     void OnImGuiRender() {}
 
-    std::string NameLableString() {
-      return NameString;
-    }
 
   };
 
@@ -381,25 +402,25 @@ namespace test {
     const std::size_t MenuHome{ std::numeric_limits<std::size_t>::max() };
     std::size_t CurrentTest{ MenuHome };
 
-    std::tuple<Tests...> tests;
+    std::tuple<std::optional<Tests>...> tests;
 
 
     template <std::size_t... indexes>
     void internal_OnOpenGLRender(std::index_sequence<indexes...>) {
-      ((CurrentTest == indexes ? std::get<indexes>(tests).OnOpenGLRender() : void()), ...);
+      ((CurrentTest == indexes ? std::get<indexes>(tests)->OnOpenGLRender() : void()), ...);
     }
 
     template <std::size_t... indexes>
     void internal_OnImGuiRender(std::index_sequence<indexes...>) {
-      ((CurrentTest == indexes ? std::get<indexes>(tests).OnImGuiRender() : void()), ...);
+      ((CurrentTest == indexes ? std::get<indexes>(tests)->OnImGuiRender() : void()), ...);
     }
     
     template <std::size_t... indexes>
     void internal_MenuRender(std::index_sequence<indexes...>) {
       (
         (
-          ImGui::Button(std::get<indexes>(tests).NameLableString().c_str())
-          ? (CurrentTest = indexes, void()) 
+          ImGui::Button(Tests::NameString.data())
+          ? (CurrentTest = indexes, std::get<indexes>(tests).emplace(), void())
           : void()
         ), 
         ...
@@ -408,6 +429,18 @@ namespace test {
 
     void RenderMenu() {
       internal_MenuRender(std::index_sequence_for<Tests...>{});
+    }
+
+    template <std::size_t... indexes>
+    void internal_current_obj_destruction(std::index_sequence<indexes...>) {
+      (
+        (
+          CurrentTest == indexes
+          ? (std::get<indexes>(tests).reset(), void())
+          : void()
+          ),
+        ...
+        );
     }
 
       
@@ -432,7 +465,12 @@ namespace test {
 
     void OnImGuiRender() {
       if (CurrentTest != MenuHome) {
-        if (ImGui::Button("< Back")) CurrentTest = MenuHome;
+        if (ImGui::Button("< Back")) { 
+          
+           
+          internal_current_obj_destruction(std::index_sequence_for<Tests...>{});
+          CurrentTest = MenuHome;
+        }
         internal_OnImGuiRender(std::index_sequence_for<Tests...>{});
       }
       else {
