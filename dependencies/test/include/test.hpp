@@ -501,10 +501,12 @@ namespace test {
       {
         shader_program.Bind();
 
-
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 
-        glm::mat4 mvp = proj * view;
+        glm::mat4 mvp = proj * view * model;
 
 
         shader_program.SetUniformMat4f("u_MVP", mvp);
@@ -516,17 +518,7 @@ namespace test {
     }
 
     void OnImGuiRender() {
-      ImGui::SliderFloat("cameraA x", &cameraA_x, -1.f, 1.f);
-      ImGui::SliderFloat("cameraA y", &cameraA_y, -1.f, 1.f);
-
-      ImGui::Spacing();
-      ImGui::Spacing();
-      ImGui::Spacing();
-      ImGui::Spacing();
-
-
-      ImGui::SliderFloat("cameraB x", &cameraB_x, -1.f, 1.f);
-      ImGui::SliderFloat("cameraB y", &cameraB_y, -1.f, 1.f);
+      
     }
 
 
