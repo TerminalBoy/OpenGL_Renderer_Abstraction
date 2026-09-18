@@ -27,10 +27,15 @@ int main() {
   }
   glfwMakeContextCurrent(window);
 
+
+
+
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cout << "Failed to oinitialize GLAD\n";
     return -1;
   }
+
+  VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
   glViewport(0, 0, 1600, 900);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);

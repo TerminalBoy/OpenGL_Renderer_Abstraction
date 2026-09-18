@@ -49,7 +49,7 @@ namespace test {
       ImGui::ColorEdit3("Clear Color", color);
     }
 
-    
+
   };
 
   class TestMultipleTexture {
@@ -200,7 +200,7 @@ namespace test {
       ImGui::SliderFloat("cameraB y", &cameraB_y, -1.f, 1.f);
     }
 
-    
+
 
   };
 
@@ -302,7 +302,7 @@ namespace test {
   class TestTriangle {
   public:
     static constexpr std::string_view NameString{ "Triangle" };
-  
+
   private:
     std::array<float, 18> Hello_Triangle_Vertices = { // x,y,z,r,g,b
      0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
@@ -373,7 +373,7 @@ namespace test {
       VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
 
     }
-    
+
     ~TestTriangle() {
       std::cout << "TestTriangle Destructed \n";
     }
@@ -381,7 +381,7 @@ namespace test {
     void OnOpenGLRender() {
 
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
-      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
       shader_program.Bind();;
       v_arr.bind();
       VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
@@ -399,7 +399,50 @@ namespace test {
   public:
     static constexpr std::string_view NameString{ "3D Cube" };
   private:
-    std::array<float, 32> Hello_Triangle_Vertices;
+    std::array<float, 180> Hello_Triangle_Vertices
+
+    {
+
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
+
+
+
+    };
 
     std::array<int, 6> index_buffer;
 
@@ -432,12 +475,7 @@ namespace test {
   public:
 
     Test3DCube()
-      : Hello_Triangle_Vertices{ // x,y,z,Tx,Ty,r,g,b
-     -0.5f, -0.5f, 0.0f,        0.0f, 0.0f,            1.0f, 0.0f, 0.0f, // 0
-      0.5f, -0.5f, 0.0f,        1.0f, 0.0f,            0.0f, 1.0f, 0.0f, // 1
-      0.5f,  0.5f, 0.0f,        1.0f, 1.0f,            0.0f, 0.0f, 1.0f, // 2
-     -0.5f,  0.5f, 0.0f,        0.0f, 1.0f,            0.0f, 1.0f, 0.0f // 3
-      },
+      :
 
       index_buffer{
       0, 1, 2, 2, 3, 0
@@ -466,16 +504,16 @@ namespace test {
       v_buff.bind(GL_ARRAY_BUFFER);
       v_buff.set_data(GL_ARRAY_BUFFER, Hello_Triangle_Vertices, GL_STATIC_DRAW);
 
-      e_buff.bind();
-      e_buff.set_data(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
+      //e_buff.bind();
+      //e_buff.set_data(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
 
-      v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
-      v_arr.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 3 * sizeof(float));
-      v_arr.push_arrtib_pointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 5 * sizeof(float));
+      v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+      v_arr.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 3 * sizeof(float));
+      v_arr.push_arrtib_pointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 5 * sizeof(float));
 
       v_arr.enable(0);
       v_arr.enable(1);
-      v_arr.enable(2);
+      //v_arr.enable(2);
 
 
 
@@ -496,14 +534,18 @@ namespace test {
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
-      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
 
       {
         shader_program.Bind();
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        
+       // model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        model = glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f),
+          glm::vec3(0.5f, 1.0f, 0.0f));
+
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 
         glm::mat4 mvp = proj * view * model;
@@ -513,12 +555,12 @@ namespace test {
 
         v_arr.bind();
 
-        VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
       }
     }
 
     void OnImGuiRender() {
-      
+
     }
 
 
@@ -546,7 +588,7 @@ namespace test {
     void internal_OnImGuiRender(std::index_sequence<indexes...>) {
       ((CurrentTest == indexes ? std::get<indexes>(tests)->OnImGuiRender() : void()), ...);
     }
-    
+
     template <std::size_t... indexes>
     void internal_MenuRender(std::index_sequence<indexes...>) {
       (
@@ -554,9 +596,9 @@ namespace test {
           ImGui::Button(Tests::NameString.data())
           ? (CurrentTest = indexes, std::get<indexes>(tests).emplace(), void())
           : void()
-        ), 
+          ),
         ...
-      );
+        );
     }
 
     void RenderMenu() {
@@ -575,9 +617,9 @@ namespace test {
         );
     }
 
-      
-    public:
-    TestMenu() 
+
+  public:
+    TestMenu()
     {
       //CurrentTest = 0;
     }
@@ -588,18 +630,18 @@ namespace test {
       }
       else {
         VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.f));
-        VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT));
+        VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
       }
     }
-  
-    
+
+
 
     void OnImGuiRender() {
       if (CurrentTest != MenuHome) {
-        if (ImGui::Button("< Back")) { 
-          
-           
+        if (ImGui::Button("< Back")) {
+
+
           internal_current_obj_destruction(std::index_sequence_for<Tests...>{});
           CurrentTest = MenuHome;
         }
@@ -608,7 +650,7 @@ namespace test {
       else {
         RenderMenu();
       }
-      
+
     }
 
   };
