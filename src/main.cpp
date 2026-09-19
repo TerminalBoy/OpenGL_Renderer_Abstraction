@@ -52,7 +52,8 @@ int main() {
     test::TestTriangle, 
     test::TestClearColor, 
     test::TestRectangle,
-    test::Test3DCube
+    test::Test3DCube,
+    test::TestMultiple3DCube
     > 
     menu;
 
