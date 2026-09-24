@@ -1004,7 +1004,8 @@ namespace test {
     }
 
     void OnImGuiRender() {
-
+      ImGui::Text("Use WASD keys to move the camera...");
+      ImGui::Text("Rotating not yet added");
     }
 
 
