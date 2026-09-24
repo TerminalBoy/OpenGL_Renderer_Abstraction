@@ -40,6 +40,8 @@ namespace test {
       std::cout << "TestClearColor Destructed \n";
     }
 
+    void processInput(GLFWwindow* window) {}
+
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(color[0], color[1], color[2], 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -49,6 +51,7 @@ namespace test {
     void OnImGuiRender() {
       ImGui::ColorEdit3("Clear Color", color);
     }
+
 
 
   };
@@ -150,6 +153,8 @@ namespace test {
     ~TestMultipleTexture() {
       std::cout << "TestMultipleTexture Deconstructed \n";
     }
+
+    void processInput(GLFWwindow* window) {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -283,6 +288,8 @@ namespace test {
       std::cout << "TestRectangle Destructed \n";
     }
 
+    void processInput(GLFWwindow* window) {}
+
     void OnOpenGLRender() {
 
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -379,6 +386,8 @@ namespace test {
     ~TestTriangle() {
       std::cout << "TestTriangle Destructed \n";
     }
+
+    void processInput(GLFWwindow* window) {}
 
     void OnOpenGLRender() {
 
@@ -533,6 +542,8 @@ namespace test {
     ~Test3DCube() {
       std::cout << NameString << " Deconstructed \n";
     }
+
+    void processInput(GLFWwindow* window) {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -733,6 +744,8 @@ namespace test {
       std::cout << NameString << " Deconstructed \n";
     }
 
+    void processInput(GLFWwindow* window) {}
+
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -784,6 +797,223 @@ namespace test {
 
 
 
+
+
+
+  class TestWalkAround_Multiple3DCube {
+  public:
+    static constexpr std::string_view NameString{ "Walk Around Multiple 3D Cube" };
+  private:
+    std::array<float, 180> Hello_Triangle_Vertices
+
+    {
+
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
+
+
+
+    };
+    // translations
+    glm::vec3 cubePositions[10] = {
+      glm::vec3(0.0f, 0.0f, 0.0f),
+      glm::vec3(2.0f, 5.0f, -15.0f),
+      glm::vec3(-1.5f, -2.2f, -2.5f),
+      glm::vec3(-3.8f, -2.0f, -12.3f),
+      glm::vec3(2.4f, -0.4f, -3.5f),
+      glm::vec3(-1.7f, 3.0f, -7.5f),
+      glm::vec3(1.3f, -2.0f, -2.5f),
+      glm::vec3(1.5f, 2.0f, -2.5f),
+      glm::vec3(1.5f, 0.2f, -1.5f),
+      glm::vec3(-1.3f, 1.0f, -1.5f)
+    };
+
+    std::array<int, 6> index_buffer;
+
+    glm::mat4 proj;
+
+    std::string VertexShaderSource;
+    std::string FragmentShaderSource;
+
+    bool VertexShaderSource_read_status;
+    bool FragmentShaderSource_read_status;
+
+    const char* v_src = VertexShaderSource.c_str();
+    const char* f_src = FragmentShaderSource.c_str();
+
+    ShaderVertex vertex_shader;
+    ShaderFragment fragment_shader;
+
+    VertexArray v_arr;
+    VertexBuffer v_buff;
+    ElementBuffer e_buff;
+
+    
+    ShaderProgram shader_program;
+    Texture texture;
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+  public:
+
+    TestWalkAround_Multiple3DCube()
+      :
+
+      index_buffer{
+      0, 1, 2, 2, 3, 0
+      },
+
+      proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
+
+      VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource)),
+      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource)),
+
+      vertex_shader(&v_src),
+      fragment_shader(&f_src),
+
+      shader_program(vertex_shader, fragment_shader),
+      texture("Assets/hellotexture.png")
+
+    {
+      //std::cout << "TestMultipleTexture constructed \n";
+      std::cout << NameString << " Constructed \n";
+
+      //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
+      //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
+
+
+      v_arr.bind();
+      v_buff.bind(GL_ARRAY_BUFFER);
+      v_buff.set_data(GL_ARRAY_BUFFER, Hello_Triangle_Vertices, GL_STATIC_DRAW);
+
+      //e_buff.bind();
+      //e_buff.set_data(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
+
+      v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+      v_arr.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 3 * sizeof(float));
+      v_arr.push_arrtib_pointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 5 * sizeof(float));
+
+      v_arr.enable(0);
+      v_arr.enable(1);
+      //v_arr.enable(2);
+
+
+
+      VALIDATE_GL_(glDeleteShader(vertex_shader.id()));
+      VALIDATE_GL_(glDeleteShader(fragment_shader.id()));
+
+      shader_program.Bind();
+
+      texture.Bind();
+      shader_program.SetUniform1i("u_Texture", 0);
+
+
+    }
+
+    ~TestWalkAround_Multiple3DCube() {
+      std::cout << NameString << " Deconstructed \n";
+    }
+
+    void processInput(GLFWwindow* window) {
+      const float cameraSpeed = 0.05f; // adjust accordingly
+      if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+      if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+      if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) *
+        cameraSpeed;
+      if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) *
+        cameraSpeed;
+
+    }
+
+    void OnOpenGLRender() {
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+
+
+      shader_program.Bind();
+
+      v_arr.bind();
+
+      for (unsigned int i = 0; i < 10; i++)
+      {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+
+        float angle = 20.0f * i;
+
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        //model = glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.f), glm::vec3(0.5f, 1.0f, 0.8f));
+
+        //glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+        
+        glm::mat4 view;
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+        glm::mat4 mvp = proj * view * model;
+
+
+        shader_program.SetUniformMat4f("u_MVP", mvp);
+
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
+      }
+
+
+      //VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
+
+    }
+
+    void OnImGuiRender() {
+
+    }
+
+
+
+  };
+
+
+
+
   template <typename... Tests>
   class TestMenu {
 
@@ -803,6 +1033,11 @@ namespace test {
     template <std::size_t... indexes>
     void internal_OnImGuiRender(std::index_sequence<indexes...>) {
       ((CurrentTest == indexes ? std::get<indexes>(tests)->OnImGuiRender() : void()), ...);
+    }
+
+    template <std::size_t... indexes>
+    void internal_processInput(std::index_sequence<indexes...>, GLFWwindow* window) {
+      ((CurrentTest == indexes ? std::get<indexes>(tests)->processInput(window) : void()), ...);
     }
 
     template <std::size_t... indexes>
@@ -867,6 +1102,18 @@ namespace test {
         RenderMenu();
       }
 
+    }
+
+
+    void processInput(GLFWwindow* window) {
+      if (CurrentTest != MenuHome) {
+        internal_processInput(std::index_sequence_for<Tests...>{}, window);
+      }
+      else {
+        VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.f));
+        VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+      }
     }
 
   };

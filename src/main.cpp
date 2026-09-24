@@ -53,7 +53,8 @@ int main() {
     test::TestClearColor, 
     test::TestRectangle,
     test::Test3DCube,
-    test::TestMultiple3DCube
+    test::TestMultiple3DCube,
+    test::TestWalkAround_Multiple3DCube
     > 
     menu;
 
@@ -75,7 +76,7 @@ int main() {
 
     processInput(window);
     
-
+    menu.processInput(window);
     //bg.ClearColor();
     //mt.OnOpenGLRender();
     //rt.OnOpenGLRender();
