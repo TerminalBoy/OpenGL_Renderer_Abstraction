@@ -890,6 +890,9 @@ namespace test {
     glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+    float deltaTime{};
+    float lastFrame{};
+
   public:
 
     TestWalkAround_Multiple3DCube()
@@ -951,7 +954,7 @@ namespace test {
     }
 
     void processInput(GLFWwindow* window) {
-      const float cameraSpeed = 0.05f; // adjust accordingly
+      const float cameraSpeed = deltaTime * 3.0f; // adjust accordingly
       if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
       if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -966,6 +969,10 @@ namespace test {
     }
 
     void OnOpenGLRender() {
+      float currentFrame = glfwGetTime();
+      deltaTime = currentFrame - lastFrame;
+      lastFrame = currentFrame;
+
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
