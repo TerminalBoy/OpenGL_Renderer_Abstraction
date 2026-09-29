@@ -33,7 +33,9 @@ void log_gl_errors(const char* expression, std::size_t line, const char* file_na
 
   }
 
-  if (loop_ran) __debugbreak(); // some opengl error occured // check call stack and terminal
+  if (loop_ran) void(); // [!!!!! CRITICAL !!!!!] 
+  //PLEASE ADD A DEBUG BREAK, MAY BE A MACRO FOR DIFFERNT COMPILERS 
+  // some opengl error occured // check call stack and terminal
 }
 
 #define VALIDATE_GL_(expr_gl) do {                             \

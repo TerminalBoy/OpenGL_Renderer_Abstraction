@@ -9,7 +9,7 @@
 #include <optional>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include "Renderer/include/Renderer.hpp"
+#include "../../../src/Renderer/include/Renderer.hpp"
 
 namespace test {
 

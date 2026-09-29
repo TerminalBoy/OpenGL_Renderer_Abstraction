@@ -16,3 +16,4 @@ imgui.ini
 !/Visual_Studio_Files/**/*.slnx 
 !/Visual_Studio_Files/**/*.vcxproj 
 !/Visual_Studio_Files/**/*.vcxproj.filters 
+/build/**
