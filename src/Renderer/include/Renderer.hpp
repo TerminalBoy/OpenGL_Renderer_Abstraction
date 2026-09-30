@@ -48,10 +48,53 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+  
+  if (firstmouse){
+    lastX = xpos;
+    lastY = ypos;
+    firstmouse = false;
+    return;
   }
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos; // reversed: y ranges bottom to top
+  lastX = xpos;
+  lastY = ypos;
+  const float sensitivity = 0.08f;
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
+
+  yaw += xoffset;
+  pitch += yoffset;
+  if(pitch > 89.0f)
+  pitch = 89.0f;
+  if(pitch < -89.0f)
+  pitch = -89.0f;
+  //========================
+  std::cout << "Pitch: " << pitch << std::endl;
+  std::cout << "Yaw  : " << yaw << std::endl;
+
+
+}
+
+void SetCameraMode(GLFWwindow* window, bool CameraMode){
+
+  if(CameraMode){
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    firstmouse = true;
+  }
+  else {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+  }
+
+}
+
+void processInput(GLFWwindow* window) {
+  //if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    //glfwSetWindowShouldClose(window, true);
+  //}
 }
 
 unsigned int CreateShader(unsigned int shader_type_gl, char const* const* const shader_src_string_array, unsigned int src_count) {

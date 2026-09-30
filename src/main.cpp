@@ -1,3 +1,9 @@
+float pitch{};
+float yaw{-90.f};
+float lastX = 800;
+float lastY = 450;
+bool firstmouse = false;
+
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +18,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include "../dependencies/test/include/test.hpp"
 
+// gloabal temporarily, ill come up with a solution soon
  
 int main() {
   glfwInit();
@@ -27,7 +34,8 @@ int main() {
   }
   glfwMakeContextCurrent(window);
 
-
+  glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // capture mouse inputs, dont show the cursor
 
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -56,7 +64,7 @@ int main() {
     test::TestMultiple3DCube,
     test::TestWalkAround_Multiple3DCube
     > 
-    menu;
+    menu(window);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -68,15 +76,14 @@ int main() {
   ImGui_ImplOpenGL3_Init("#version 330");
 
 
-
-
+  
   while (!glfwWindowShouldClose(window)) {
 
 
 
     processInput(window);
     
-    menu.processInput(window);
+    menu.processInput();
     //bg.ClearColor();
     //mt.OnOpenGLRender();
     //rt.OnOpenGLRender();

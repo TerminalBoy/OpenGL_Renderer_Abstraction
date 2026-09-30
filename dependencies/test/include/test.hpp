@@ -30,7 +30,7 @@ namespace test {
 
     }
 
-    TestClearColor()
+    TestClearColor(GLFWwindow* window)
       : color{ 0.5f, 0.5f, 0.5f }
     {
       std::cout << "TestClearColor constructed \n";
@@ -40,7 +40,7 @@ namespace test {
       std::cout << "TestClearColor Destructed \n";
     }
 
-    void processInput(GLFWwindow* window) {}
+    void processInput() {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(color[0], color[1], color[2], 0.1f));
@@ -92,7 +92,7 @@ namespace test {
     Texture texture;
   public:
 
-    TestMultipleTexture()
+    TestMultipleTexture(GLFWwindow* window)
       : Hello_Triangle_Vertices{ // x,y,z,Tx,Ty,r,g,b
      -0.5f, -0.5f, 0.0f,        0.0f, 0.0f,            1.0f, 0.0f, 0.0f, // 0
       0.5f, -0.5f, 0.0f,        1.0f, 0.0f,            0.0f, 1.0f, 0.0f, // 1
@@ -154,7 +154,7 @@ namespace test {
       std::cout << "TestMultipleTexture Deconstructed \n";
     }
 
-    void processInput(GLFWwindow* window) {}
+    void processInput() {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -247,7 +247,7 @@ namespace test {
 
   public:
 
-    TestRectangle()
+    TestRectangle(GLFWwindow* window)
       : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
 
@@ -288,7 +288,7 @@ namespace test {
       std::cout << "TestRectangle Destructed \n";
     }
 
-    void processInput(GLFWwindow* window) {}
+    void processInput() {}
 
     void OnOpenGLRender() {
 
@@ -345,7 +345,7 @@ namespace test {
 
   public:
 
-    TestTriangle()
+    TestTriangle(GLFWwindow* window)
       : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
 
@@ -387,7 +387,7 @@ namespace test {
       std::cout << "TestTriangle Destructed \n";
     }
 
-    void processInput(GLFWwindow* window) {}
+    void processInput() {}
 
     void OnOpenGLRender() {
 
@@ -485,7 +485,7 @@ namespace test {
     Texture texture;
   public:
 
-    Test3DCube()
+    Test3DCube(GLFWwindow* window)
       :
 
       index_buffer{
@@ -543,7 +543,7 @@ namespace test {
       std::cout << NameString << " Deconstructed \n";
     }
 
-    void processInput(GLFWwindow* window) {}
+    void processInput() {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -686,7 +686,7 @@ namespace test {
 
   public:
 
-    TestMultiple3DCube()
+    TestMultiple3DCube(GLFWwindow* window)
       :
 
       index_buffer{
@@ -744,7 +744,7 @@ namespace test {
       std::cout << NameString << " Deconstructed \n";
     }
 
-    void processInput(GLFWwindow* window) {}
+    void processInput() {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -804,6 +804,9 @@ namespace test {
   public:
     static constexpr std::string_view NameString{ "Walk Around Multiple 3D Cube" };
   private:
+
+    GLFWwindow* glfw_window = nullptr;
+
     std::array<float, 180> Hello_Triangle_Vertices
 
     {
@@ -895,8 +898,9 @@ namespace test {
 
   public:
 
-    TestWalkAround_Multiple3DCube()
+    TestWalkAround_Multiple3DCube(GLFWwindow* window)
       :
+      glfw_window(window),
 
       index_buffer{
       0, 1, 2, 2, 3, 0
@@ -919,7 +923,7 @@ namespace test {
 
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
-
+      SetCameraMode(glfw_window, true);
 
       v_arr.bind();
       v_buff.bind(GL_ARRAY_BUFFER);
@@ -950,22 +954,29 @@ namespace test {
     }
 
     ~TestWalkAround_Multiple3DCube() {
+      SetCameraMode(glfw_window, false);
       std::cout << NameString << " Deconstructed \n";
     }
 
-    void processInput(GLFWwindow* window) {
+    void processInput() {
       const float cameraSpeed = deltaTime * 3.0f; // adjust accordingly
-      if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+      if (glfwGetKey(glfw_window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
-      if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+      if (glfwGetKey(glfw_window, GLFW_KEY_S) == GLFW_PRESS)
         cameraPos -= cameraSpeed * cameraFront;
-      if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) *
-        cameraSpeed;
-      if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) *
-        cameraSpeed;
+      if (glfwGetKey(glfw_window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+      if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+      if (glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        SetCameraMode(glfw_window, false);
 
+
+        glm::vec3 direction;
+        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.y = sin(glm::radians(pitch));
+        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        cameraFront = glm::normalize(direction);
     }
 
     void OnOpenGLRender() {
@@ -1012,9 +1023,12 @@ namespace test {
 
     void OnImGuiRender() {
       ImGui::Text("Use WASD keys to move the camera...");
-      ImGui::Text("Rotating not yet added");
+      ImGui::Text("Move mouse to rotate camera");
+      ImGui::Spacing();
+      ImGui::Text("Press ESC to disable camera and enable mouse");
     }
 
+    
 
 
   };
@@ -1024,6 +1038,8 @@ namespace test {
 
   template <typename... Tests>
   class TestMenu {
+
+    GLFWwindow* window = nullptr;
 
     static_assert(sizeof...(Tests) != 0, "Cannot create a test menu with zero tests");
 
@@ -1044,8 +1060,8 @@ namespace test {
     }
 
     template <std::size_t... indexes>
-    void internal_processInput(std::index_sequence<indexes...>, GLFWwindow* window) {
-      ((CurrentTest == indexes ? std::get<indexes>(tests)->processInput(window) : void()), ...);
+    void internal_processInput(std::index_sequence<indexes...>) {
+      ((CurrentTest == indexes ? std::get<indexes>(tests)->processInput() : void()), ...);
     }
 
     template <std::size_t... indexes>
@@ -1053,7 +1069,7 @@ namespace test {
       (
         (
           ImGui::Button(Tests::NameString.data())
-          ? (CurrentTest = indexes, std::get<indexes>(tests).emplace(), void())
+          ? (CurrentTest = indexes, std::get<indexes>(tests).emplace(window), void())
           : void()
           ),
         ...
@@ -1078,7 +1094,8 @@ namespace test {
 
 
   public:
-    TestMenu()
+    TestMenu(GLFWwindow* window)
+    : window(window)
     {
       //CurrentTest = 0;
     }
@@ -1113,9 +1130,9 @@ namespace test {
     }
 
 
-    void processInput(GLFWwindow* window) {
+    void processInput() {
       if (CurrentTest != MenuHome) {
-        internal_processInput(std::index_sequence_for<Tests...>{}, window);
+        internal_processInput(std::index_sequence_for<Tests...>{});
       }
       else {
         VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.f));
