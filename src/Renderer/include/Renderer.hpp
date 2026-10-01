@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
+
 void clear_gl_errors() {
   while (glGetError() != GL_NO_ERROR) {}
 }
@@ -44,13 +45,34 @@ expr_gl;                                                       \
 log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 } while(0)
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-  glViewport(0, 0, width, height);
-}
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
-  
-  if (firstmouse){
+
+class Camera {
+  GLFWwindow* window;
+  public:
+  float pitch{};
+  float yaw{-90.f};
+  float lastX;
+  float lastY;
+
+  bool firstmouse = false;
+
+  Camera(GLFWwindow* window)
+  : window(window)
+  {
+    int window_width{};
+    int window_height{};
+
+    glfwGetWindowSize(window, &window_width, &window_height);
+
+    lastX = static_cast<float>(window_width) / 2.f;
+    lastY = static_cast<float>(window_height) / 2.f;
+
+  }
+
+  void ProcessInput(double xpos, double ypos){
+
+    if (firstmouse){
     lastX = xpos;
     lastY = ypos;
     firstmouse = false;
@@ -71,25 +93,67 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
   pitch = 89.0f;
   if(pitch < -89.0f)
   pitch = -89.0f;
-  //========================
-  std::cout << "Pitch: " << pitch << std::endl;
-  std::cout << "Yaw  : " << yaw << std::endl;
 
+  }
 
-}
-
-void SetCameraMode(GLFWwindow* window, bool CameraMode){
-
-  if(CameraMode){
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  void SetCameraEnabled(){
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // disabling cursor... not camera
     firstmouse = true;
   }
-  else {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+  void SetCameraDisabled(){
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    firstmouse = false; // only set to false for understanding and clarity
+    // is set to false by mouse_callback
   }
 
+
+
+};
+
+
+
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+  glViewport(0, 0, width, height);
 }
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+  
+
+
+  static_cast<Camera*>(glfwGetWindowUserPointer(window))->ProcessInput(xpos, ypos);
+
+
+  // if (firstmouse){
+  //   lastX = xpos;
+  //   lastY = ypos;
+  //   firstmouse = false;
+  //   return;
+  // }
+
+  // float xoffset = xpos - lastX;
+  // float yoffset = lastY - ypos; // reversed: y ranges bottom to top
+  // lastX = xpos;
+  // lastY = ypos;
+  // const float sensitivity = 0.08f;
+  // xoffset *= sensitivity;
+  // yoffset *= sensitivity;
+
+  // yaw += xoffset;
+  // pitch += yoffset;
+  // if(pitch > 89.0f)
+  // pitch = 89.0f;
+  // if(pitch < -89.0f)
+  // pitch = -89.0f;
+  // //========================
+  // std::cout << "Pitch: " << pitch << std::endl;
+  // std::cout << "Yaw  : " << yaw << std::endl;
+
+
+}
+
+
 
 void processInput(GLFWwindow* window) {
   //if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

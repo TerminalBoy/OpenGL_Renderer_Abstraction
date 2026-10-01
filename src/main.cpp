@@ -1,8 +1,8 @@
-float pitch{};
-float yaw{-90.f};
-float lastX = 800;
-float lastY = 450;
-bool firstmouse = false;
+// float pitch{};
+// float yaw{-90.f};
+// float lastX = 800;
+// float lastY = 450;
+// bool firstmouse = false;
 
 #include <iostream>
 #include <glad/glad.h>
@@ -53,6 +53,9 @@ int main() {
   //test::TestMultipleTexture mt;
   //test::TestRectangle rt;
   //test::TestTriangle tr;
+  Camera camera(window);
+  
+  glfwSetWindowUserPointer(window, &camera); // met glfw know the camera object
 
   test::TestMenu
     <
@@ -64,7 +67,7 @@ int main() {
     test::TestMultiple3DCube,
     test::TestWalkAround_Multiple3DCube
     > 
-    menu(window);
+    menu(window, camera);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
