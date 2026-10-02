@@ -21,6 +21,7 @@
 // gloabal temporarily, ill come up with a solution soon
  
 int main() {
+  { // code block so glfw clears its internal stack, and manage resources // absence of this causes segfaults
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -119,7 +120,8 @@ int main() {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
-
+  
+  } // end of glfw code block
   glfwTerminate();
   return 0;
 }

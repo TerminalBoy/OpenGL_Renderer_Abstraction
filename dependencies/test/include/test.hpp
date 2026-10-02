@@ -40,7 +40,7 @@ namespace test {
       std::cout << "TestClearColor Destructed \n";
     }
 
-    void processInput() {}
+    //void processInput() {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(color[0], color[1], color[2], 0.1f));
@@ -543,7 +543,7 @@ namespace test {
       std::cout << NameString << " Deconstructed \n";
     }
 
-    void processInput() {}
+    //void processInput() {}
 
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
@@ -1058,17 +1058,66 @@ namespace test {
 
     template <std::size_t... indexes>
     void internal_OnOpenGLRender(std::index_sequence<indexes...>) {
-      ((CurrentTest == indexes ? std::get<indexes>(tests)->OnOpenGLRender() : void()), ...);
+      //((CurrentTest == indexes ? std::get<indexes>(tests)->OnOpenGLRender() : void()), ...);
+      
+      ((CurrentTest == indexes ? 
+        [&]
+        {
+          if constexpr (requires { std::get<indexes>(tests)->OnOpenGLRender(); })
+          {
+            std::get<indexes>(tests)->OnOpenGLRender();
+          } 
+          else 
+          {
+            void();
+          }
+        }()
+        
+        : void()), ...
+      );
+    
+    
     }
 
     template <std::size_t... indexes>
     void internal_OnImGuiRender(std::index_sequence<indexes...>) {
-      ((CurrentTest == indexes ? std::get<indexes>(tests)->OnImGuiRender() : void()), ...);
+      //((CurrentTest == indexes ? std::get<indexes>(tests)->OnImGuiRender() : void()), ...);
+      
+      ((CurrentTest == indexes ? 
+        [&]
+        {
+          if constexpr (requires { std::get<indexes>(tests)->OnImGuiRender(); })
+          {
+            std::get<indexes>(tests)->OnImGuiRender();
+          } 
+          else 
+          {
+            void();
+          }
+        }()
+        
+        : void()), ...
+      );
+    
     }
 
     template <std::size_t... indexes>
     void internal_processInput(std::index_sequence<indexes...>) {
-      ((CurrentTest == indexes ? std::get<indexes>(tests)->processInput() : void()), ...);
+      ((CurrentTest == indexes ? 
+        [&]
+        {
+          if constexpr (requires { std::get<indexes>(tests)->processInput(); })
+          {
+            std::get<indexes>(tests)->processInput();
+          } 
+          else 
+          {
+            void();
+          }
+        }()
+        
+        : void()), ...
+      );
     }
 
     template <std::size_t... indexes>
