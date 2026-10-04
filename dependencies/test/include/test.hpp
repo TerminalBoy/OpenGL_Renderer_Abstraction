@@ -1014,11 +1014,11 @@ namespace test {
 
   };
 
-  class TestLightingScene{
+  class TestLightingAmbient{
     Camera camera;
 
     public:
-    static constexpr std::string_view NameString{ "Lighting Scene" };
+    static constexpr std::string_view NameString{ "Lighting Ambient" };
     std::array<float, 6*3*6> Vertices{
     // front
     -0.5f,  0.5f, 0.5f,
@@ -1110,7 +1110,7 @@ namespace test {
     VertexBuffer v_buff;
     public:
 
-    TestLightingScene(GLFWwindow* window)
+    TestLightingAmbient(GLFWwindow* window)
     : 
       camera(window),
       proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
@@ -1187,7 +1187,7 @@ namespace test {
     }
     
 
-    ~TestLightingScene(){
+    ~TestLightingAmbient(){
       std::cout << NameString << " Deconstructed" << std::endl;
       camera.SetCameraDisabled();
     }
