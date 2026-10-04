@@ -1003,6 +1003,7 @@ namespace test {
 
     void OnImGuiRender() {
       ImGui::Text("Use WASD keys to move the camera...");
+      ImGui::Text("Use SPACE and LCTRL keys to move the camera Up or Down...");
       ImGui::Text("Move mouse to rotate camera");
       ImGui::Spacing();
       ImGui::Text("Press ESC to disable camera and enable mouse");
@@ -1193,6 +1194,7 @@ namespace test {
 
     void OnImGuiRender() {
       ImGui::Text("Use WASD keys to move the camera...");
+      ImGui::Text("Use SPACE and LCTRL keys to move the camera Up or Down...");
       ImGui::Text("Move mouse to rotate camera");
       ImGui::Spacing();
       ImGui::Text("Press ESC to disable camera and enable mouse");
