@@ -1114,6 +1114,9 @@ namespace test {
     glm::mat4 proj;
     glm::mat4 model_cube = glm::mat4(1);
     glm::mat4 model_light = glm::mat4(1);
+    glm::vec3 cube_color = glm::vec3(1.f, 1.f, 1.f);
+    glm::vec3 light_color = glm::vec3(1.f, 1.f, 1.f);
+
     glm::vec3 light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
     std::string VertexShaderSource;
     std::string FragmentShaderSource;
@@ -1181,6 +1184,8 @@ namespace test {
 
         shader_program.SetUniformMat4f("u_MVP", mvp);
         shader_program.SetUniformVec3f("u_Color", glm::vec3(1.0f, 0.5f, 0.5f));
+        shader_program.SetUniformVec3f("multiplier_light_color", light_color);
+
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
       }
@@ -1195,6 +1200,7 @@ namespace test {
 
         shader_program.SetUniformMat4f("u_MVP", mvp);
         shader_program.SetUniformVec3f("u_Color", glm::vec3(1.0f, 1.0f, 1.0f));
+        shader_program.SetUniformVec3f("multiplier_light_color", glm::vec3(1.0f, 1.0f, 1.0f));
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
       }

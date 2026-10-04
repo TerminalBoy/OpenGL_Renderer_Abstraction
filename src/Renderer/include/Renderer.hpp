@@ -49,6 +49,7 @@ log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 
 class Camera {
   GLFWwindow* window;
+  bool take_input = false;
   public:
   float pitch{};
   float yaw{-90.f};
@@ -83,7 +84,7 @@ class Camera {
   }
 
   void ProcessInput(double xpos, double ypos){
-
+    if (!take_input) return;
     if (firstmouse){
     lastX = xpos;
     lastY = ypos;
@@ -110,12 +111,14 @@ class Camera {
   void SetCameraEnabled(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // disabling cursor... not camera
     firstmouse = true;
+    take_input = true;
   }
 
   void SetCameraDisabled(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     firstmouse = false; // only set to false for understanding and clarity
     // is set to false by mouse_callback
+    take_input = false;
   }
 
   void OnOpenGLRender(){ // to be ivoked everyframe
@@ -163,6 +166,15 @@ class Camera {
 
     deltaTime = 0;
     lastFrame = 0;
+
+        int window_width{};
+    int window_height{};
+
+    glfwGetWindowSize(window, &window_width, &window_height);
+
+    lastX = static_cast<float>(window_width) / 2.f;
+    lastY = static_cast<float>(window_height) / 2.f;
+
   }
 
 
