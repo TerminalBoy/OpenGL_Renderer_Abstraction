@@ -46,7 +46,6 @@ log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 } while(0)
 
 
-
 class Camera {
   GLFWwindow* window;
   bool take_input = false;
@@ -73,6 +72,9 @@ class Camera {
   Camera(GLFWwindow* window)
   : window(window)
   {
+
+    glfwSetWindowUserPointer(window, this); // set the current camera object as the window user pointer
+
     int window_width{};
     int window_height{};
 
@@ -82,6 +84,13 @@ class Camera {
     lastY = static_cast<float>(window_height) / 2.f;
 
   }
+
+  ~Camera(){
+    glfwSetWindowUserPointer(window, nullptr); // set nullptr as the window user pointer
+
+  }
+
+
 
   void ProcessInput(double xpos, double ypos){
     if (!take_input) return;
@@ -156,27 +165,6 @@ class Camera {
     
   }
 
-  void ResetInstance(){
-    pitch = 0;
-    yaw = -90.f;
-
-    cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-    deltaTime = 0;
-    lastFrame = 0;
-
-        int window_width{};
-    int window_height{};
-
-    glfwGetWindowSize(window, &window_width, &window_height);
-
-    lastX = static_cast<float>(window_width) / 2.f;
-    lastY = static_cast<float>(window_height) / 2.f;
-
-  }
-
 
 };
 
@@ -189,8 +177,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
   
-
-
+  if (glfwGetWindowUserPointer(window))
   static_cast<Camera*>(glfwGetWindowUserPointer(window))->ProcessInput(xpos, ypos);
 
 

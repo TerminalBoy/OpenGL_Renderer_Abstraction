@@ -30,7 +30,7 @@ namespace test {
 
     }
 
-    TestClearColor(GLFWwindow* window, Camera&)
+    TestClearColor(GLFWwindow* window)
       : color{ 0.5f, 0.5f, 0.5f }
     {
       std::cout << "TestClearColor constructed \n";
@@ -92,7 +92,7 @@ namespace test {
     Texture texture;
   public:
 
-    TestMultipleTexture(GLFWwindow* window, Camera&)
+    TestMultipleTexture(GLFWwindow* window)
       : Hello_Triangle_Vertices{ // x,y,z,Tx,Ty,r,g,b
      -0.5f, -0.5f, 0.0f,        0.0f, 0.0f,            1.0f, 0.0f, 0.0f, // 0
       0.5f, -0.5f, 0.0f,        1.0f, 0.0f,            0.0f, 1.0f, 0.0f, // 1
@@ -247,7 +247,7 @@ namespace test {
 
   public:
 
-    TestRectangle(GLFWwindow* window, Camera&)
+    TestRectangle(GLFWwindow* window)
       : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
 
@@ -345,7 +345,7 @@ namespace test {
 
   public:
 
-    TestTriangle(GLFWwindow* window, Camera&)
+    TestTriangle(GLFWwindow* window)
       : VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/fragmentshader.shader", FragmentShaderSource)),
 
@@ -485,7 +485,7 @@ namespace test {
     Texture texture;
   public:
 
-    Test3DCube(GLFWwindow* window, Camera&)
+    Test3DCube(GLFWwindow* window)
       :
 
       index_buffer{
@@ -665,12 +665,6 @@ namespace test {
     VertexBuffer v_buff;
     ElementBuffer e_buff;
 
-    float cameraA_x{};
-    float cameraA_y{};
-
-    float cameraB_x{};
-    float cameraB_y{};
-
     ShaderProgram shader_program;
     Texture texture;
 
@@ -686,7 +680,7 @@ namespace test {
 
   public:
 
-    TestMultiple3DCube(GLFWwindow* window, Camera&)
+    TestMultiple3DCube(GLFWwindow* window)
       :
 
       index_buffer{
@@ -806,7 +800,7 @@ namespace test {
   private:
 
     GLFWwindow* glfw_window = nullptr;
-    Camera& camera;
+    Camera camera;
 
     std::array<float, 180> Hello_Triangle_Vertices
 
@@ -899,10 +893,10 @@ namespace test {
 
   public:
 
-    TestWalkAround_Multiple3DCube(GLFWwindow* window, Camera& camera)
+    TestWalkAround_Multiple3DCube(GLFWwindow* window)
       :
       glfw_window(window),
-      camera(camera),
+      camera(window),
 
       index_buffer{
       0, 1, 2, 2, 3, 0
@@ -964,31 +958,11 @@ namespace test {
     }
 
     void processInput() {
-      const float cameraSpeed = deltaTime * 3.0f; // adjust accordingly
-      if (glfwGetKey(glfw_window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
-      if (glfwGetKey(glfw_window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
-      if (glfwGetKey(glfw_window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-      if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-      if (glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        camera.SetCameraDisabled();  
-        //SetCameraMode(glfw_window, false);
-
-
-        glm::vec3 direction;
-        direction.x = cos(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
-        direction.y = sin(glm::radians(camera.pitch));
-        direction.z = sin(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
-        cameraFront = glm::normalize(direction);
+      camera.predefined_generic_WASD_control();
     }
 
     void OnOpenGLRender() {
-      float currentFrame = glfwGetTime();
-      deltaTime = currentFrame - lastFrame;
-      lastFrame = currentFrame;
+      camera.OnOpenGLRender();
 
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -1012,7 +986,7 @@ namespace test {
         //glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
         
         glm::mat4 view;
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        view = camera.GetViewMatrix();;
 
         glm::mat4 mvp = proj * view * model;
 
@@ -1040,7 +1014,7 @@ namespace test {
   };
 
   class TestLightingScene{
-    Camera& camera;
+    Camera camera;
 
     public:
     static constexpr std::string_view NameString{ "Lighting Scene" };
@@ -1135,9 +1109,9 @@ namespace test {
     VertexBuffer v_buff;
     public:
 
-    TestLightingScene(GLFWwindow*, Camera& camera)
+    TestLightingScene(GLFWwindow* window)
     : 
-      camera(camera),
+      camera(window),
       proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/Lighting/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/Lighting/fragmentshader.shader", FragmentShaderSource)),
@@ -1214,7 +1188,6 @@ namespace test {
 
     ~TestLightingScene(){
       std::cout << NameString << " Deconstructed" << std::endl;
-      camera.ResetInstance();
       camera.SetCameraDisabled();
     }
 
@@ -1232,7 +1205,6 @@ namespace test {
   class TestMenu {
 
     GLFWwindow* window = nullptr;
-    Camera& camera;
 
     static_assert(sizeof...(Tests) != 0, "Cannot create a test menu with zero tests");
 
@@ -1311,7 +1283,7 @@ namespace test {
       (
         (
           ImGui::Button(Tests::NameString.data())
-          ? (CurrentTest = indexes, std::get<indexes>(tests).emplace(window, camera), void())
+          ? (CurrentTest = indexes, std::get<indexes>(tests).emplace(window), void())
           : void()
           ),
         ...
@@ -1336,9 +1308,8 @@ namespace test {
 
 
   public:
-    TestMenu(GLFWwindow* window, Camera& camera)
-    : window(window),
-      camera(camera)
+    TestMenu(GLFWwindow* window)
+    : window(window)
     {
       //CurrentTest = 0;
     }

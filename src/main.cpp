@@ -54,9 +54,8 @@ int main() {
   //test::TestMultipleTexture mt;
   //test::TestRectangle rt;
   //test::TestTriangle tr;
-  Camera camera(window);
   
-  glfwSetWindowUserPointer(window, &camera); // met glfw know the camera object
+  glfwSetWindowUserPointer(window, nullptr); 
 
   test::TestMenu
     <
@@ -69,7 +68,7 @@ int main() {
     test::TestWalkAround_Multiple3DCube,
     test::TestLightingScene
     > 
-    menu(window, camera);
+    menu(window);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
