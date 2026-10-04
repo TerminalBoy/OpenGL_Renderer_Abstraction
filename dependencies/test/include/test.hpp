@@ -1114,8 +1114,8 @@ namespace test {
     : 
       camera(window),
       proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
-      VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/Lighting/vertexshader.shader", VertexShaderSource)),
-      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/Lighting/fragmentshader.shader", FragmentShaderSource)),
+      VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLightingAmbient/vertexshader.shader", VertexShaderSource)),
+      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLightingAmbient/fragmentshader.shader", FragmentShaderSource)),
 
       vertex_shader(&v_src),
       fragment_shader(&f_src),
@@ -1156,10 +1156,10 @@ namespace test {
         v_arr.bind();
 
         glm::mat4 mvp = proj * view * model_cube;
-
+        shader_program.SetUniform1i("rendering_light_source", 0);
         shader_program.SetUniformMat4f("u_MVP", mvp);
-        shader_program.SetUniformVec3f("u_Color", glm::vec3(1.0f, 0.5f, 0.5f));
-        shader_program.SetUniformVec3f("multiplier_light_color", light_color);
+        shader_program.SetUniformVec3f("object_color", glm::vec3(1.0f, 0.5f, 0.5f));
+        shader_program.SetUniformVec3f("light_color", light_color);
 
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
@@ -1173,9 +1173,9 @@ namespace test {
         
         glm::mat4 mvp = proj * view * model_light;
 
+        shader_program.SetUniform1i("rendering_light_source", 1);
         shader_program.SetUniformMat4f("u_MVP", mvp);
-        shader_program.SetUniformVec3f("u_Color", glm::vec3(1.0f, 1.0f, 1.0f));
-        shader_program.SetUniformVec3f("multiplier_light_color", glm::vec3(1.0f, 1.0f, 1.0f));
+        shader_program.SetUniformVec3f("light_color", glm::vec3(1.0f, 1.0f, 1.0f));
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
       }
