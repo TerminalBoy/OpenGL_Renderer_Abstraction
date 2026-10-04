@@ -273,10 +273,10 @@ public:
   }
 
   void push_arrtib_pointer(std::size_t index, std::size_t element_count_per_vertex_arrtib, unsigned int type_type_GLenum,
-    int normalise, std::size_t stride_count, std::size_t vertex_element_offset_size_bytes) {
+    int normalise, std::size_t stride_size_bytes, std::size_t vertex_element_offset_size_bytes) {
     VALIDATE_GL_(glVertexAttribPointer(
 
-      index, element_count_per_vertex_arrtib, type_type_GLenum, normalise, stride_count, reinterpret_cast<void*>(vertex_element_offset_size_bytes)
+      index, element_count_per_vertex_arrtib, type_type_GLenum, normalise, stride_size_bytes, reinterpret_cast<void*>(vertex_element_offset_size_bytes)
 
     ));
 
