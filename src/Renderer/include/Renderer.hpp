@@ -162,6 +162,12 @@ class Camera {
       SetCameraDisabled();
     // SetCameraMode(glfw_window, false);
 
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+      cameraPos.y += cameraSpeed;
+    
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+      cameraPos.y -= cameraSpeed;
+    
     
   }
 
