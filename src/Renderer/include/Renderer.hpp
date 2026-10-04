@@ -55,8 +55,20 @@ class Camera {
   float lastX;
   float lastY;
 
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+  glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+  glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+  
+
+  float deltaTime{};
+  float lastFrame{};
+
+
+  private:
   bool firstmouse = false;
 
+  public:
+  
   Camera(GLFWwindow* window)
   : window(window)
   {
@@ -77,23 +89,22 @@ class Camera {
     lastY = ypos;
     firstmouse = false;
     return;
-  }
+    }
 
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos; // reversed: y ranges bottom to top
-  lastX = xpos;
-  lastY = ypos;
-  const float sensitivity = 0.08f;
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed: y ranges bottom to top
+    lastX = xpos;
+    lastY = ypos;
+    const float sensitivity = 0.08f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
 
-  yaw += xoffset;
-  pitch += yoffset;
-  if(pitch > 89.0f)
-  pitch = 89.0f;
-  if(pitch < -89.0f)
-  pitch = -89.0f;
-
+    yaw += xoffset;
+    pitch += yoffset;
+    if (pitch > 89.0f)
+      pitch = 89.0f;
+    if (pitch < -89.0f)
+      pitch = -89.0f;
   }
 
   void SetCameraEnabled(){
@@ -107,6 +118,52 @@ class Camera {
     // is set to false by mouse_callback
   }
 
+  void OnOpenGLRender(){ // to be ivoked everyframe
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    
+  }
+
+  glm::mat4 GetViewMatrix() { // to be invoked everyframe
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+
+    return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+  }
+
+  void predefined_generic_WASD_control(){
+    
+    const float cameraSpeed = deltaTime * 3.0f; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+      cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+      cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+      cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+      cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+      SetCameraDisabled();
+    // SetCameraMode(glfw_window, false);
+
+    
+  }
+
+  void ResetInstance(){
+    pitch = 0;
+    yaw = -90.f;
+
+    cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    deltaTime = 0;
+    lastFrame = 0;
+  }
 
 
 };
@@ -397,6 +454,10 @@ public:
   void SetUniformMat4f(const std::string& uniform_name, const glm::mat4& matrix) {
     VALIDATE_GL_(glUniformMatrix4fv(GetUniformLocation(uniform_name), 1, GL_FALSE, &matrix[0][0]));
   } 
+  
+  void SetUniformVec3f(const std::string& uniform_name, const glm::vec3& vec3) {
+    VALIDATE_GL_(glUniform3f(GetUniformLocation(uniform_name), vec3.x, vec3.y, vec3.z ));
+  }
 
 
 private:

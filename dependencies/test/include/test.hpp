@@ -1039,6 +1039,186 @@ namespace test {
 
   };
 
+  class TestLightingScene{
+    Camera& camera;
+
+    public:
+    static constexpr std::string_view NameString{ "Lighting Scene" };
+    std::array<float, 6*3*6> Vertices{
+    // front
+    -0.5f,  0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+     0.5f,  0.5f, 0.5f,
+ 
+     0.5f,  0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+     0.5f, -0.5f, 0.5f,
+ 
+    // back
+
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+ 
+     0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+
+ 
+    // left
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+
+
+    //right
+
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+
+     0.5f,  0.5f,  0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+ 
+ 
+    //up
+
+     -0.5f, 0.5f,  0.5f,
+      0.5f, 0.5f, -0.5f,
+     -0.5f, 0.5f, -0.5f,
+ 
+     -0.5f, 0.5f,  0.5f,
+      0.5f, 0.5f,  0.5f,
+      0.5f, 0.5f, -0.5f,
+
+
+    //down 
+
+
+     -0.5f, -0.5f,  0.5f,
+      0.5f, -0.5f, -0.5f,
+     -0.5f, -0.5f, -0.5f,
+ 
+     -0.5f, -0.5f,  0.5f,
+      0.5f, -0.5f,  0.5f,
+      0.5f, -0.5f, -0.5f,
+
+
+    };
+    glm::mat4 proj;
+    glm::mat4 model_cube = glm::mat4(1);
+    glm::mat4 model_light = glm::mat4(1);
+    glm::vec3 light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
+    std::string VertexShaderSource;
+    std::string FragmentShaderSource;
+
+    bool VertexShaderSource_read_status;
+    bool FragmentShaderSource_read_status;
+
+    const char* v_src = VertexShaderSource.c_str();
+    const char* f_src = FragmentShaderSource.c_str();
+
+    ShaderVertex vertex_shader;
+    ShaderFragment fragment_shader;
+    ShaderProgram shader_program;
+
+    VertexArray v_arr;
+    VertexBuffer v_buff;
+    public:
+
+    TestLightingScene(GLFWwindow*, Camera& camera)
+    : 
+      camera(camera),
+      proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
+      VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/Lighting/vertexshader.shader", VertexShaderSource)),
+      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/Lighting/fragmentshader.shader", FragmentShaderSource)),
+
+      vertex_shader(&v_src),
+      fragment_shader(&f_src),
+
+      shader_program(vertex_shader, fragment_shader)
+    {
+      std::cout << NameString << " Constructed \n";
+      
+      if (!VertexShaderSource_read_status) std::cout << "Failed to read Vertex Shader\n";
+      if (!FragmentShaderSource_read_status) std::cout << "Failed to read Fragment Shader\n";
+
+      v_arr.bind();
+      v_buff.bind(GL_ARRAY_BUFFER);
+      v_buff.set_data(GL_ARRAY_BUFFER, Vertices, GL_STATIC_DRAW);
+
+      v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+      v_arr.enable(0);
+      shader_program.Bind();
+
+      camera.SetCameraEnabled();
+
+
+
+      model_light = glm::translate(model_light, light_source_translation);
+      model_light = glm::scale(model_light, glm::vec3(0.5f, 0.5f, 0.5f));
+    }
+
+    void OnOpenGLRender(){
+      camera.OnOpenGLRender();
+
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+      glm::mat4 view = camera.GetViewMatrix();
+
+      { // cube
+        shader_program.Bind();
+        v_arr.bind();
+
+        glm::mat4 mvp = proj * view * model_cube;
+
+        shader_program.SetUniformMat4f("u_MVP", mvp);
+        shader_program.SetUniformVec3f("u_Color", glm::vec3(1.0f, 0.5f, 0.5f));
+
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
+      }
+
+
+      { // light
+        shader_program.Bind();
+        v_arr.bind();
+        
+        
+        glm::mat4 mvp = proj * view * model_light;
+
+        shader_program.SetUniformMat4f("u_MVP", mvp);
+        shader_program.SetUniformVec3f("u_Color", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
+      }
+      
+    }
+
+    void processInput(){
+      camera.predefined_generic_WASD_control();
+    }
+    
+
+    ~TestLightingScene(){
+      std::cout << NameString << " Deconstructed" << std::endl;
+      camera.ResetInstance();
+      camera.SetCameraDisabled();
+    }
+
+    void OnImGuiRender() {
+      ImGui::Text("Use WASD keys to move the camera...");
+      ImGui::Text("Move mouse to rotate camera");
+      ImGui::Spacing();
+      ImGui::Text("Press ESC to disable camera and enable mouse");
+    }
+  };
 
 
 

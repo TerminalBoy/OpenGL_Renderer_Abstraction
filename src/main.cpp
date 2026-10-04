@@ -66,7 +66,8 @@ int main() {
     test::TestRectangle,
     test::Test3DCube,
     test::TestMultiple3DCube,
-    test::TestWalkAround_Multiple3DCube
+    test::TestWalkAround_Multiple3DCube,
+    test::TestLightingScene
     > 
     menu(window, camera);
 
