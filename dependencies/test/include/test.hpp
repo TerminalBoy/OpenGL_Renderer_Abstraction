@@ -60,6 +60,9 @@ namespace test {
   public:
     static constexpr std::string_view NameString{ "Multiple Textures" };
   private:
+    int window_width{};
+    int window_height{};
+    
     std::array<float, 32> Hello_Triangle_Vertices;
 
     std::array<int, 6> index_buffer;
@@ -104,7 +107,7 @@ namespace test {
       0, 1, 2, 2, 3, 0
       },
 
-      proj(glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, -1.0f, 1.0f)),
+      //proj(glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, -1.0f, 1.0f)),
 
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource)),
@@ -117,7 +120,17 @@ namespace test {
 
     {
       std::cout << "TestMultipleTexture constructed \n";
+      
+      glfwGetWindowSize(window, &window_width, &window_height);
 
+      float unit_far{ 100.f }; // how much pixels for one far(left right bottom up) unit
+      proj = glm::ortho(
+        (0.f - (static_cast<float>(window_width) / 2.f)) / unit_far, // left
+        (0.f + (static_cast<float>(window_width) / 2.f)) / unit_far, // right
+
+        (0.f - (static_cast<float>(window_height) / 2.f)) / unit_far, // bottom
+        (0.f + (static_cast<float>(window_height) / 2.f)) / unit_far // up
+      );
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
 
@@ -214,6 +227,9 @@ namespace test {
   public:
     static constexpr std::string_view NameString{ "Rectangle" };
   private:
+    int window_width{};
+    int window_height{};
+
     std::array<float, 24> Hello_Triangle_Vertices = { // x,y,z,r,g,b
     -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
      0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
@@ -225,6 +241,7 @@ namespace test {
       0, 1, 2, 2, 3, 0
     };
 
+    glm::mat4 proj;
 
     VertexArray v_arr;
     VertexBuffer v_buff;
@@ -264,7 +281,18 @@ namespace test {
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
 
+      glfwGetWindowSize(window, &window_width, &window_height);
 
+      float unit_far{ 100.f }; // how much pixels for one far(left right bottom up) unit
+      proj = glm::ortho(
+        (0.f - (static_cast<float>(window_width) / 2.f)) / unit_far, // left
+        (0.f + (static_cast<float>(window_width) / 2.f)) / unit_far, // right
+
+        (0.f - (static_cast<float>(window_height) / 2.f)) / unit_far, // bottom
+        (0.f + (static_cast<float>(window_height) / 2.f)) / unit_far // up
+      );
+
+      proj = glm::scale(proj, glm::vec3(3.f, 3.f, 3.f));
       v_arr.bind();
 
       v_buff.bind(GL_ARRAY_BUFFER);
@@ -298,6 +326,7 @@ namespace test {
 
       shader_program.Bind();;
       v_arr.bind();
+      shader_program.SetUniformMat4f("u_MVP", proj);
       VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 
 
@@ -313,6 +342,10 @@ namespace test {
     static constexpr std::string_view NameString{ "Triangle" };
 
   private:
+
+    int window_width{};
+    int window_height{};
+
     std::array<float, 18> Hello_Triangle_Vertices = { // x,y,z,r,g,b
      0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
      0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
@@ -323,6 +356,7 @@ namespace test {
       0, 1, 2
     };
 
+    glm::mat4 proj;
 
     VertexArray v_arr;
     VertexBuffer v_buff;
@@ -363,6 +397,18 @@ namespace test {
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
       std::cout << "TestTriangle constructed \n";
 
+      glfwGetWindowSize(window, &window_width, &window_height);
+
+      float unit_far{ 100.f }; // how much pixels for one far(left right bottom up) unit
+      proj = glm::ortho(
+        (0.f - (static_cast<float>(window_width) / 2.f)) / unit_far, // left
+        (0.f + (static_cast<float>(window_width) / 2.f)) / unit_far, // right
+
+        (0.f - (static_cast<float>(window_height) / 2.f)) / unit_far, // bottom
+        (0.f + (static_cast<float>(window_height) / 2.f)) / unit_far // up
+      );
+
+      proj = glm::scale(proj, glm::vec3(3.f, 3.f, 3.f));
 
       v_arr.bind();
 
@@ -395,6 +441,7 @@ namespace test {
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
       shader_program.Bind();;
       v_arr.bind();
+      shader_program.SetUniformMat4f("u_MVP", proj);
       VALIDATE_GL_(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 
 
@@ -410,6 +457,9 @@ namespace test {
   public:
     static constexpr std::string_view NameString{ "3D Cube" };
   private:
+    int window_width{};
+    int window_height{};
+    
     std::array<float, 180> Hello_Triangle_Vertices
 
     {
@@ -492,7 +542,6 @@ namespace test {
       0, 1, 2, 2, 3, 0
       },
 
-      proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
 
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource)),
@@ -506,6 +555,9 @@ namespace test {
     {
       //std::cout << "TestMultipleTexture constructed \n";
       std::cout << NameString << " Constructed \n";
+      
+      glfwGetWindowSize(window, &window_width, &window_height);
+      proj = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
 
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
@@ -587,6 +639,9 @@ namespace test {
   public:
     static constexpr std::string_view NameString{ "Multiple 3D Cube" };
   private:
+    int window_width{};
+    int window_height{};
+
     std::array<float, 180> Hello_Triangle_Vertices
 
     {
@@ -687,7 +742,6 @@ namespace test {
       0, 1, 2, 2, 3, 0
       },
 
-      proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
 
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource)),
@@ -701,6 +755,9 @@ namespace test {
     {
       //std::cout << "TestMultipleTexture constructed \n";
       std::cout << NameString << " Constructed \n";
+
+      glfwGetWindowSize(window, &window_width, &window_height);
+      proj = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
 
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
@@ -801,6 +858,8 @@ namespace test {
 
     GLFWwindow* glfw_window = nullptr;
     Camera camera;
+    int window_width{};
+    int window_height{};
 
     std::array<float, 180> Hello_Triangle_Vertices
 
@@ -902,7 +961,7 @@ namespace test {
       0, 1, 2, 2, 3, 0
       },
 
-      proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
+      
 
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/Shaders/fragmentshader.shader", FragmentShaderSource)),
@@ -916,6 +975,10 @@ namespace test {
     {
       //std::cout << "TestMultipleTexture constructed \n";
       std::cout << NameString << " Constructed \n";
+
+
+      glfwGetWindowSize(window, &window_width, &window_height);
+      proj = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
 
       //std::cout << "Vertex shader: " << VertexShaderSource << std::endl;
       //std::cout << "Fragment shader: " << FragmentShaderSource << std::endl;
@@ -1016,6 +1079,8 @@ namespace test {
 
   class TestLightingAmbient{
     Camera camera;
+    int window_width{};
+    int window_height{};
 
     public:
     static constexpr std::string_view NameString{ "Lighting Ambient" };
@@ -1112,8 +1177,8 @@ namespace test {
 
     TestLightingAmbient(GLFWwindow* window)
     : 
+      
       camera(window),
-      proj(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
       VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLightingAmbient/vertexshader.shader", VertexShaderSource)),
       FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLightingAmbient/fragmentshader.shader", FragmentShaderSource)),
 
@@ -1124,6 +1189,9 @@ namespace test {
     {
       std::cout << NameString << " Constructed \n";
       
+      glfwGetWindowSize(window, &window_width, &window_height);
+      proj = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
+
       if (!VertexShaderSource_read_status) std::cout << "Failed to read Vertex Shader\n";
       if (!FragmentShaderSource_read_status) std::cout << "Failed to read Fragment Shader\n";
 
