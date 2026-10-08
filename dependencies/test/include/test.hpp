@@ -1405,7 +1405,11 @@ namespace test {
       shader_program.Bind();
 
       camera.SetCameraEnabled();
-
+      camera.SetDragStyleCamera();
+      camera.SetCursorVisible(); // we want the cursor to be visible for a drag style camera
+      // allow proper keyboard and mouse sharing with imgui
+      camera.SetMouseSharedWithImGui();
+      camera.SetKeyboardSharedWithImGui();
 
 
       model_light = glm::translate(model_light, light_source_translation);

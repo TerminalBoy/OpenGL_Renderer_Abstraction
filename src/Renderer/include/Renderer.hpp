@@ -12,6 +12,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+// for imgui integration with camera
+#include <imgui.h>
+
 
 
 void clear_gl_errors() {
@@ -49,6 +52,14 @@ log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 class Camera {
   GLFWwindow* window;
   bool take_input = false;
+  bool drag_style_camera = false;
+
+  bool left_click_pressed = false;
+  float sensitivity = 0.08f;
+  bool ImGui_shared_mouse = false;
+  bool ImGui_shared_keyboard = false;
+  ImGuiIO& ImGui_io;
+
   public:
   float pitch{};
   float yaw{-90.f};
@@ -70,7 +81,8 @@ class Camera {
   public:
   
   Camera(GLFWwindow* window)
-  : window(window)
+  : window(window), 
+    ImGui_io(ImGui::GetIO())
   {
 
     glfwSetWindowUserPointer(window, this); // set the current camera object as the window user pointer
@@ -94,6 +106,22 @@ class Camera {
 
   void ProcessInput(double xpos, double ypos){
     if (!take_input) return;
+    if (ImGui_shared_mouse && ImGui_io.WantCaptureMouse) return;
+    if (drag_style_camera) {
+      if (!left_click_pressed && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT))
+      {
+        firstmouse = true;
+        left_click_pressed = true;
+      }
+
+      if (left_click_pressed && !glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT))
+      {
+        left_click_pressed = false;
+      }
+
+      if (!left_click_pressed) return;
+    }
+    
     if (firstmouse){
     lastX = xpos;
     lastY = ypos;
@@ -101,11 +129,21 @@ class Camera {
     return;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed: y ranges bottom to top
+    float xoffset;
+    float yoffset;
+
+    if (drag_style_camera) {
+      xoffset = lastX - xpos ;
+      yoffset = ypos - lastY;
+    } else {
+      xoffset = xpos - lastX;
+      yoffset = lastY - ypos; // reversed: y ranges bottom to top
+    }
+    
+    
     lastX = xpos;
     lastY = ypos;
-    const float sensitivity = 0.08f;
+    
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
@@ -118,16 +156,36 @@ class Camera {
   }
 
   void SetCameraEnabled(){
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // disabling cursor... not camera
     firstmouse = true;
     take_input = true;
   }
-
+  
   void SetCameraDisabled(){
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     firstmouse = false; // only set to false for understanding and clarity
     // is set to false by mouse_callback
     take_input = false;
+  }
+
+  void SetCursorVisible() {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  }
+
+  void SetCursorInvisible(){
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // disabling cursor... not camera
+  }
+
+  void SetDragStyleCamera(){
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    
+    drag_style_camera = true;
+  }
+
+  void SetMouseSharedWithImGui(){
+    ImGui_shared_mouse = true;
+  }
+
+  void SetKeyboardSharedWithImGui(){
+    ImGui_shared_keyboard = true;
   }
 
   void OnOpenGLRender(){ // to be ivoked everyframe
@@ -148,7 +206,8 @@ class Camera {
   }
 
   void predefined_generic_WASD_control(){
-    
+    if (!take_input) return;
+    if (ImGui_shared_keyboard && ImGui_io.WantCaptureKeyboard) return;
     const float cameraSpeed = deltaTime * 3.0f; // adjust accordingly
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
       cameraPos += cameraSpeed * cameraFront;
@@ -158,8 +217,7 @@ class Camera {
       cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
       cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-      SetCameraDisabled();
+    
     // SetCameraMode(glfw_window, false);
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
@@ -169,6 +227,11 @@ class Camera {
       cameraPos.y -= cameraSpeed;
     
     
+  }
+
+  void CameraDisablingKey_control(){
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+      SetCameraDisabled();
   }
 
 
