@@ -475,7 +475,7 @@ private:
     int uniform_location{};
     VALIDATE_GL_(uniform_location = glGetUniformLocation(_id, name.c_str()));
     if (uniform_location == -1) {
-      std::cout << "Uniform " << name << " does not exist \n";
+      std::cout << "\n \n \n \n !!!!!!!!!!!! Uniform " << name << " does not exist \n \n \n \n";
       assert(0);
     }
     else {

@@ -1270,6 +1270,215 @@ namespace test {
   };
 
 
+  class TestLightingDiffuse{
+    Camera camera;
+    int window_width{};
+    int window_height{};
+
+    public:
+    static constexpr std::string_view NameString{ "Lighting Diffuse" };
+    std::array<float, 6*6*6> Vertices{ // xyz, normals
+    // front
+    -0.5f,  0.5f, 0.5f,  0.f, 0.f, 1.f,
+    -0.5f, -0.5f, 0.5f,  0.f, 0.f, 1.f,
+     0.5f,  0.5f, 0.5f,  0.f, 0.f, 1.f,
+ 
+     0.5f,  0.5f, 0.5f,  0.f, 0.f, 1.f,
+    -0.5f, -0.5f, 0.5f,  0.f, 0.f, 1.f,
+     0.5f, -0.5f, 0.5f,  0.f, 0.f, 1.f,
+ 
+    // back
+
+    -0.5f,  0.5f, -0.5f,  0.f, 0.f, -1.f,
+    -0.5f, -0.5f, -0.5f,  0.f, 0.f, -1.f,
+     0.5f,  0.5f, -0.5f,  0.f, 0.f, -1.f,
+ 
+     0.5f,  0.5f, -0.5f,  0.f, 0.f, -1.f,
+    -0.5f, -0.5f, -0.5f,  0.f, 0.f, -1.f,
+     0.5f, -0.5f, -0.5f,  0.f, 0.f, -1.f,
+
+ 
+    // left
+
+    -0.5f,  0.5f,  0.5f,  -1.f, 0.f, 0.f,
+    -0.5f,  0.5f, -0.5f,  -1.f, 0.f, 0.f,
+    -0.5f, -0.5f, -0.5f,  -1.f, 0.f, 0.f,
+
+    -0.5f,  0.5f,  0.5f,  -1.f, 0.f, 0.f,
+    -0.5f, -0.5f, -0.5f,  -1.f, 0.f, 0.f,
+    -0.5f, -0.5f,  0.5f,  -1.f, 0.f, 0.f,
+
+
+    //right
+
+     0.5f,  0.5f,  0.5f,  1.f, 0.f, 0.f,
+     0.5f,  0.5f, -0.5f,  1.f, 0.f, 0.f,
+     0.5f, -0.5f, -0.5f,  1.f, 0.f, 0.f,
+
+     0.5f,  0.5f,  0.5f,  1.f, 0.f, 0.f,
+     0.5f, -0.5f, -0.5f,  1.f, 0.f, 0.f,
+     0.5f, -0.5f,  0.5f,  1.f, 0.f, 0.f,
+ 
+ 
+    //up
+
+     -0.5f, 0.5f,  0.5f,  0.f, 1.f, 0.f,
+      0.5f, 0.5f, -0.5f,  0.f, 1.f, 0.f,
+     -0.5f, 0.5f, -0.5f,  0.f, 1.f, 0.f,
+ 
+     -0.5f, 0.5f,  0.5f,  0.f, 1.f, 0.f,
+      0.5f, 0.5f,  0.5f,  0.f, 1.f, 0.f,
+      0.5f, 0.5f, -0.5f,  0.f, 1.f, 0.f,
+
+
+    //down 
+
+
+     -0.5f, -0.5f,  0.5f,  0.f, -1.f, 0.f,
+      0.5f, -0.5f, -0.5f,  0.f, -1.f, 0.f,
+     -0.5f, -0.5f, -0.5f,  0.f, -1.f, 0.f,
+ 
+     -0.5f, -0.5f,  0.5f,  0.f, -1.f, 0.f,
+      0.5f, -0.5f,  0.5f,  0.f, -1.f, 0.f,
+      0.5f, -0.5f, -0.5f,  0.f, -1.f, 0.f,
+
+
+    };
+    glm::mat4 proj;
+    glm::mat4 model_cube = glm::mat4(1);
+    glm::mat4 model_light = glm::mat4(1);
+    glm::vec3 cube_color = glm::vec3(0.2f, 0.8f, 0.2f); // green-ish
+    //glm::vec3 light_color = glm::vec3(1.f, 0.3f, 0.3f); // red-ish
+    glm::vec3 light_color = glm::vec3(1.f, 1.0f, 1.0f); 
+
+    glm::vec3 light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
+    std::string VertexShaderSource;
+    std::string FragmentShaderSource;
+
+    bool VertexShaderSource_read_status;
+    bool FragmentShaderSource_read_status;
+
+    const char* v_src = VertexShaderSource.c_str();
+    const char* f_src = FragmentShaderSource.c_str();
+
+    ShaderVertex vertex_shader;
+    ShaderFragment fragment_shader;
+    ShaderProgram shader_program;
+
+    VertexArray v_arr;
+    VertexBuffer v_buff;
+    public:
+
+    TestLightingDiffuse(GLFWwindow* window)
+    : 
+      
+      camera(window),
+      VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLightingDiffuse/vertexshader.shader", VertexShaderSource)),
+      FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLightingDiffuse/fragmentshader.shader", FragmentShaderSource)),
+
+      vertex_shader(&v_src),
+      fragment_shader(&f_src),
+
+      shader_program(vertex_shader, fragment_shader)
+    {
+      std::cout << NameString << " Constructed \n";
+      
+      glfwGetWindowSize(window, &window_width, &window_height);
+      proj = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
+
+      if (!VertexShaderSource_read_status) std::cout << "Failed to read Vertex Shader\n";
+      if (!FragmentShaderSource_read_status) std::cout << "Failed to read Fragment Shader\n";
+
+      v_arr.bind();
+      v_buff.bind(GL_ARRAY_BUFFER);
+      v_buff.set_data(GL_ARRAY_BUFFER, Vertices, GL_STATIC_DRAW);
+      
+
+      v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
+      v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 3 * sizeof(float));
+
+
+      v_arr.enable(0);
+      v_arr.enable(1);
+
+      shader_program.Bind();
+
+      camera.SetCameraEnabled();
+
+
+
+      model_light = glm::translate(model_light, light_source_translation);
+      model_light = glm::scale(model_light, glm::vec3(0.5f, 0.5f, 0.5f));
+    }
+
+    void OnOpenGLRender(){
+      camera.OnOpenGLRender();
+
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+      glm::mat4 view = camera.GetViewMatrix();
+
+      { // cube
+        shader_program.Bind();
+        v_arr.bind();
+
+        glm::mat4 mvp = proj * view * model_cube;
+        shader_program.SetUniform1i("rendering_light_source", 0);
+
+        shader_program.SetUniformMat4f("projection", proj);
+        shader_program.SetUniformMat4f("view", view);
+        shader_program.SetUniformMat4f("model", model_cube);
+
+        shader_program.SetUniformVec3f("object_color", cube_color);
+        shader_program.SetUniformVec3f("light_color", light_color);
+        shader_program.SetUniformVec3f("lightPos", light_source_translation);
+
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
+      }
+
+
+      { // light
+        shader_program.Bind();
+        v_arr.bind();
+        
+        
+        glm::mat4 mvp = proj * view * model_light;
+
+        shader_program.SetUniform1i("rendering_light_source", 1);
+        
+        shader_program.SetUniformMat4f("projection", proj);
+        shader_program.SetUniformMat4f("view", view);
+        shader_program.SetUniformMat4f("model", model_light);
+        shader_program.SetUniformVec3f("lightPos", light_source_translation);
+
+
+        shader_program.SetUniformVec3f("light_color", light_color);
+
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
+      }
+      
+    }
+
+    void processInput(){
+      camera.predefined_generic_WASD_control();
+    }
+    
+
+    ~TestLightingDiffuse(){
+      std::cout << NameString << " Deconstructed" << std::endl;
+      camera.SetCameraDisabled();
+    }
+
+    void OnImGuiRender() {
+      ImGui::Text("Use WASD keys to move the camera...");
+      ImGui::Text("Use SPACE and LCTRL keys to move the camera Up or Down...");
+      ImGui::Text("Move mouse to rotate camera");
+      ImGui::Spacing();
+      ImGui::Text("Press ESC to disable camera and enable mouse");
+    }
+  };
+
+
 
   template <typename... Tests>
   class TestMenu {
