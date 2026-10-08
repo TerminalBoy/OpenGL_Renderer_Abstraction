@@ -10,6 +10,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include "../../../src/Renderer/include/Renderer.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace test {
 
@@ -1475,6 +1476,12 @@ namespace test {
       ImGui::Text("Move mouse to rotate camera");
       ImGui::Spacing();
       ImGui::Text("Press ESC to disable camera and enable mouse");
+      ImGui::Spacing();
+      ImGui::ColorEdit3("Light Color : ", glm::value_ptr(light_color));
+      ImGui::Spacing();
+      ImGui::ColorEdit3("Cube Color : ", glm::value_ptr(cube_color));
+
+
     }
   };
 
