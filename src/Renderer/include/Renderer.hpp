@@ -230,8 +230,10 @@ class Camera {
   }
 
   void CameraDisablingKey_control(){
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
       SetCameraDisabled();
+      SetCursorVisible();
+    }
   }
 
 

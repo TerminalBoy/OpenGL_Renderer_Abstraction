@@ -986,6 +986,10 @@ namespace test {
       //SetCameraMode(glfw_window, true);
 
       camera.SetCameraEnabled();
+      camera.SetCursorInvisible();
+      camera.SetMouseSharedWithImGui();
+      camera.SetKeyboardSharedWithImGui();
+
 
       v_arr.bind();
       v_buff.bind(GL_ARRAY_BUFFER);
@@ -1018,11 +1022,13 @@ namespace test {
     ~TestWalkAround_Multiple3DCube() {
       // SetCameraMode(glfw_window, false);
       camera.SetCameraDisabled();
+      camera.SetCursorVisible();
       std::cout << NameString << " Deconstructed \n";
     }
 
     void processInput() {
       camera.predefined_generic_WASD_control();
+      camera.CameraDisablingKey_control();
     }
 
     void OnOpenGLRender() {
@@ -1206,6 +1212,9 @@ namespace test {
       shader_program.Bind();
 
       camera.SetCameraEnabled();
+      camera.SetDragStyleCamera();
+      camera.SetMouseSharedWithImGui();
+      camera.SetKeyboardSharedWithImGui();
 
 
 
