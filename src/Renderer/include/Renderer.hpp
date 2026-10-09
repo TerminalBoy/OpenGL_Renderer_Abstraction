@@ -188,6 +188,10 @@ class Camera {
     ImGui_shared_keyboard = true;
   }
 
+  glm::vec3 GetPosition(){
+    return cameraPos;
+  }
+
   void OnOpenGLRender(){ // to be ivoked everyframe
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
