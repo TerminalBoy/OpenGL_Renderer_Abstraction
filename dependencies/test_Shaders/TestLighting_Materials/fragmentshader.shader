@@ -1,0 +1,57 @@
+#version 330 core  
+
+struct Material {
+  float ambient_strength;
+	float specular_strength;
+	float specular_power;
+
+  vec3 diffuse_color;
+	vec3 color;
+};
+
+struct Light{
+	vec3 pos;
+	vec3 color;
+};
+
+struct Camera{
+  vec3 pos;
+};
+
+in vec3 Normal;
+in vec3 FragPos;
+out vec4 FragColor;  
+
+uniform Material material;
+uniform Light light;
+uniform Camera camera;
+
+uniform bool rendering_light_source;
+
+void main() {  
+
+	if (rendering_light_source) {
+		FragColor = vec4(light.color, 1.0);
+		return;	
+	}
+
+
+	//ambient
+	vec3 ambient = light.color * material.ambient_strength;
+
+	//diffuse
+	vec3 norm = normalize(Normal);
+	vec3 lightDir = normalize(light.pos - FragPos);
+	float diff= max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = light.color * (diff * material.diffuse_color);
+
+	//specular
+	vec3 viewDir = normalize(camera.pos - FragPos);
+	vec3 reflectionDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectionDir), 0.0), material.specular_power);
+	vec3 specular = light.color * (spec * material.specular_strength);
+
+	vec3 result = (ambient + diffuse + specular) * material.color;
+	
+	FragColor = vec4(result, 1.0);  
+}	

@@ -68,7 +68,8 @@ int main() {
     test::TestWalkAround_Multiple3DCube,
     test::TestLightingAmbient,
     test::TestLightingDiffuse,
-    test::TestLightingSpecular
+    test::TestLightingSpecular,
+    test::TestLighting_Materials
     > 
     menu(window);
 
