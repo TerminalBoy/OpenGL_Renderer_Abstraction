@@ -1735,7 +1735,7 @@ namespace test {
       glm::vec3 diffuse_color = glm::vec3(1.f, 1.f, 1.f);;
       enum class Type {
         Emerald, Pearl, Bronze, Gold, Cyan_Plastic, 
-        Red_Plastic, Green_Rubber, Yellow_Rubber
+        Red_Plastic, Green_Rubber, Yellow_Rubber, None
       };
       Material(){}
       Material(Type type){
@@ -1799,7 +1799,7 @@ namespace test {
         }  
       }
     };
-
+    Material::Type Current_Material;
     struct Light{
       glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
       glm::mat4 mat_model = glm::mat4(1.f);
@@ -1928,9 +1928,7 @@ namespace test {
       light.mat_model = glm::translate(light.mat_model, light.pos);
       light.mat_model = glm::scale(light.mat_model, light.scale);
 
-      cube = Material(Material::Type::Yellow_Rubber);
-
-
+      Current_Material = Material::Type::None;
 
       v_arr.bind();
       v_buff.bind(GL_ARRAY_BUFFER);
@@ -2031,7 +2029,46 @@ namespace test {
       ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
       ImGui::Text("Pitch: %.2f", camera.pitch);
       ImGui::Text("Yaw: %.2f", camera.yaw);
+      ImGui::Spacing();
+      ImGui::Text("Select desired Material:");
       
+      if (Current_Material == Material::Type::None){
+        if (ImGui::Button("Emerald")) {
+          Current_Material = Material::Type::Emerald;
+          cube = Material(Material::Type::Emerald);
+        }
+        if (ImGui::Button("Pearl")) {
+          Current_Material = Material::Type::Pearl;
+          cube = Material(Material::Type::Pearl);
+        }
+        if (ImGui::Button("Bronze")) {
+          Current_Material = Material::Type::Bronze;
+          cube = Material(Material::Type::Bronze);
+        }
+        if (ImGui::Button("Gold")) {
+          Current_Material = Material::Type::Gold;
+          cube = Material(Material::Type::Gold);
+        }
+        if (ImGui::Button("Cyan Plastic")) {
+          Current_Material = Material::Type::Cyan_Plastic;
+          cube = Material(Material::Type::Cyan_Plastic);
+        }
+        if (ImGui::Button("Red Plastic")) {
+          Current_Material = Material::Type::Red_Plastic;
+          cube = Material(Material::Type::Red_Plastic);
+        }
+        if (ImGui::Button("Green Rubber")) {
+          Current_Material = Material::Type::Green_Rubber;
+          cube = Material(Material::Type::Green_Rubber);
+        }
+        if (ImGui::Button("Yellow Rubber")) {
+          Current_Material = Material::Type::Yellow_Rubber;
+          cube = Material(Material::Type::Yellow_Rubber);
+        }
+        
+      } else {
+        if (ImGui::Button("<--- Select another Material")) Current_Material = Material::Type::None;
+      }
 
 
     }
