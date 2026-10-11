@@ -1724,6 +1724,90 @@ namespace test {
     int window_width{};
     int window_height{};
 
+
+    struct Material {
+      float ambient_strength;
+      float specular_strength;
+      float specular_power;
+      glm::mat4 mat_model = glm::mat4(1);
+      glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);;
+      glm::vec3 color;
+      glm::vec3 diffuse_color = glm::vec3(1.f, 1.f, 1.f);;
+      enum class Type {
+        Emerald, Pearl, Bronze, Gold, Cyan_Plastic, 
+        Red_Plastic, Green_Rubber, Yellow_Rubber
+      };
+      Material(){}
+      Material(Type type){
+        switch (type){
+
+          case Type::Emerald:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.5; // less = less shine brightness, more = more shine brightness
+            specular_power = 64.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.f, 1.f, 0.f); // color of the object;
+          break;
+
+          case Type::Pearl:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.5; // less = less shine brightness, more = more shine brightness
+            specular_power = 2.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.9f, 0.9f); // color of the object;
+          break;
+
+          case Type::Bronze:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.7; // less = less shine brightness, more = more shine brightness
+            specular_power = 32.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.722f, 0.337f, 0.145f); // color of the object;
+          break;
+
+          case Type::Gold:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.9; // less = less shine brightness, more = more shine brightness
+            specular_power = 64.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9804f, 0.8824f, 0.0078f); // color of the object;
+          break;
+
+          case Type::Cyan_Plastic:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            specular_power = 128.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.0f, 0.8f, 0.8f); // color of the object;
+          break;
+
+          case Type::Red_Plastic:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            specular_power = 256.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.0f, 0.0f); // color of the object;
+          break;
+
+          case Type::Green_Rubber:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            specular_power = 128.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.0f, 0.9f, 0.0f); // color of the object;
+          break;
+
+          case Type::Yellow_Rubber:
+            ambient_strength = 0.1; // less = dark, more = bright
+            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            specular_power = 128.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.9f, 0.0f); // color of the object;
+          break;
+        }  
+      }
+    };
+
+    struct Light{
+      glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+      glm::mat4 mat_model = glm::mat4(1.f);
+      glm::vec3 scale = glm::vec3(0.5f, 0.5f, 0.5f);
+      glm::vec3 pos;
+    };
+    
+
     public:
     static constexpr std::string_view NameString{ "Lighting Meterials" };
     std::array<float, 6*6*6> Vertices{ // xyz, normals
@@ -1794,11 +1878,9 @@ namespace test {
 
     };
     glm::mat4 proj;
-    glm::mat4 model_cube = glm::mat4(1);
-    glm::mat4 model_light = glm::mat4(1);
-    glm::vec3 cube_color = glm::vec3(0.2f, 0.8f, 0.2f); // green-ish
-    //glm::vec3 light_color = glm::vec3(1.f, 0.3f, 0.3f); // red-ish
-    glm::vec3 light_color = glm::vec3(1.f, 1.0f, 1.0f); 
+    
+    Material cube;
+    Light light;
 
     glm::vec3 light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
     std::string VertexShaderSource;
@@ -1832,11 +1914,23 @@ namespace test {
     {
       std::cout << NameString << " Constructed \n";
       
+      camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
+      camera.pitch = 12.9f; 
+      camera.yaw = 50.83f; 
+
       glfwGetWindowSize(window, &window_width, &window_height);
       proj = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
 
       if (!VertexShaderSource_read_status) std::cout << "Failed to read Vertex Shader\n";
       if (!FragmentShaderSource_read_status) std::cout << "Failed to read Fragment Shader\n";
+
+      light.pos = light_source_translation;
+      light.mat_model = glm::translate(light.mat_model, light.pos);
+      light.mat_model = glm::scale(light.mat_model, light.scale);
+
+      cube = Material(Material::Type::Yellow_Rubber);
+
+
 
       v_arr.bind();
       v_buff.bind(GL_ARRAY_BUFFER);
@@ -1859,9 +1953,6 @@ namespace test {
       camera.SetMouseSharedWithImGui();
       camera.SetKeyboardSharedWithImGui();
 
-
-      model_light = glm::translate(model_light, light_source_translation);
-      model_light = glm::scale(model_light, glm::vec3(0.5f, 0.5f, 0.5f));
     }
 
     void OnOpenGLRender(){
@@ -1875,22 +1966,22 @@ namespace test {
         shader_program.Bind();
         v_arr.bind();
 
-        glm::mat4 mvp = proj * view * model_cube;
+        glm::mat4 mvp = proj * view * cube.mat_model;
         shader_program.SetUniform1i("rendering_light_source", 0);
 
         shader_program.SetUniformMat4f("projection", proj);
         shader_program.SetUniformMat4f("view", view);
-        shader_program.SetUniformMat4f("model", model_cube);
+        shader_program.SetUniformMat4f("model", cube.mat_model);
 
-        shader_program.SetUniformVec3f("material.color", cube_color);
-        shader_program.SetUniformVec3f("light.color", light_color);
-        shader_program.SetUniformVec3f("light.pos", light_source_translation);
+        shader_program.SetUniformVec3f("material.color", cube.color);
+        shader_program.SetUniformVec3f("light.color", light.color);
+        shader_program.SetUniformVec3f("light.pos", light.pos);
         shader_program.SetUniformVec3f("camera.pos", camera.GetPosition());
 
-        shader_program.SetUniform1f("material.ambient_strength", 0.1f);
-        shader_program.SetUniformVec3f("material.diffuse_color", glm::vec3(1.0f, 1.0f, 1.0f));
-        shader_program.SetUniform1f("material.specular_strength", 0.5f);
-        shader_program.SetUniform1f("material.specular_power", 32.f);
+        shader_program.SetUniform1f("material.ambient_strength", cube.ambient_strength);
+        shader_program.SetUniformVec3f("material.diffuse_color", cube.diffuse_color);
+        shader_program.SetUniform1f("material.specular_strength", cube.specular_strength);
+        shader_program.SetUniform1f("material.specular_power", cube.specular_power);
 
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
@@ -1906,9 +1997,9 @@ namespace test {
         
         shader_program.SetUniformMat4f("projection", proj);
         shader_program.SetUniformMat4f("view", view);
-        shader_program.SetUniformMat4f("model", model_light);
+        shader_program.SetUniformMat4f("model", light.mat_model);
         
-        shader_program.SetUniformVec3f("light.color", light_color);
+        shader_program.SetUniformVec3f("light.color", light.color);
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
       }
@@ -1932,12 +2023,20 @@ namespace test {
       ImGui::Spacing();
       ImGui::Text("Press ESC to disable camera and enable mouse");
       ImGui::Spacing();
-      ImGui::ColorEdit3("Light Color : ", glm::value_ptr(light_color));
+      ImGui::ColorEdit3("Light Color : ", glm::value_ptr(light.color));
       ImGui::Spacing();
-      ImGui::ColorEdit3("Cube Color : ", glm::value_ptr(cube_color));
+      ImGui::ColorEdit3("Cube Color : ", glm::value_ptr(cube.color));
+
+      //temp 
+      ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+      ImGui::Text("Pitch: %.2f", camera.pitch);
+      ImGui::Text("Yaw: %.2f", camera.yaw);
+      
 
 
     }
+
+    
   };
 
 
