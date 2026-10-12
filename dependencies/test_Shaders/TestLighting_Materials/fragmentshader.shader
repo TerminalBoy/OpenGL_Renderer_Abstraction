@@ -12,6 +12,9 @@ struct Material {
 struct Light{
 	vec3 pos;
 	vec3 color;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
 };
 
 struct Camera{
@@ -37,19 +40,19 @@ void main() {
 
 
 	//ambient
-	vec3 ambient = light.color * material.ambient_strength;
+	vec3 ambient = light.ambient * material.ambient_strength;
 
 	//diffuse
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(light.pos - FragPos);
 	float diff= max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = light.color * (diff * material.diffuse_color);
+	vec3 diffuse = light.diffuse * (diff * material.diffuse_color);
 
 	//specular
 	vec3 viewDir = normalize(camera.pos - FragPos);
 	vec3 reflectionDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectionDir), 0.0), material.specular_power);
-	vec3 specular = light.color * (spec * material.specular_strength);
+	vec3 specular = light.specular * (spec * material.specular_strength);
 
 	vec3 result = (ambient + diffuse + specular) * material.color;
 	

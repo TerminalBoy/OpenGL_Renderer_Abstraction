@@ -1801,10 +1801,22 @@ namespace test {
     };
     Material::Type Current_Material;
     struct Light{
-      glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-      glm::mat4 mat_model = glm::mat4(1.f);
-      glm::vec3 scale = glm::vec3(0.5f, 0.5f, 0.5f);
+      glm::vec3 color;
+      glm::mat4 mat_model;
+      glm::vec3 scale;
       glm::vec3 pos;
+      glm::vec3 ambient;
+      glm::vec3 diffuse;
+      glm::vec3 specular;
+      Light()
+      : 
+      color(1.0f, 1.0f, 1.0f), 
+      mat_model(1), 
+      scale(0.5f, 0.5f, 0.5f),
+      ambient(1.f), diffuse(1.f), specular(1.f)
+      {
+
+      }
     };
     
 
@@ -1998,6 +2010,10 @@ namespace test {
         shader_program.SetUniformMat4f("model", light.mat_model);
         
         shader_program.SetUniformVec3f("light.color", light.color);
+        shader_program.SetUniformVec3f("light.ambient", light.ambient);
+        shader_program.SetUniformVec3f("light.diffuse", light.diffuse);
+        shader_program.SetUniformVec3f("light.specular", light.specular);
+
 
         VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, 36));
       }
