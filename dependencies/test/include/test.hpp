@@ -1726,75 +1726,81 @@ namespace test {
 
 
     struct Material {
-      float ambient_strength;
-      float specular_strength;
-      float specular_power;
-      glm::mat4 mat_model = glm::mat4(1);
-      glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);;
+      glm::vec3 ambient;
+      glm::vec3 diffuse;
+      glm::vec3 specular;
+      glm::vec3 pos;
       glm::vec3 color;
-      glm::vec3 diffuse_color = glm::vec3(1.f, 1.f, 1.f);;
+      glm::mat4 mat_model;
+      float specular_power;
       enum class Type {
         Emerald, Pearl, Bronze, Gold, Cyan_Plastic, 
         Red_Plastic, Green_Rubber, Yellow_Rubber, None
       };
-      Material(){}
-      Material(Type type){
+      Material() : mat_model(0.f){}
+      Material(Type type)
+      : ambient(0.f), diffuse(1.f), specular(0.f), mat_model(1.f), pos(0.f)
+      {
         switch (type){
 
           case Type::Emerald:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.5; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.5); // less = less shine brightness, more = more shine brightness
             specular_power = 64.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.f, 1.f, 0.f); // color of the object;
           break;
 
           case Type::Pearl:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.5; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.5); // less = less shine brightness, more = more shine brightness
             specular_power = 2.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.9f, 0.9f, 0.9f); // color of the object;
           break;
 
           case Type::Bronze:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.7; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.7); // less = less shine brightness, more = more shine brightness
             specular_power = 32.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.722f, 0.337f, 0.145f); // color of the object;
           break;
 
           case Type::Gold:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.9; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.9); // less = less shine brightness, more = more shine brightness
             specular_power = 64.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.9804f, 0.8824f, 0.0078f); // color of the object;
           break;
 
           case Type::Cyan_Plastic:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
             specular_power = 128.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.0f, 0.8f, 0.8f); // color of the object;
           break;
 
           case Type::Red_Plastic:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
             specular_power = 256.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.9f, 0.0f, 0.0f); // color of the object;
           break;
 
           case Type::Green_Rubber:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
             specular_power = 128.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.0f, 0.9f, 0.0f); // color of the object;
           break;
 
           case Type::Yellow_Rubber:
-            ambient_strength = 0.1; // less = dark, more = bright
-            specular_strength = 0.4; // less = less shine brightness, more = more shine brightness
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
             specular_power = 128.f; // area of shine, less = more area, more = less area,
             color = glm::vec3(0.9f, 0.9f, 0.0f); // color of the object;
+          break;
+
+          case Type::None:
+            mat_model = glm::mat4(0.f);
           break;
         }  
       }
@@ -1988,9 +1994,9 @@ namespace test {
         shader_program.SetUniformVec3f("light.pos", light.pos);
         shader_program.SetUniformVec3f("camera.pos", camera.GetPosition());
 
-        shader_program.SetUniform1f("material.ambient_strength", cube.ambient_strength);
-        shader_program.SetUniformVec3f("material.diffuse_color", cube.diffuse_color);
-        shader_program.SetUniform1f("material.specular_strength", cube.specular_strength);
+        shader_program.SetUniformVec3f("material.ambient", cube.ambient);
+        shader_program.SetUniformVec3f("material.diffuse", cube.diffuse);
+        shader_program.SetUniformVec3f("material.specular", cube.specular);
         shader_program.SetUniform1f("material.specular_power", cube.specular_power);
 
 
@@ -2083,7 +2089,10 @@ namespace test {
         }
         
       } else {
-        if (ImGui::Button("<--- Select another Material")) Current_Material = Material::Type::None;
+        if (ImGui::Button("<--- Select another Material")) { 
+          Current_Material = Material::Type::None;
+          cube = Material(Material::Type::None);
+        }
       }
 
 

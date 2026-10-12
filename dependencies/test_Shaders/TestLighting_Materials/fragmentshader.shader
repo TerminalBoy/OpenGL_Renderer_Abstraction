@@ -1,11 +1,10 @@
 #version 330 core  
 
 struct Material {
-  float ambient_strength;
-	float specular_strength;
+  vec3 ambient;
+	vec3 specular;
+	vec3 diffuse;
 	float specular_power;
-
-  vec3 diffuse_color;
 	vec3 color;
 };
 
@@ -40,19 +39,19 @@ void main() {
 
 
 	//ambient
-	vec3 ambient = light.ambient * material.ambient_strength;
+	vec3 ambient = light.ambient * material.ambient;
 
 	//diffuse
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(light.pos - FragPos);
 	float diff= max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = light.diffuse * (diff * material.diffuse_color);
+	vec3 diffuse = light.diffuse * (diff * material.diffuse);
 
 	//specular
 	vec3 viewDir = normalize(camera.pos - FragPos);
 	vec3 reflectionDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectionDir), 0.0), material.specular_power);
-	vec3 specular = light.specular * (spec * material.specular_strength);
+	vec3 specular = light.specular * (spec * material.specular);
 
 	vec3 result = (ambient + diffuse + specular) * material.color;
 	
