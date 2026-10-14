@@ -31,6 +31,7 @@ uniform Light light;
 uniform Camera camera;
 
 uniform bool rendering_light_source;
+uniform bool rendering_specular;
 
 void main() {  
 
@@ -54,8 +55,12 @@ void main() {
 	vec3 reflectionDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectionDir), 0.0), material.specular_power);
 	vec3 specular = light.specular * (spec * material.specular);
+	vec3 result;
+  if (rendering_specular) {
+		result = (ambient + diffuse + specular);
+	} else {
+		result = (ambient + diffuse);
+	}
 
-	vec3 result = (ambient + diffuse + specular);
-	
 	FragColor = vec4(result, 1.0);  
 }	

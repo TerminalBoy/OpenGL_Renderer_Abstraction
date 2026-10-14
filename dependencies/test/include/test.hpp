@@ -2353,6 +2353,8 @@ namespace test {
 
         m_shader_program.Bind();
         m_shader_program.SetUniform1i("rendering_light_source", 0);
+        m_shader_program.SetUniform1i("rendering_specular", 0);
+        
         m_shader_program.SetUniformMat4f("model", m_cube.mat_model);
         m_shader_program.SetUniformMat4f("view", view);
         m_shader_program.SetUniformMat4f("projection", m_proj);
