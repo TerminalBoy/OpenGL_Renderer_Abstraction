@@ -70,7 +70,8 @@ int main() {
     test::TestLightingDiffuse,
     test::TestLightingSpecular,
     test::TestLighting_Materials,
-    test::TestLighting_DiffuseMap
+    test::TestLighting_DiffuseMap,
+    test::TestLighting_SpecularMap
     > 
     menu(window);
 
