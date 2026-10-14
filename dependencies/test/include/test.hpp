@@ -2247,7 +2247,7 @@ namespace test {
             ambient = glm::vec3(0.1); // less = dark, more = bright
             specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
             specular_power = 32.f; // area of shine, less = more area, more = less area,
-            color = glm::vec3(0.9f, 0.9f, 9.0f); // color of the object;
+            color = glm::vec3(0.9f, 0.9f, 0.9f); // color of the object;
           break;
 
           case Type::None:
@@ -2277,7 +2277,7 @@ namespace test {
 
     VertexArray m_v_arr;
     VertexBuffer m_v_buff;
-
+    Texture m_diffuse_map;
     public:
     static constexpr std::string_view NameString{"Diffuse Map"};
     
@@ -2290,7 +2290,8 @@ namespace test {
       m_vertex_shader(&m_v_src), 
       m_fragment_shader(&m_f_src),
 
-      m_shader_program(m_vertex_shader, m_fragment_shader)
+      m_shader_program(m_vertex_shader, m_fragment_shader),
+      m_diffuse_map("Assets/Wooden_Box_Steel_Frame.png")
 
     {
       std::cout << NameString << " Constructed\n";
@@ -2323,6 +2324,7 @@ namespace test {
       m_v_arr.enable(2);
       
       m_shader_program.Bind();
+      m_diffuse_map.Bind();
       
       m_camera.SetCameraEnabled();
       m_camera.SetDragStyleCamera();
@@ -2350,29 +2352,35 @@ namespace test {
       { //cube 
 
         m_shader_program.Bind();
-        m_shader_program.SetUniform1f("rendering_light_source", 0);
+        m_shader_program.SetUniform1i("rendering_light_source", 0);
         m_shader_program.SetUniformMat4f("model", m_cube.mat_model);
         m_shader_program.SetUniformMat4f("view", view);
         m_shader_program.SetUniformMat4f("projection", m_proj);
-        m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
-        m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
+        //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
+        //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
         m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
         m_shader_program.SetUniformVec3f("material.color", m_cube.color);
         m_shader_program.SetUniform1f("material.specular_power", m_cube.specular_power);
 
         m_shader_program.SetUniformVec3f("light.color", m_light.color);
         m_shader_program.SetUniformVec3f("light.pos", m_light.pos);
+        m_shader_program.SetUniformVec3f("light.ambient", m_light.ambient);
+        m_shader_program.SetUniformVec3f("light.diffuse", m_light.diffuse);
+        m_shader_program.SetUniformVec3f("light.specular", m_light.specular);
+
 
         m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+
+        m_shader_program.SetUniform1i("material.diffuse", 0);
         
-        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size()));
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
 
       }
 
       { // light 
 
         m_shader_program.Bind();
-        m_shader_program.SetUniform1f("rendering_light_source", 1);
+        m_shader_program.SetUniform1i("rendering_light_source", 1);
         m_shader_program.SetUniformMat4f("model", m_light.mat_model);
         m_shader_program.SetUniformMat4f("view", view);
         m_shader_program.SetUniformMat4f("projection", m_proj);
@@ -2387,7 +2395,7 @@ namespace test {
 
         m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
         
-        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size()));
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
 
       }
 
