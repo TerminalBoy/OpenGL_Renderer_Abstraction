@@ -2912,7 +2912,7 @@ namespace test {
     std::vector<Material> m_cubes;
     Light m_light;
 
-    glm::vec3 m_light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
+    glm::vec3 m_light_source_translation = glm::vec3(2.f, 4.f, -5.f) * glm::vec3(5.f);
     std::string m_VertexShaderSource;
     std::string m_FragmentShaderSource;
 
