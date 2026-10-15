@@ -71,7 +71,8 @@ int main() {
     test::TestLightingSpecular,
     test::TestLighting_Materials,
     test::TestLighting_DiffuseMap,
-    test::TestLighting_SpecularMap
+    test::TestLighting_SpecularMap,
+    test::TestLighting_DirectionalLight
     > 
     menu(window);
 
