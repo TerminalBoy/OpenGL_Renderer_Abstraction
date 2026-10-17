@@ -73,7 +73,8 @@ int main() {
     test::TestLighting_DiffuseMap,
     test::TestLighting_SpecularMap,
     test::TestLighting_DirectionalLight,
-    test::TestLighting_Attenuation
+    test::TestLighting_Attenuation,
+    test::TestLighting_Flashlight
     > 
     menu(window);
 
