@@ -20,6 +20,7 @@ struct Light{
 	float atten_linear;
 	float atten_quadratic;
 	float cutOff;
+	float outerCutOff;
 };
 
 struct Camera{
@@ -77,8 +78,13 @@ void main() {
   
 	
 	float theta = dot(lightDir, normalize(-light.direction));
+	float epsilon = light.cutOff - light.outerCutOff;
+	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-	if (theta > light.cutOff) {
+	diffuse *= intensity;
+	specular *= intensity;
+
+	if (theta > light.outerCutOff) {
 		result = (ambient + diffuse + specular);
 
 	} else {

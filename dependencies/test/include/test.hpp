@@ -3728,6 +3728,8 @@ namespace test {
         m_shader_program.SetUniformVec3f("light.ambient", m_light.ambient);
         m_shader_program.SetUniformVec3f("light.diffuse", m_light.diffuse);
         m_shader_program.SetUniform1f("light.cutOff", glm::cos(glm::radians(12.5f)));
+        m_shader_program.SetUniform1f("light.outerCutOff", glm::cos(glm::radians(15.5f)));
+
         m_shader_program.SetUniformVec3f("light.specular", m_light.specular);
 
 
