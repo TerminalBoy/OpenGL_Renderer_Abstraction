@@ -68,7 +68,7 @@ void main() {
 	
 	vec3 result;
 
-	//ambient *= attenuation;
+	ambient *= attenuation;
 	diffuse *= attenuation;
 	specular *= attenuation;
 
