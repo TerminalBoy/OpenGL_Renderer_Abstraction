@@ -16,6 +16,16 @@
 #include <imgui.h>
 
 
+static bool PrintGLErrors = true; // just a temporary solution, will look forward to encapsulate or find a better architecture
+
+void DisableGLErrorPrinting(){
+  PrintGLErrors = false;
+}
+
+void EnableGLErrorPrinting(){
+  PrintGLErrors = true;
+}
+
 
 void clear_gl_errors() {
   while (glGetError() != GL_NO_ERROR) {}
@@ -27,12 +37,14 @@ void log_gl_errors(const char* expression, std::size_t line, const char* file_na
   bool loop_ran = false;
 
   while (error_code != GL_NO_ERROR) {
-    std::cout << "OpenGL Error on: " << expression
-      << "\nBreakpoint trigger:"
-      << "\nAt line: " << line
-      << "\nFile: " << file_name
-      << "\nError Code: " << error_code;
-    error_code = glGetError();
+    if (PrintGLErrors)
+      std::cout << "OpenGL Error on: " << expression
+        << "\nBreakpoint trigger:"
+        << "\nAt line: " << line
+        << "\nFile: " << file_name
+        << "\nError Code: " << error_code;
+    
+        error_code = glGetError();
     loop_ran = true;
 
   }
@@ -463,6 +475,7 @@ class ShaderProgram {
 private:
   unsigned int _id;
   std::unordered_map<std::string, int> uniform_location_cache;
+  std::unordered_map<std::string, int> nonexistent_uniform_reported;
   bool m_ignore_nonexistent_uniform = false;
 
 public:
@@ -553,7 +566,11 @@ private:
         std::cout << "\n \n \n \n !!!!!!!!!!!! Uniform " << name << " does not exist \n \n \n \n";
         assert(0);
       } else {
-        std::cout << "Ignored non existent uniform: " << name << std::endl;
+        if (nonexistent_uniform_reported.find(name) == nonexistent_uniform_reported.end() ||
+            nonexistent_uniform_reported[name] == false) {// not yet reported
+          std::cout << "Ignored non existent uniform: " << name << std::endl;
+          nonexistent_uniform_reported[name] = true;
+        }
       }
     }
     else {
