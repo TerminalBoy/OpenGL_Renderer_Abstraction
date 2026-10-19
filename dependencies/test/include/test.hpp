@@ -3789,6 +3789,443 @@ namespace test {
   };
 
 
+
+    class TestLighting_MultipleLights {
+    int m_window_width{};
+    int m_window_height{};
+    Camera m_camera;
+    std::array<float, 6*6*(6+2)> m_Vertices{ //xyz, normals, Texture_xy
+     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
+     -0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
+     
+     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
+      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+     -0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
+    
+     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, -0.5f,     -1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, 0.5f,     -1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+
+      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f,      1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, -0.5f, 0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      1.0f, 1.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
+    
+     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       0.0f, 0.0f,
+     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f
+
+    };
+    
+    
+    struct DirectionalLight{
+    	glm::vec3 direction;
+
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+      glm::vec3 color;
+    };
+
+    struct PointLight {
+    	glm::vec3 scale;
+      glm::mat4 mat_model;
+      
+      glm::vec3 pos;
+
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+
+    	glm::vec3 color;
+
+    	float atten_constant;
+    	float atten_linear;
+    	float atten_quadratic;
+    };
+
+    struct Spotlight {
+    	glm::vec3 pos;
+    	glm::vec3 color;
+    	glm::vec3 direction;
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+    	float atten_constant;
+    	float atten_linear;
+    	float atten_quadratic;
+    	float cutOff;
+    	float outerCutOff;
+    };
+
+    struct Material {
+      glm::vec3 ambient;
+      glm::vec3 diffuse;
+      glm::vec3 specular;
+      glm::vec3 pos;
+      glm::vec3 color;
+      glm::mat4 mat_model;
+      float specular_power;
+      enum class Type {
+        Emerald, Pearl, Bronze, Gold, Cyan_Plastic, 
+        Red_Plastic, Green_Rubber, Yellow_Rubber, Neutral, None
+      };
+      Material() : mat_model(0.f){}
+      Material(Type type)
+      : ambient(0.f), diffuse(1.f), specular(0.f), mat_model(1.f), pos(0.f)
+      {
+        switch (type){
+
+          case Type::Emerald:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.5); // less = less shine brightness, more = more shine brightness
+            specular_power = 64.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.f, 1.f, 0.f); // color of the object;
+          break;
+
+          case Type::Pearl:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.5); // less = less shine brightness, more = more shine brightness
+            specular_power = 2.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.9f, 0.9f); // color of the object;
+          break;
+
+          case Type::Bronze:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.7); // less = less shine brightness, more = more shine brightness
+            specular_power = 32.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.722f, 0.337f, 0.145f); // color of the object;
+          break;
+
+          case Type::Gold:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.9); // less = less shine brightness, more = more shine brightness
+            specular_power = 64.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9804f, 0.8824f, 0.0078f); // color of the object;
+          break;
+
+          case Type::Cyan_Plastic:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
+            specular_power = 128.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.0f, 0.8f, 0.8f); // color of the object;
+          break;
+
+          case Type::Red_Plastic:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
+            specular_power = 256.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.0f, 0.0f); // color of the object;
+          break;
+
+          case Type::Green_Rubber:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
+            specular_power = 128.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.0f, 0.9f, 0.0f); // color of the object;
+          break;
+
+          case Type::Yellow_Rubber:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
+            specular_power = 128.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.9f, 0.0f); // color of the object;
+          break;
+
+          case Type::Neutral:
+            ambient = glm::vec3(0.1); // less = dark, more = bright
+            specular = glm::vec3(0.4); // less = less shine brightness, more = more shine brightness
+            specular_power = 32.f; // area of shine, less = more area, more = less area,
+            color = glm::vec3(0.9f, 0.9f, 0.9f); // color of the object;
+          break;
+
+          case Type::None:
+            mat_model = glm::mat4(0.f);
+          break;
+        }  
+      }
+    };
+
+    glm::vec3 cubePositions[10] = { // translations
+      glm::vec3(0.0f, 0.0f, 0.0f),
+      glm::vec3(2.0f, 5.0f, -15.0f),
+      glm::vec3(-1.5f, -2.2f, -2.5f),
+      glm::vec3(-3.8f, -2.0f, -12.3f),
+      glm::vec3(2.4f, -0.4f, -3.5f),
+      glm::vec3(-1.7f, 3.0f, -7.5f),
+      glm::vec3(1.3f, -2.0f, -2.5f),
+      glm::vec3(1.5f, 2.0f, -2.5f),
+      glm::vec3(1.5f, 0.2f, -1.5f),
+      glm::vec3(-1.3f, 1.0f, -1.5f)
+    };
+
+    glm::mat4 m_proj;
+    std::vector<Material> m_cubes;
+
+    DirectionalLight m_sun;
+    PointLight m_bulb;
+    Spotlight m_flashlight;
+
+    glm::vec3 m_light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
+    std::string m_VertexShaderSource;
+    std::string m_FragmentShaderSource;
+
+    bool m_VertexShaderSource_read_status;
+    bool m_FragmentShaderSource_read_status;
+
+    const char* m_v_src = m_VertexShaderSource.c_str();
+    const char* m_f_src = m_FragmentShaderSource.c_str();
+
+    ShaderVertex m_vertex_shader;
+    ShaderFragment m_fragment_shader;
+    ShaderProgram m_shader_program;
+
+    VertexArray m_v_arr;
+    VertexBuffer m_v_buff;
+    Texture m_diffuse_map;
+    Texture m_specular_map;
+    public:
+    static constexpr std::string_view NameString{"Multiple Lights"};
+    
+    TestLighting_MultipleLights(GLFWwindow* window)
+    : m_camera(window),
+      
+      m_VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLighting_MultipleLights/vertexshader.shader", m_VertexShaderSource)),
+      m_FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestLighting_MultipleLights/fragmentshader.shader", m_FragmentShaderSource)),
+      
+      m_vertex_shader(&m_v_src), 
+      m_fragment_shader(&m_f_src),
+
+      m_shader_program(m_vertex_shader, m_fragment_shader),
+      m_specular_map("Assets/Steel_Frame.png"),
+      m_diffuse_map("Assets/Wooden_Box_Steel_Frame.png"),
+      m_cubes(10)
+
+    {
+      std::cout << NameString << " Constructed\n";
+
+      glfwGetWindowSize(window, &m_window_width, &m_window_height);
+      m_proj = glm::perspective(glm::radians(45.0f), static_cast<float>(m_window_width) / static_cast<float>(m_window_height), 0.1f, 100.0f);
+
+
+      //m_cube = Material(Material::Type::Neutral);
+      
+      for (std::size_t i{}; i < m_cubes.size(); ++i){
+        m_cubes[i] = Material(Material::Type::Neutral);
+        m_cubes[i].pos =  cubePositions[i];
+        m_cubes[i].mat_model = glm::translate(m_cubes[i].mat_model, m_cubes[i].pos);
+      }
+
+      // initializing sun
+      m_sun.direction = glm::vec3(1.f, 1.f, -1.f);
+      m_sun.color = glm::vec3(255.f/255.f, 229.f/255.f, 200.f/255.f);
+      m_sun.ambient = m_sun.color - glm::vec3(0.7); // darken the ambient
+      m_sun.diffuse = m_sun.color;
+      m_sun.specular = m_sun.color;
+
+
+      // initializing bulb
+      m_bulb.pos = m_light_source_translation;      
+      m_bulb.scale = glm::vec3(0.5f);
+      m_bulb.mat_model = glm::mat4(1);
+      m_bulb.mat_model = glm::translate(m_bulb.mat_model, m_bulb.pos);
+      m_bulb.mat_model = glm::scale(m_bulb.mat_model, m_bulb.scale);
+      m_bulb.color = glm::vec3(1.0f);
+      m_bulb.ambient = m_bulb.color - glm::vec3(0.9);
+      m_bulb.diffuse = m_bulb.color;
+      m_bulb.specular = m_bulb.color;
+      m_bulb.atten_constant = 1.0f;
+      m_bulb.atten_linear = 0.09f;
+      m_bulb.atten_quadratic = 0.032f;
+
+      // initializing flashlight
+      m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
+      m_flashlight.color = glm::vec3(1.0f);
+      m_flashlight.direction = m_camera.cameraFront; // !!!! TO BE DONE EVERY FRAME
+      m_flashlight.ambient = m_flashlight.color - glm::vec3(0.95f);
+      m_flashlight.diffuse = m_flashlight.color;
+      m_flashlight.specular = m_flashlight.color;
+      m_flashlight.atten_constant = 1.0f;
+      m_flashlight.atten_linear = 0.022f;
+      m_flashlight.atten_quadratic = 0.0019f;
+
+
+
+
+
+      if (!m_VertexShaderSource_read_status) std::cout << "Failed to read Vertex Shader\n";
+      if (!m_FragmentShaderSource_read_status) std::cout << "Failed to read Fragment Shader\n";
+
+      m_v_arr.bind();
+      m_v_buff.bind(GL_ARRAY_BUFFER);
+      m_v_buff.set_data(GL_ARRAY_BUFFER, m_Vertices, GL_STATIC_DRAW);
+
+      m_v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 0);
+      m_v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 3 * sizeof(float));
+      m_v_arr.push_arrtib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 6 * sizeof(float));
+
+      m_v_arr.enable(0);
+      m_v_arr.enable(1);
+      m_v_arr.enable(2);
+      
+      m_shader_program.Bind();
+      m_shader_program.SetIgnoreNonExistentUniform(true);
+      m_diffuse_map.Bind(0);
+      m_specular_map.Bind(1);
+      
+      m_camera.SetCameraEnabled();
+      m_camera.SetDragStyleCamera();
+      m_camera.SetCursorVisible(); // we want the cursor to be visible for a drag style camera
+      // allow proper keyboard and mouse sharing with imgui
+      m_camera.SetMouseSharedWithImGui();
+      m_camera.SetKeyboardSharedWithImGui();
+
+      m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
+      m_camera.pitch = 12.9f; 
+      m_camera.yaw = 50.83f; 
+
+    }
+
+    ~TestLighting_MultipleLights(){
+      std::cout << NameString << " Deconstructed\n";
+    }
+
+    void OnOpenGLRender(){
+      m_camera.OnOpenGLRender();
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+      glm::mat4 view = m_camera.GetViewMatrix();
+      DisableGLErrorPrinting();
+      for (std::size_t i{}; i < m_cubes.size(); ++i)
+      { //cube 
+
+        m_shader_program.Bind();
+        m_shader_program.SetUniform1i("rendering_light_source", 0);
+
+        m_shader_program.SetUniformMat4f("model", m_cubes[i].mat_model);
+        m_shader_program.SetUniformMat4f("view", view);
+        m_shader_program.SetUniformMat4f("projection", m_proj);
+        //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
+        //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
+        //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
+        
+        // setting materials
+        m_shader_program.SetUniformVec3f("material.color", m_cubes[i].color);
+        m_shader_program.SetUniform1f("material.specular_power", m_cubes[i].specular_power);
+        m_shader_program.SetUniform1i("material.diffuse", 0); // texture slots
+        m_shader_program.SetUniform1i("material.specular", 1); // texture slots
+
+        // setting directional light
+        m_shader_program.SetUniformVec3f("sun.direction", m_sun.direction);
+        m_shader_program.SetUniformVec3f("sun.ambient", m_sun.ambient);
+        m_shader_program.SetUniformVec3f("sun.diffuse", m_sun.diffuse);
+        m_shader_program.SetUniformVec3f("sun.specular", m_sun.specular);
+        m_shader_program.SetUniformVec3f("sun.color", m_sun.color);
+
+        // setting point light
+        m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
+        m_shader_program.SetUniformVec3f("bulb.ambient", m_bulb.ambient);
+        m_shader_program.SetUniformVec3f("bulb.diffuse", m_bulb.diffuse);
+        m_shader_program.SetUniformVec3f("bulb.specular", m_bulb.specular);
+        m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
+        m_shader_program.SetUniform1f("bulb.atten_constant", m_bulb.atten_constant);
+        m_shader_program.SetUniform1f("bulb.atten_linear", m_bulb.atten_linear);
+        m_shader_program.SetUniform1f("bulb.atten_quadratic", m_bulb.atten_quadratic);
+
+        // setting spotlight
+        m_flashlight.pos = m_camera.GetPosition();
+        m_flashlight.direction = m_camera.cameraFront;
+
+        m_shader_program.SetUniformVec3f("flashlight.pos", m_flashlight.pos);
+        m_shader_program.SetUniformVec3f("flashlight.direction", m_flashlight.direction);
+        m_shader_program.SetUniformVec3f("flashlight.ambient", m_flashlight.ambient);
+        m_shader_program.SetUniformVec3f("flashlight.diffuse", m_flashlight.diffuse);
+        m_shader_program.SetUniformVec3f("flashlight.specular", m_flashlight.specular);
+        m_shader_program.SetUniformVec3f("flashlight.color", m_flashlight.color);
+        m_shader_program.SetUniform1f("flashlight.atten_constant", m_flashlight.atten_constant);
+        m_shader_program.SetUniform1f("flashlight.atten_linear", m_flashlight.atten_linear);
+        m_shader_program.SetUniform1f("flashlight.atten_quadratic", m_flashlight.atten_quadratic);
+        m_shader_program.SetUniform1f("flashlight.cutOff", glm::cos(glm::radians(12.5f)));
+        m_shader_program.SetUniform1f("flashlight.outerCutOff", glm::cos(glm::radians(15.5f)));
+
+
+
+
+        // setting camera
+        m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+
+        // m_shader_program.SetUniform1f("light.atten_constant", 1.0f);
+        // // m_shader_program.SetUniform1f("light.atten_linear", 0.09f);
+        // // m_shader_program.SetUniform1f("light.atten_quadratic", 0.032f);
+        // m_shader_program.SetUniform1f("light.atten_linear", 0.022f);
+        // m_shader_program.SetUniform1f("light.atten_quadratic", 0.0019f);
+
+
+        
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
+
+      }
+
+      { // light 
+
+        m_shader_program.Bind();
+        m_shader_program.SetUniform1i("rendering_light_source", 1);
+        m_shader_program.SetUniformMat4f("model", m_bulb.mat_model);
+        m_shader_program.SetUniformMat4f("view", view);
+        m_shader_program.SetUniformMat4f("projection", m_proj);
+        //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
+        //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
+        //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
+        //m_shader_program.SetUniformVec3f("material.color", m_cube.color);
+        //m_shader_program.SetUniform1f("material.specular_power", m_cube.specular_power);
+
+        m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
+        m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
+
+        m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+     
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
+
+      }
+
+      
+
+
+
+      EnableGLErrorPrinting();
+    }
+
+    void processInput(){
+      m_camera.predefined_generic_WASD_control();
+    }
+
+    void OnImGuiRender(){}
+
+    
+  };
+
   template <typename... Tests>
   class TestMenu {
 
