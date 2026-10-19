@@ -463,10 +463,11 @@ class ShaderProgram {
 private:
   unsigned int _id;
   std::unordered_map<std::string, int> uniform_location_cache;
+  bool m_ignore_nonexistent_uniform = false;
 
 public:
 
-  ShaderProgram() : _id(0) {
+  ShaderProgram() : _id(0){
 
   }
 
@@ -533,6 +534,9 @@ public:
     VALIDATE_GL_(glUniform3f(GetUniformLocation(uniform_name), vec3.x, vec3.y, vec3.z ));
   }
 
+  void SetIgnoreNonExistentUniform(bool true_or_false){
+    m_ignore_nonexistent_uniform = true_or_false;
+  }
 
 private:
 
@@ -544,8 +548,13 @@ private:
     int uniform_location{};
     VALIDATE_GL_(uniform_location = glGetUniformLocation(_id, name.c_str()));
     if (uniform_location == -1) {
-      std::cout << "\n \n \n \n !!!!!!!!!!!! Uniform " << name << " does not exist \n \n \n \n";
-      assert(0);
+      
+      if (!m_ignore_nonexistent_uniform){
+        std::cout << "\n \n \n \n !!!!!!!!!!!! Uniform " << name << " does not exist \n \n \n \n";
+        assert(0);
+      } else {
+        std::cout << "Ignored non existent uniform: " << name << std::endl;
+      }
     }
     else {
       uniform_location_cache[name] = uniform_location;
