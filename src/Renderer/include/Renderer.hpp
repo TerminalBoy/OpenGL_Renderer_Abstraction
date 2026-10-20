@@ -15,6 +15,10 @@
 // for imgui integration with camera
 #include <imgui.h>
 
+//assimp
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 static bool PrintGLErrors = true; // just a temporary solution, will look forward to encapsulate or find a better architecture
 
@@ -726,7 +730,7 @@ class Mesh {
 
   void Draw(){
     VAO.bind();
-    VALIDATE_GL_(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0));
+    VALIDATE_GL_(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, 0));
     VAO.Unbind();
   }
 
@@ -754,6 +758,136 @@ class Mesh {
   }
 
 };
+
+class Model {
+
+  std::vector<Mesh> m_meshes;
+  std::string directory;
+
+
+  void loadModel(std::string path){
+    Assimp::Importer import;
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
+      std::cout << "ERROR::ASSIMP:: " << import.GetErrorString() << std::endl;
+      return;
+    }
+    directory = path.substr(0, path.find_last_of('/'));
+    processNode(scene->mRootNode, scene);
+  }
+  
+  void processNode(aiNode* node, const aiScene* scene){
+    for (std::size_t i{}; i < node->mNumMeshes; ++i){
+      aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+      m_meshes.push_back(processMesh(mesh, scene));
+    }
+
+    for (std::size_t i{}; i < node->mNumChildren; ++i){
+      processNode(node->mChildren[i], scene);   
+    }
+  }
+  
+  Mesh processMesh(aiMesh* mesh, const aiScene* scene){
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture> textures;
+
+    for (std::size_t i{}; i < mesh->mNumVertices; ++i){
+      Vertex vertex;
+      // process vertex positions, normals and texture coordinates
+      //[...]
+      glm::vec3 vec;
+
+      vec.x = mesh->mVertices[i].x;
+      vec.y = mesh->mVertices[i].y;
+      vec.x = mesh->mVertices[i].z;
+      
+      vertex.position = vec;
+
+
+      vec.x = mesh->mNormals[i].x;
+      vec.y = mesh->mNormals[i].y;
+      vec.x = mesh->mNormals[i].z;
+      
+      vertex.normal = vec;
+
+      vec.x = mesh->mVertices[i].x;
+      vec.y = mesh->mVertices[i].y;
+      vec.x = mesh->mVertices[i].z;
+      
+      if (mesh->mTextureCoords[0]){
+        glm::vec2 tvec;
+        
+        tvec.x = mesh->mTextureCoords[0][i].x;
+        tvec.y = mesh->mTextureCoords[0][i].y;
+        vertex.texcoordinates = tvec;
+      } else {
+        vertex.texcoordinates = glm::vec2(0.0f);
+      }
+
+      vertices.push_back(vertex);
+    }
+    // process indices
+    // [...]
+    for (std::size_t i{}; i < mesh->mNumFaces; ++i){
+      aiFace face = mesh->mFaces[i];
+      for (std::size_t j{}; j < face.mNumIndices; ++j){
+        indices.push_back(face.mIndices[j]);
+      }
+    }
+
+    // process material
+
+    if (mesh->mMaterialIndex >= 0){
+      // [...]
+
+      aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+      
+      std::vector<Texture> diffuse_maps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+      textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
+      
+      std::vector<Texture> specular_maps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+      textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
+
+    }
+
+
+    return Mesh(vertices, indices, textures);
+
+  }
+
+  std::vector<Texture> loadMaterialTextures(aiMaterial* material, aiTextureType texture_type, std::string type_name){
+
+    std::vector<Texture> textures;
+    for (std::size_t i{}; i < material->GetTextureCount(texture_type); ++i){
+      aiString str;
+      material->GetTexture(texture_type, i, &str);
+      Texture texture(directory + "/" + str.C_Str());
+      texture.type = type_name;
+      textures.push_back(texture);
+    }
+    return textures;
+
+  }
+
+
+  public:
+
+  Model(std::string path){
+    loadModel(path);
+  }
+
+  void Draw(ShaderProgram& shader_program){
+    for (std::size_t i{}; i < m_meshes.size(); ++i){
+      m_meshes[i].PrepareDraw(shader_program);
+      m_meshes[i].Draw();
+    }
+  }
+
+
+};
+
 
 namespace ShaderInput {
 
