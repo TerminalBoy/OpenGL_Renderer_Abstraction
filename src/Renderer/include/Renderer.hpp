@@ -358,6 +358,16 @@ public:
     VALIDATE_GL_(glBindVertexArray(VAO));
   }
 
+  void Unbind() const {
+    VALIDATE_GL_(glBindVertexArray(0));
+  }
+
+  static void UnbindAll(){
+    VALIDATE_GL_(glBindVertexArray(0));
+  }
+
+
+
   void push_arrtib_pointer(std::size_t index, std::size_t element_count_per_vertex_arrtib, unsigned int type_type_GLenum,
     int normalise, std::size_t stride_size_bytes, std::size_t vertex_element_offset_size_bytes) {
     VALIDATE_GL_(glVertexAttribPointer(
@@ -394,6 +404,10 @@ public:
   template <typename T, std::size_t buffer_size>
   void set_data(unsigned int target_type_GLenum, const std::array<T, buffer_size>& buffer, unsigned int usage_type_GLenum) {
     VALIDATE_GL_(glBufferData(target_type_GLenum, sizeof(T) * buffer_size, buffer.data(), usage_type_GLenum));
+  }
+
+  void set_data(unsigned int target_type_GLenum, std::size_t buffer_size_bytes, void* buffer_start, unsigned int usage_type_GLenum){
+    VALIDATE_GL_(glBufferData(target_type_GLenum, buffer_size_bytes, buffer_start, usage_type_GLenum));
   }
 
   unsigned int id() const{
@@ -462,6 +476,11 @@ public:
     VALIDATE_GL_(glBufferData(target_type_GLenum, sizeof(T) * buffer_size, buffer.data(), usage_type_GLenum));
   }
   
+  void set_data(unsigned int target_type_GLenum, std::size_t buffer_size_bytes, void* buffer_start, unsigned int usage_type_GLenum){
+    VALIDATE_GL_(glBufferData(target_type_GLenum, buffer_size_bytes, buffer_start, usage_type_GLenum));
+  }
+
+
   void bind() {
     VALIDATE_GL_(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
   }
@@ -583,19 +602,36 @@ private:
 
 class Texture {
 private:
-  unsigned int _id;
+  //unsigned int _id;
   std::string filepath;
+  //std::string type;
   std::int32_t width;
   std::int32_t height;
   std::int32_t bits_per_pixel;
+  
   unsigned char* local_buffer;
 
+
 public:
+  unsigned int _id;
+  std::string type;
+
+  Texture()
+  : _id(0), filepath(""), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr) 
+  {}
 
   Texture(const std::string& path) 
     : _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
   {
 
+    SetFile(path);
+  }
+
+  ~Texture() {
+    VALIDATE_GL_(glDeleteTextures(1, &_id));
+  }
+
+  void SetFile(const std::string& path){
     stbi_set_flip_vertically_on_load(1);
     local_buffer = stbi_load(path.c_str(), &width, &height, &bits_per_pixel, 4);
 
@@ -617,10 +653,6 @@ public:
 
   }
 
-  ~Texture() {
-    VALIDATE_GL_(glDeleteTextures(1, &_id));
-  }
-
   void Bind(unsigned int slot = 0) {	
     
     VALIDATE_GL_(glActiveTexture(GL_TEXTURE0 + slot));
@@ -630,6 +662,95 @@ public:
 
   void UnBind() {
     VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+  }
+
+  static void UnBindAll() {
+    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+  }
+
+};
+
+// making mesh abstractions
+
+struct Vertex {
+  glm::vec3 position;
+  glm::vec3 normal;
+  glm::vec2 texcoordinates;
+};
+
+// struct Texture {};// already made
+
+class Mesh {
+  VertexArray VAO;
+  VertexBuffer VBO;
+  ElementBuffer EBO;
+  
+  public:
+  // mesh data
+  std::vector<Vertex> m_vertices;
+  std::vector<unsigned int> m_indices;
+  std::vector<Texture> m_textures;
+
+  Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
+  : m_vertices(vertices), m_indices(indices), m_textures(textures) 
+  {
+    SetMesh();
+  }
+
+  void PrepareDraw(ShaderProgram& shader_program){
+    unsigned int diffuse_count = 1;
+    unsigned int specular_count = 1;
+
+    for (std::size_t i{}; i < m_textures.size(); ++i){
+      m_textures[i].Bind(i);
+
+      std::string number;
+      std::string name = m_textures[i].type;
+
+      if (name == "texture_diffuse"){
+        number = std::to_string(diffuse_count);
+        diffuse_count++;
+      } else if (name == "texture_specular"){
+        number = std::to_string(specular_count);
+        specular_count++;
+      }
+      std::string uniform_name("material." + name + number);
+
+      shader_program.SetUniform1i(uniform_name.c_str(), i);
+
+
+    }
+
+    Texture::UnBindAll();
+  }
+
+  void Draw(){
+    VAO.bind();
+    VALIDATE_GL_(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0));
+    VAO.Unbind();
+  }
+
+  private:
+
+  void SetMesh(){
+    VAO.bind();
+    
+    VBO.bind(GL_ARRAY_BUFFER);
+    VBO.set_data(GL_ARRAY_BUFFER, sizeof(Vertex) * m_vertices.size(), m_vertices.data() ,GL_STATIC_DRAW);
+
+    EBO.bind();
+    EBO.set_data(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW);
+
+    VAO.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, position));
+    VAO.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, normal));
+    VAO.push_arrtib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, texcoordinates));
+
+    VAO.enable(0);
+    VAO.enable(1);
+    VAO.enable(2);
+
+    VALIDATE_GL_(glBindVertexArray(0)); // unbind the vao
+
   }
 
 };
