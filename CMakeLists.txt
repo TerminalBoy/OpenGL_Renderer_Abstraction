@@ -47,8 +47,24 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE
   
 )
+ 
+FetchContent_Declare(
+  assimp  
+  GIT_REPOSITORY https://github.com/assimp/assimp
+  GIT_TAG v5.4.3
+  GIT_SHALLOW TRUE
   
+)
+
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+
+
 FetchContent_MakeAvailable(glfw)
+FetchContent_MakeAvailable(assimp)
+
 
 
 target_link_libraries(OpenGL_Renderer_Abstraction PRIVATE
@@ -56,4 +72,5 @@ target_link_libraries(OpenGL_Renderer_Abstraction PRIVATE
   glfw
   imgui
   stb_image
+  assimp
 )
