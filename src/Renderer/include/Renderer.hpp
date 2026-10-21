@@ -5,6 +5,7 @@
 #include <cassert>
 #include <fstream>
 #include <string>
+#include <utility>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <unordered_map>
@@ -630,6 +631,34 @@ public:
 
     SetFile(path);
   }
+
+  // not copyable
+  Texture(const Texture& other) = delete;
+  Texture& operator=(const Texture& other) = delete;
+
+  Texture(Texture&& other) noexcept 
+  : _id(std::exchange(other._id, 0)),
+    filepath(std::exchange(other.filepath, "")),
+    width(std::exchange(other.width, 0)),
+    height(std::exchange(other.height, 0)),
+    bits_per_pixel(std::exchange(other.bits_per_pixel, 0)),
+    local_buffer(std::exchange(other.local_buffer, 0))
+  {
+
+  }
+
+  Texture& operator=(Texture&& other) noexcept 
+  {
+    if (this != &other){
+      _id = std::exchange(other._id, 0);
+      filepath = std::exchange(other.filepath, "");
+      width = std::exchange(other.width, 0);
+      height = std::exchange(other.height, 0);
+      bits_per_pixel = std::exchange(other.bits_per_pixel, 0);
+      local_buffer = std::exchange(other.local_buffer, 0);
+    }
+  }
+
 
   ~Texture() {
     VALIDATE_GL_(glDeleteTextures(1, &_id));
