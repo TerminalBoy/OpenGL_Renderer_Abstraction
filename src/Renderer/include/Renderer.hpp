@@ -718,7 +718,7 @@ class Mesh {
         number = std::to_string(specular_count);
         specular_count++;
       }
-      std::string uniform_name("material." + name + number);
+      std::string uniform_name(name + number);
 
       shader_program.SetUniform1i(uniform_name.c_str(), i);
 
