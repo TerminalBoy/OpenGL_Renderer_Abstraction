@@ -4541,8 +4541,8 @@ class TestModelLoading {
       //m_camera.SetCursorVisible(); // we want the cursor to be visible for a drag style camera
       m_camera.SetCursorInvisible(); 
       // allow proper keyboard and mouse sharing with imgui
-      m_camera.SetMouseSharedWithImGui();
-      m_camera.SetKeyboardSharedWithImGui();
+      //m_camera.SetMouseSharedWithImGui();
+      //m_camera.SetKeyboardSharedWithImGui();
 
       m_camera.cameraPos = glm::vec3(0.0f, 0.0f, 5.58f);
       //m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);

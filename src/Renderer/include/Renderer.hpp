@@ -241,6 +241,11 @@ class Camera {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
       cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     
+    if (!drag_style_camera && glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){ 
+      SetCameraDisabled();
+      SetCursorVisible();
+    }
+
     // SetCameraMode(glfw_window, false);
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
