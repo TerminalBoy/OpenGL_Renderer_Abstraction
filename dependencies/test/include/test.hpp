@@ -4575,7 +4575,6 @@ class TestModelLoading {
       m_shader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
       m_shader_program.SetUniformMat4f("view", view);
       m_shader_program.SetUniformMat4f("projection", m_proj);
-      bag.Draw(m_shader_program);
 
       //   //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
       //   //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
@@ -4588,11 +4587,13 @@ class TestModelLoading {
       //   m_shader_program.SetUniform1i("material.specular", 1); // texture slots
 
       //   // setting directional light
-      //   m_shader_program.SetUniformVec3f("sun.direction", m_sun.direction);
-      //   m_shader_program.SetUniformVec3f("sun.ambient", m_sun.ambient);
-      //   m_shader_program.SetUniformVec3f("sun.diffuse", m_sun.diffuse);
-      //   m_shader_program.SetUniformVec3f("sun.specular", m_sun.specular);
-      //   m_shader_program.SetUniformVec3f("sun.color", m_sun.color);
+        m_shader_program.SetUniformVec3f("sun.direction", glm::vec3(-1.f, 1.f, 3.f));
+        m_shader_program.SetUniformVec3f("sun.ambient", glm::vec3(0.1f));
+        m_shader_program.SetUniformVec3f("sun.diffuse", glm::vec3(1.f));
+        m_shader_program.SetUniformVec3f("sun.specular", glm::vec3(1.f));
+        m_shader_program.SetUniformVec3f("sun.color", glm::vec3(1.f));
+
+
 
       //   // setting point light
       //   m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
@@ -4624,7 +4625,7 @@ class TestModelLoading {
 
 
       //   // setting camera
-      //   m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+      m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
 
       //   // m_shader_program.SetUniform1f("light.atten_constant", 1.0f);
       //   // // m_shader_program.SetUniform1f("light.atten_linear", 0.09f);
@@ -4635,7 +4636,7 @@ class TestModelLoading {
 
         
       //   VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
-
+        bag.Draw(m_shader_program);
       // }
 
       // { // light 
