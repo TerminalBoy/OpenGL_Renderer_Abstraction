@@ -6,6 +6,8 @@
 #include <fstream>
 #include <string>
 #include <utility>
+#include <iterator>
+#include <memory>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <unordered_map>
@@ -352,13 +354,35 @@ unsigned int CreateShaderProgram(unsigned int VertexShader, unsigned int Fragmen
 
 class VertexArray {
 private:
-  unsigned int VAO;
+  unsigned int VAO{0};
 public:
   
   VertexArray() {
     VALIDATE_GL_(glGenVertexArrays(1, &VAO));
   }
   
+  //not copyable
+  VertexArray(const VertexArray& other) = delete;
+  VertexArray& operator=(const VertexArray& other) = delete;
+
+  VertexArray(VertexArray&& other) noexcept
+  : VAO(std::exchange(other.VAO, 0))
+  {
+  }
+
+  VertexArray& operator=(VertexArray&& other) noexcept {  
+    if (this != &other){
+      VALIDATE_GL_(glDeleteVertexArrays(1, &VAO)); // delete the current vertex array in destination obj
+      VAO = std::exchange(other.VAO, 0);
+    }
+    return *this;
+  }
+  
+  ~VertexArray(){
+    VALIDATE_GL_(glDeleteVertexArrays(1, &VAO));
+  }
+
+
   void bind() const {
     VALIDATE_GL_(glBindVertexArray(VAO));
   }
@@ -395,11 +419,30 @@ public:
 
 class VertexBuffer {
 private:
-  unsigned int VBO;
+  unsigned int VBO{0};
 public:
   
   VertexBuffer() {
     VALIDATE_GL_(glGenBuffers(1, &VBO));
+  }
+  //not copyable
+  VertexBuffer(const VertexBuffer& other) = delete;
+  VertexBuffer& operator=(const VertexBuffer& other) = delete;
+
+  VertexBuffer(VertexBuffer&& other) noexcept
+  : VBO(std::exchange(other.VBO, 0))
+  {}
+
+  VertexBuffer& operator=(VertexBuffer&& other) noexcept {
+    if (this != &other){
+      VALIDATE_GL_(glDeleteBuffers(1, &VBO)); // delete destination obj vertex buffer
+      VBO = std::exchange(other.VBO, 0);
+    }
+    return *this;
+  }
+
+  ~VertexBuffer(){
+    VALIDATE_GL_(glDeleteBuffers(1, &VBO));
   }
 
   void bind(unsigned int target_type_GLenum) {
@@ -423,11 +466,34 @@ public:
 class ShaderVertex {
 
 private:
-  unsigned int _id;
+  unsigned int _id{0};
 
 public:
-  ShaderVertex() : _id(0) {
+  ShaderVertex(){
   }
+
+  //not copyable
+  ShaderVertex(const ShaderVertex& other) = delete;
+  ShaderVertex& operator=(const ShaderVertex& other) = delete;
+
+  ShaderVertex(ShaderVertex&& other) noexcept
+  : _id(std::exchange(other._id, 0))
+  {}
+  
+  ShaderVertex& operator=(ShaderVertex&& other) noexcept
+  {
+    if (this != &other){
+      VALIDATE_GL_(glDeleteShader(_id)); // delete destination objects previous shader
+      _id = std::exchange(other._id, 0);
+    }
+    return *this;
+
+  }
+
+  ~ShaderVertex(){
+    VALIDATE_GL_(glDeleteShader(_id));
+  }
+  
   
   ShaderVertex(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
     _id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
@@ -447,10 +513,31 @@ public:
 class ShaderFragment {
 
 private:
-  unsigned int _id;
+  unsigned int _id{0};
 
 public:
-  ShaderFragment() : _id(0) {
+  ShaderFragment() {
+  }
+
+  // not copyable
+  ShaderFragment(const ShaderFragment& other) = delete;
+  ShaderFragment& operator=(const ShaderFragment& other) = delete;
+
+  ShaderFragment(ShaderFragment&& other) noexcept 
+  : _id(std::exchange(other._id, 0))
+  {
+  }
+
+  ShaderFragment& operator=(ShaderFragment&& other) noexcept {
+    if (this != &other) {
+      VALIDATE_GL_(glDeleteShader(_id)); // delete destination objects shader
+      _id = std::exchange(other._id, 0);
+    }
+    return *this;
+  }
+
+  ~ShaderFragment(){
+    VALIDATE_GL_(glDeleteShader(_id));
   }
 
   ShaderFragment(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
@@ -469,11 +556,30 @@ public:
 
 class ElementBuffer {
 private:
-  unsigned int EBO;
+  unsigned int EBO{0};
 
 public:
   ElementBuffer() {
     VALIDATE_GL_(glGenBuffers(1, &EBO));
+  }
+
+  ElementBuffer(const ElementBuffer& other) = delete;
+  ElementBuffer& operator=(const ElementBuffer& other) = delete;
+
+  ElementBuffer(ElementBuffer&& other) noexcept
+  : EBO(std::exchange(other.EBO, 0))
+  {}
+
+  ElementBuffer& operator=(ElementBuffer&& other) noexcept {
+    if (this != &other){
+      VALIDATE_GL_(glDeleteBuffers(1, &EBO)); // delete the destination object element/index buffer;
+      EBO = std::exchange(other.EBO, 0);
+    }
+    return *this;
+  } 
+
+  ~ElementBuffer(){
+    VALIDATE_GL_(glDeleteBuffers(1, &EBO));
   }
 
   template <typename T, std::size_t buffer_size>
@@ -497,22 +603,51 @@ public:
 
 class ShaderProgram {
 private:
-  unsigned int _id;
+  unsigned int _id{0};
   std::unordered_map<std::string, int> uniform_location_cache;
   std::unordered_map<std::string, int> nonexistent_uniform_reported;
   bool m_ignore_nonexistent_uniform = false;
 
 public:
 
-  ShaderProgram() : _id(0){
+  ShaderProgram() {
 
   }
 
-  ShaderProgram(ShaderVertex VertexShader, ShaderFragment FragmentShader) {
+  //non copyable
+  ShaderProgram(const ShaderProgram& other) = delete;
+  ShaderProgram& operator=(const ShaderProgram& other) = delete;
+
+
+  ShaderProgram(ShaderProgram&& other) noexcept 
+  : _id(std::exchange(other._id, 0)),
+    uniform_location_cache(std::move(other.uniform_location_cache)),
+    nonexistent_uniform_reported(std::move(other.nonexistent_uniform_reported)),
+    m_ignore_nonexistent_uniform(std::exchange(other.m_ignore_nonexistent_uniform, false))
+  {
+  }
+
+  ShaderProgram& operator=(ShaderProgram&& other) noexcept {
+    if (this != & other) {
+      VALIDATE_GL_(glDeleteProgram(_id)); // delete the shader program of the destination object
+      _id = std::exchange(other._id, 0);
+      uniform_location_cache = std::move(other.uniform_location_cache);
+      nonexistent_uniform_reported = std::move(other.nonexistent_uniform_reported);
+      m_ignore_nonexistent_uniform = std::exchange(other.m_ignore_nonexistent_uniform, false);
+    }
+    return *this;
+  }
+
+  ~ShaderProgram(){
+    VALIDATE_GL_(glDeleteProgram(_id));
+  }
+
+  ShaderProgram(const ShaderVertex& VertexShader, const ShaderFragment& FragmentShader) {
     _id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
   }
 
-  void CreateProgram_seperately(ShaderVertex VertexShader, ShaderFragment FragmentShader) {
+  void CreateProgram_seperately(const ShaderVertex& VertexShader, const ShaderFragment& FragmentShader) {
+    assert(_id == 0 && "_id already containts a different shader program");
     _id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
   }
 
@@ -632,6 +767,13 @@ public:
     SetFile(path);
   }
 
+  Texture(const std::string& path, const std::string& type) 
+    : _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr), type(type)
+  {
+
+    SetFile(path);
+  }
+
   // not copyable
   Texture(const Texture& other) = delete;
   Texture& operator=(const Texture& other) = delete;
@@ -642,7 +784,8 @@ public:
     width(std::exchange(other.width, 0)),
     height(std::exchange(other.height, 0)),
     bits_per_pixel(std::exchange(other.bits_per_pixel, 0)),
-    local_buffer(std::exchange(other.local_buffer, 0))
+    local_buffer(std::exchange(other.local_buffer, nullptr)),
+    type(std::exchange(other.type, ""))
   {
 
   }
@@ -650,13 +793,16 @@ public:
   Texture& operator=(Texture&& other) noexcept 
   {
     if (this != &other){
+      VALIDATE_GL_(glDeleteTextures(1, &_id)); // delete the current texture as it will leak  
       _id = std::exchange(other._id, 0);
       filepath = std::exchange(other.filepath, "");
       width = std::exchange(other.width, 0);
       height = std::exchange(other.height, 0);
       bits_per_pixel = std::exchange(other.bits_per_pixel, 0);
-      local_buffer = std::exchange(other.local_buffer, 0);
+      local_buffer = std::exchange(other.local_buffer, nullptr);
+      type = std::exchange(other.type, "");
     }
+    return *this;
   }
 
 
@@ -667,6 +813,11 @@ public:
   void SetFile(const std::string& path){
     stbi_set_flip_vertically_on_load(1);
     local_buffer = stbi_load(path.c_str(), &width, &height, &bits_per_pixel, 4);
+
+    if (!local_buffer){
+      std::cerr << "Failed to load texture in stbi_image \n";
+      assert(0);
+    }
 
     VALIDATE_GL_(glGenTextures(1, &_id));
     VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
@@ -682,6 +833,11 @@ public:
     
     if (local_buffer) {
       stbi_image_free(local_buffer);
+      local_buffer = nullptr;
+      
+      std::cout << "Texture: " << path << " [" <<  width << "x" << height << "] | Decoded RGBA: " 
+      << (static_cast<std::size_t>(width) * static_cast<std::size_t>(height)  * 4) / (1024*1024) << " MiB \n";
+
     }
 
   }
@@ -705,15 +861,52 @@ public:
 
 // making mesh abstractions
 
-struct Vertex {
+class Vertex {
+  public:
   glm::vec3 position;
   glm::vec3 normal;
   glm::vec2 texcoordinates;
+
+  Vertex(){}
+
+  Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 texcoordinates) 
+  : position(position), normal(normal), texcoordinates(texcoordinates)
+  {}
+
+  // not copyable for api consistency
+  Vertex(const Vertex& other) = delete;
+  Vertex& operator=(const Vertex& other) = delete;
+
+  Vertex(Vertex&& other) noexcept
+  : position(std::exchange(other.position, glm::vec3(0.f))),
+    normal(std::exchange(other.normal, glm::vec3(0.f))),
+    texcoordinates(std::exchange(other.texcoordinates, glm::vec2(0.f)))
+  {}
+
+  Vertex& operator=(Vertex&& other) noexcept {
+    if (this != &other){
+      position = std::exchange(other.position, glm::vec3(0.f));
+      normal = std::exchange(other.normal, glm::vec3(0.f));
+      texcoordinates = std::exchange(other.texcoordinates, glm::vec2(0.f));
+    }
+    return *this;
+  }
+
+  ~Vertex(){}
+
 };
 
 // struct Texture {};// already made
+// Texture Handle to reuse textures
+struct TextureHandle{
+  std::string type;
+  std::shared_ptr<Texture> resource;
+  
+};
+
 
 class Mesh {
+  // these are non copyable... please modify using refenrences
   VertexArray VAO;
   VertexBuffer VBO;
   ElementBuffer EBO;
@@ -722,11 +915,41 @@ class Mesh {
   // mesh data
   std::vector<Vertex> m_vertices;
   std::vector<unsigned int> m_indices;
-  std::vector<Texture> m_textures;
+  std::vector<TextureHandle> m_textures;
 
-  Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
-  : m_vertices(vertices), m_indices(indices), m_textures(textures) 
+  // not copyable
+  Mesh(const Mesh& other) = delete;
+  Mesh& operator=(const Mesh& other) = delete;
+
+  Mesh(Mesh&& other) noexcept
+  : VAO(std::move(other.VAO)),
+    VBO(std::move(other.VBO)),
+    EBO(std::move(other.EBO)),
+
+    m_vertices(std::move(other.m_vertices)),
+    m_indices(std::move(other.m_indices)),
+    m_textures(std::move(other.m_textures))
+
   {
+    // SetMesh(); already set from the original object
+  }
+
+  Mesh& operator=(Mesh&& other) noexcept{
+    if (this != &other){
+      VAO = std::move(other.VAO);
+      VBO = std::move(other.VBO);
+      EBO = std::move(other.EBO);
+
+      m_vertices = std::move(other.m_vertices);
+      m_indices = std::move(other.m_indices);
+      m_textures = std::move(other.m_textures);
+    }
+    return *this;
+  }
+
+  Mesh(){}
+
+  void UploadMesh(){
     SetMesh();
   }
 
@@ -735,32 +958,35 @@ class Mesh {
     unsigned int specular_count = 1;
 
     for (std::size_t i{}; i < m_textures.size(); ++i){
-      m_textures[i].Bind(i);
+      m_textures[i].resource->Bind(i);
 
       std::string number;
       std::string name = m_textures[i].type;
-
+      std::string uniform_name;
       if (name == "texture_diffuse"){
         number = std::to_string(diffuse_count);
         diffuse_count++;
-      } else if (name == "texture_specular"){
+        uniform_name = name + number;
+        shader_program.SetUniform1i(uniform_name, i);
+      } 
+      
+      else if (name == "texture_specular"){
         number = std::to_string(specular_count);
         specular_count++;
+        uniform_name = name + number;
+        shader_program.SetUniform1i(uniform_name, i);
       }
-      std::string uniform_name(name + number);
-
-      shader_program.SetUniform1i(uniform_name.c_str(), i);
-
-
+      
     }
 
-    Texture::UnBindAll();
+    
   }
 
   void Draw(){
     VAO.bind();
     VALIDATE_GL_(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, 0));
     VAO.Unbind();
+    Texture::UnBindAll();
   }
 
   private:
@@ -789,38 +1015,68 @@ class Mesh {
 };
 
 class Model {
-
+  std::unordered_map<std::string, std::shared_ptr<Texture>> texture_cache;
   std::vector<Mesh> m_meshes;
   std::string directory;
 
 
   void loadModel(std::string path){
+    // temporarily disable the opengl error reporting
+    DisableGLErrorPrinting();
+
+    std::cout << "[1] Before Assimp Import \n";
+    
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
-
+    
+    std::cout << "[2] After Assimp Import \n";
+    
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
       std::cout << "ERROR::ASSIMP:: " << import.GetErrorString() << std::endl;
       return;
     }
+
     directory = path.substr(0, path.find_last_of('/'));
+    
+    std::cout << "[3] Before Process Node \n";
+
     processNode(scene->mRootNode, scene);
+    
+    std::cout << "[4] After Process Node \n";
+    std::cout << "[5] After Model Loading \n";
   }
   
   void processNode(aiNode* node, const aiScene* scene){
+    static std::size_t recurse_depth{};
+    
+    std::cout << "  [RECURSION DEPTH : " << recurse_depth << "]" << std::endl;
+    
+    std::cout << "    -[Node] Meshes: " << node->mNumMeshes << std::endl;
+    std::cout << "    -[Node] Children: " << node->mNumChildren << std::endl;
+    
     for (std::size_t i{}; i < node->mNumMeshes; ++i){
       aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-      m_meshes.push_back(processMesh(mesh, scene));
-    }
+      std::cout << "    -[Mesh " << node->mMeshes[i] << 
+                   "] Vertices: " << mesh->mNumVertices << 
+                   ", Faces: " << mesh->mNumFaces<< std::endl;
+      
 
+      std::cout << "    -[1] Before Process Mesh" << std::endl;
+      
+      m_meshes.emplace_back();
+      processMesh(m_meshes.back(), mesh, scene);
+      
+      //m_meshes.push_back(processMesh(mesh, scene));
+      std::cout << "    -[2] After Process Mesh" << std::endl;
+      
+    }
+    recurse_depth++;
     for (std::size_t i{}; i < node->mNumChildren; ++i){
       processNode(node->mChildren[i], scene);   
     }
   }
   
-  Mesh processMesh(aiMesh* mesh, const aiScene* scene){
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
+  void processMesh(Mesh& destination_Meshobj, aiMesh* mesh, const aiScene* scene){
 
     for (std::size_t i{}; i < mesh->mNumVertices; ++i){
       Vertex vertex;
@@ -830,20 +1086,16 @@ class Model {
 
       vec.x = mesh->mVertices[i].x;
       vec.y = mesh->mVertices[i].y;
-      vec.x = mesh->mVertices[i].z;
+      vec.z = mesh->mVertices[i].z;
       
       vertex.position = vec;
 
 
       vec.x = mesh->mNormals[i].x;
       vec.y = mesh->mNormals[i].y;
-      vec.x = mesh->mNormals[i].z;
+      vec.z = mesh->mNormals[i].z;
       
       vertex.normal = vec;
-
-      vec.x = mesh->mVertices[i].x;
-      vec.y = mesh->mVertices[i].y;
-      vec.x = mesh->mVertices[i].z;
       
       if (mesh->mTextureCoords[0]){
         glm::vec2 tvec;
@@ -855,48 +1107,59 @@ class Model {
         vertex.texcoordinates = glm::vec2(0.0f);
       }
 
-      vertices.push_back(vertex);
+      destination_Meshobj.m_vertices.emplace_back(vertex.position, vertex.normal, vertex.texcoordinates);
     }
     // process indices
     // [...]
     for (std::size_t i{}; i < mesh->mNumFaces; ++i){
       aiFace face = mesh->mFaces[i];
       for (std::size_t j{}; j < face.mNumIndices; ++j){
-        indices.push_back(face.mIndices[j]);
+        destination_Meshobj.m_indices.emplace_back(face.mIndices[j]);
       }
     }
 
     // process material
 
-    if (mesh->mMaterialIndex >= 0){
+    // if (mesh->mMaterialIndex >= 0 ){
+    // TEMPORARILY DISABLED
+    if (mesh->mMaterialIndex < scene->mNumMaterials){
+      
       // [...]
 
       aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
       
-      std::vector<Texture> diffuse_maps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-      textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
+      loadMaterialTextures(destination_Meshobj ,material, aiTextureType_DIFFUSE, "texture_diffuse");
       
-      std::vector<Texture> specular_maps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-      textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
-
+      loadMaterialTextures(destination_Meshobj, material, aiTextureType_SPECULAR, "texture_specular");
+      
     }
 
-
-    return Mesh(vertices, indices, textures);
+    destination_Meshobj.UploadMesh();
+    //return Mesh(std::move(vertices), std::move(indices), std::move(textures));
 
   }
+  
+  // [OK]
+  void loadMaterialTextures(Mesh& destination_Meshobj, aiMaterial* material, aiTextureType texture_type, std::string type_name){
 
-  std::vector<Texture> loadMaterialTextures(aiMaterial* material, aiTextureType texture_type, std::string type_name){
-
-    std::vector<Texture> textures;
     for (std::size_t i{}; i < material->GetTextureCount(texture_type); ++i){
       aiString str;
       material->GetTexture(texture_type, i, &str);
-      Texture texture(directory + "/" + str.C_Str());
-      texture.type = type_name;
-      textures.push_back(texture);
+      std::string path = directory + "/" + str.C_Str(); 
+      // caching
+      auto it = texture_cache.find(path); 
+
+      if (it == texture_cache.end()) { // cache miss
+        auto texture = std::make_shared<Texture>(path);
+
+        it = texture_cache.emplace(path, std::move(texture)).first;
+      } else { // cache hit
+        std::cout << "Reusing Texture: " << path << std::endl;
+      }
+
+      // =========
+      destination_Meshobj.m_textures.emplace_back(TextureHandle{.type = type_name, .resource = it->second});
     }
-    return textures;
 
   }
 
@@ -907,6 +1170,29 @@ class Model {
     loadModel(path);
   }
 
+  //not copyable
+  Model(const Model& other) = delete;
+  Model& operator=(const Model& other) = delete;
+
+  // [OK]
+  Model(Model&& other) noexcept
+  : m_meshes(std::move(other.m_meshes)),
+    directory(std::move(other.directory)),
+    texture_cache(std::move(other.texture_cache))
+  {}
+
+  // [OK]
+  Model& operator=(Model&& other) noexcept
+  {
+    if (this != &other){
+      m_meshes = std::move(other.m_meshes);
+      directory = std::move(other.directory);
+      texture_cache = std::move(other.texture_cache);
+    }
+    return *this;
+  }
+
+  // [OK]
   void Draw(ShaderProgram& shader_program){
     for (std::size_t i{}; i < m_meshes.size(); ++i){
       m_meshes[i].PrepareDraw(shader_program);

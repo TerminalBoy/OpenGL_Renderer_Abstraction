@@ -75,7 +75,8 @@ int main() {
     test::TestLighting_DirectionalLight,
     test::TestLighting_Attenuation,
     test::TestLighting_Flashlight,
-    test::TestLighting_MultipleLights
+    test::TestLighting_MultipleLights,
+    test::TestModelLoading
     > 
     menu(window);
 
