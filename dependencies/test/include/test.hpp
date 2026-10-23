@@ -4537,8 +4537,9 @@ class TestModelLoading {
       // m_specular_map.Bind(1);
       
       m_camera.SetCameraEnabled();
-      m_camera.SetDragStyleCamera();
-      m_camera.SetCursorVisible(); // we want the cursor to be visible for a drag style camera
+      //m_camera.SetDragStyleCamera();
+      //m_camera.SetCursorVisible(); // we want the cursor to be visible for a drag style camera
+      m_camera.SetCursorInvisible(); 
       // allow proper keyboard and mouse sharing with imgui
       m_camera.SetMouseSharedWithImGui();
       m_camera.SetKeyboardSharedWithImGui();

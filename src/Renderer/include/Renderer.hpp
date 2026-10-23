@@ -195,7 +195,7 @@ class Camera {
 
   void SetDragStyleCamera(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    
+    SetCursorVisible();
     drag_style_camera = true;
   }
 
