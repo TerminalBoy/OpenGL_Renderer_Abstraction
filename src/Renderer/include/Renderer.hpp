@@ -958,7 +958,7 @@ class Mesh {
     SetMesh();
   }
 
-  void PrepareDraw(ShaderProgram& shader_program){
+  void PrepareDraw(ShaderProgram& BOUND_shader_program){
     unsigned int diffuse_count = 1;
     unsigned int specular_count = 1;
 
@@ -972,14 +972,14 @@ class Mesh {
         number = std::to_string(diffuse_count);
         diffuse_count++;
         uniform_name = name + number;
-        shader_program.SetUniform1i(uniform_name, i);
+        BOUND_shader_program.SetUniform1i(uniform_name, i);
       } 
       
       else if (name == "texture_specular"){
         number = std::to_string(specular_count);
         specular_count++;
         uniform_name = name + number;
-        shader_program.SetUniform1i(uniform_name, i);
+        BOUND_shader_program.SetUniform1i(uniform_name, i);
       }
       
     }

@@ -4233,91 +4233,91 @@ class TestModelLoading {
     int m_window_width{};
     int m_window_height{};
     Camera m_camera;
-    // std::array<float, 6*6*(6+2)> m_Vertices{ //xyz, normals, Texture_xy
-    //  -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
-    //   0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      1.0f, 0.0f,
-    //   0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
-    //   0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
-    //  -0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      0.0f, 1.0f,
-    //  -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
+    std::array<float, 6*6*(6+2)> m_Vertices{ //xyz, normals, Texture_xy
+     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
+     -0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
      
-    //  -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
-    //   0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
-    //   0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
-    //   0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
-    //  -0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 1.0f,
-    //  -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
+      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+     -0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
     
-    //  -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-    //  -0.5f, 0.5f, -0.5f,     -1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
-    //  -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-    //  -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-    //  -0.5f, -0.5f, 0.5f,     -1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
-    //  -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, -0.5f,     -1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, 0.5f,     -1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
 
-    //   0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-    //   0.5f, 0.5f, -0.5f,      1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
-    //   0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-    //   0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-    //   0.5f, -0.5f, 0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
-    //   0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f,      1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, -0.5f, 0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
 
-    //  -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
-    //   0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      1.0f, 1.0f,
-    //   0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
-    //   0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
-    //  -0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      0.0f, 0.0f,
-    //  -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      1.0f, 1.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
     
-    //  -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f,
-    //   0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 1.0f,
-    //   0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
-    //   0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
-    //  -0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       0.0f, 0.0f,
-    //  -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f
+     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       0.0f, 0.0f,
+     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f
 
-    // };
+    };
     
     
-    // struct DirectionalLight{
-    // 	glm::vec3 direction;
+    struct DirectionalLight{
+    	glm::vec3 direction;
 
-    // 	glm::vec3 ambient;
-    // 	glm::vec3 diffuse;
-    // 	glm::vec3 specular;
-    //   glm::vec3 color;
-    // };
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+      glm::vec3 color;
+    };
 
-    // struct PointLight {
-    // 	glm::vec3 scale;
-    //   glm::mat4 mat_model;
+    struct PointLight {
+    	glm::vec3 scale;
+      glm::mat4 mat_model;
       
-    //   glm::vec3 pos;
+      glm::vec3 pos;
 
-    // 	glm::vec3 ambient;
-    // 	glm::vec3 diffuse;
-    // 	glm::vec3 specular;
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
 
-    // 	glm::vec3 color;
+    	glm::vec3 color;
 
-    // 	float atten_constant;
-    // 	float atten_linear;
-    // 	float atten_quadratic;
-    // };
+    	float atten_constant;
+    	float atten_linear;
+    	float atten_quadratic;
+    };
 
-    // struct Spotlight {
-    // 	glm::vec3 pos;
-    // 	glm::vec3 color;
-    // 	glm::vec3 direction;
-    // 	glm::vec3 ambient;
-    // 	glm::vec3 diffuse;
-    // 	glm::vec3 specular;
-    // 	float atten_constant;
-    // 	float atten_linear;
-    // 	float atten_quadratic;
-    // 	float cutOff;
-    // 	float outerCutOff;
-    // };
+    struct Spotlight {
+    	glm::vec3 pos;
+    	glm::vec3 color;
+    	glm::vec3 direction;
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+    	float atten_constant;
+    	float atten_linear;
+    	float atten_quadratic;
+    	float cutOff;
+    	float outerCutOff;
+    };
 
     // struct Material {
     //   glm::vec3 ambient;
@@ -4423,11 +4423,11 @@ class TestModelLoading {
     glm::mat4 m_proj;
     // std::vector<Material> m_cubes;
 
-    // DirectionalLight m_sun;
-    // PointLight m_bulb;
-    // Spotlight m_flashlight;
+    DirectionalLight m_sun;
+    PointLight m_bulb;
+    Spotlight m_flashlight;
 
-    // glm::vec3 m_light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
+    glm::vec3 m_light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
     std::string m_VertexShaderSource;
     std::string m_FragmentShaderSource;
 
@@ -4487,19 +4487,19 @@ class TestModelLoading {
       // m_sun.specular = m_sun.color;
 
 
-      // // initializing bulb
-      // m_bulb.pos = m_light_source_translation;      
-      // m_bulb.scale = glm::vec3(0.5f);
-      // m_bulb.mat_model = glm::mat4(1);
-      // m_bulb.mat_model = glm::translate(m_bulb.mat_model, m_bulb.pos);
-      // m_bulb.mat_model = glm::scale(m_bulb.mat_model, m_bulb.scale);
-      // m_bulb.color = glm::vec3(1.0f);
-      // m_bulb.ambient = m_bulb.color - glm::vec3(0.9);
-      // m_bulb.diffuse = m_bulb.color;
-      // m_bulb.specular = m_bulb.color;
-      // m_bulb.atten_constant = 1.0f;
-      // m_bulb.atten_linear = 0.09f;
-      // m_bulb.atten_quadratic = 0.032f;
+      // initializing bulb
+      m_bulb.pos = m_light_source_translation;      
+      m_bulb.scale = glm::vec3(0.5f);
+      m_bulb.mat_model = glm::mat4(1);
+      m_bulb.mat_model = glm::translate(m_bulb.mat_model, m_bulb.pos);
+      m_bulb.mat_model = glm::scale(m_bulb.mat_model, m_bulb.scale);
+      m_bulb.color = glm::vec3(1.0f);
+      m_bulb.ambient = m_bulb.color - glm::vec3(0.9);
+      m_bulb.diffuse = m_bulb.color;
+      m_bulb.specular = m_bulb.color;
+      m_bulb.atten_constant = 1.0f;
+      m_bulb.atten_linear = 0.09f;
+      m_bulb.atten_quadratic = 0.032f;
 
       // // initializing flashlight
       // m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
@@ -4519,20 +4519,20 @@ class TestModelLoading {
       if (!m_VertexShaderSource_read_status) std::cout << "Failed to read Vertex Shader\n";
       if (!m_FragmentShaderSource_read_status) std::cout << "Failed to read Fragment Shader\n";
 
-      // m_v_arr.bind();
-      // m_v_buff.bind(GL_ARRAY_BUFFER);
-      // m_v_buff.set_data(GL_ARRAY_BUFFER, m_Vertices, GL_STATIC_DRAW);
+      m_v_arr.bind();
+      m_v_buff.bind(GL_ARRAY_BUFFER);
+      m_v_buff.set_data(GL_ARRAY_BUFFER, m_Vertices, GL_STATIC_DRAW);
 
-      // m_v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 0);
-      // m_v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 3 * sizeof(float));
-      // m_v_arr.push_arrtib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 6 * sizeof(float));
+      m_v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 0);
+      m_v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 3 * sizeof(float));
+      m_v_arr.push_arrtib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 6 * sizeof(float));
 
-      // m_v_arr.enable(0);
-      // m_v_arr.enable(1);
-      // m_v_arr.enable(2);
+      m_v_arr.enable(0);
+      m_v_arr.enable(1);
+      m_v_arr.enable(2);
       
-      // m_shader_program.Bind();
-      // m_shader_program.SetIgnoreNonExistentUniform(true);
+      m_shader_program.Bind();
+      m_shader_program.SetIgnoreNonExistentUniform(true);
       // m_diffuse_map.Bind(0);
       // m_specular_map.Bind(1);
       
@@ -4573,6 +4573,8 @@ class TestModelLoading {
       // m_shader_program.SetUniform1i("rendering_light_source", 0);
       m_shader_program.Bind();
       m_shader_program.SetIgnoreNonExistentUniform(true);
+      m_shader_program.SetUniform1i("rendering_light_source", 0);
+
       m_shader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
       m_shader_program.SetUniformMat4f("view", view);
       m_shader_program.SetUniformMat4f("projection", m_proj);
@@ -4597,14 +4599,14 @@ class TestModelLoading {
 
 
       //   // setting point light
-      //   m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
-      //   m_shader_program.SetUniformVec3f("bulb.ambient", m_bulb.ambient);
-      //   m_shader_program.SetUniformVec3f("bulb.diffuse", m_bulb.diffuse);
-      //   m_shader_program.SetUniformVec3f("bulb.specular", m_bulb.specular);
-      //   m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
-      //   m_shader_program.SetUniform1f("bulb.atten_constant", m_bulb.atten_constant);
-      //   m_shader_program.SetUniform1f("bulb.atten_linear", m_bulb.atten_linear);
-      //   m_shader_program.SetUniform1f("bulb.atten_quadratic", m_bulb.atten_quadratic);
+        m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
+        m_shader_program.SetUniformVec3f("bulb.ambient", m_bulb.ambient);
+        m_shader_program.SetUniformVec3f("bulb.diffuse", m_bulb.diffuse);
+        m_shader_program.SetUniformVec3f("bulb.specular", m_bulb.specular);
+        m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
+        m_shader_program.SetUniform1f("bulb.atten_constant", m_bulb.atten_constant);
+        m_shader_program.SetUniform1f("bulb.atten_linear", m_bulb.atten_linear);
+        m_shader_program.SetUniform1f("bulb.atten_quadratic", m_bulb.atten_quadratic);
 
       //   // setting spotlight
       //   m_flashlight.pos = m_camera.GetPosition();
@@ -4640,27 +4642,28 @@ class TestModelLoading {
         bag.Draw(m_shader_program);
       // }
 
-      // { // light 
+      { // light 
 
-      //   m_shader_program.Bind();
-      //   m_shader_program.SetUniform1i("rendering_light_source", 1);
-      //   m_shader_program.SetUniformMat4f("model", m_bulb.mat_model);
-      //   m_shader_program.SetUniformMat4f("view", view);
-      //   m_shader_program.SetUniformMat4f("projection", m_proj);
-      //   //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
-      //   //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
-      //   //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
-      //   //m_shader_program.SetUniformVec3f("material.color", m_cube.color);
-      //   //m_shader_program.SetUniform1f("material.specular_power", m_cube.specular_power);
+        m_shader_program.Bind();
+        m_shader_program.SetUniform1i("rendering_light_source", 1);
+        m_shader_program.SetUniformMat4f("model", m_bulb.mat_model);
+        m_shader_program.SetUniformMat4f("view", view);
+        m_shader_program.SetUniformMat4f("projection", m_proj);
+        //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
+        //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
+        //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
+        //m_shader_program.SetUniformVec3f("material.color", m_cube.color);
+        //m_shader_program.SetUniform1f("material.specular_power", m_cube.specular_power);
 
-      //   m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
-      //   m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
+        m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
+        m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
 
-      //   m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
-     
-      //   VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
-
-      // }
+        m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+        
+        m_v_arr.bind();
+        VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
+        m_v_arr.Unbind();
+      }
 
       
 
