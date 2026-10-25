@@ -4698,6 +4698,7 @@ class TestModelLoading {
     void OnImGuiRender(){
       ImGui::Text("Press ESC to disable camera and control mouse cursor");
       ImGui::Text("Press F to toggle flashlight on/off");
+      ImGui::Text("Press G to toggle bulb on/off");
       
 
     }
