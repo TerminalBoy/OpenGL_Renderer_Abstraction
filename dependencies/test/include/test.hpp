@@ -4502,15 +4502,15 @@ class TestModelLoading {
       m_bulb.atten_quadratic = 0.032f;
 
       // // initializing flashlight
-      // m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
-      // m_flashlight.color = glm::vec3(1.0f);
-      // m_flashlight.direction = m_camera.cameraFront; // !!!! TO BE DONE EVERY FRAME
-      // m_flashlight.ambient = m_flashlight.color - glm::vec3(0.95f);
-      // m_flashlight.diffuse = m_flashlight.color;
-      // m_flashlight.specular = m_flashlight.color;
-      // m_flashlight.atten_constant = 1.0f;
-      // m_flashlight.atten_linear = 0.022f;
-      // m_flashlight.atten_quadratic = 0.0019f;
+      m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
+      m_flashlight.color = glm::vec3(1.0f);
+      m_flashlight.direction = m_camera.cameraFront; // !!!! TO BE DONE EVERY FRAME
+      m_flashlight.ambient = m_flashlight.color - glm::vec3(0.95f);
+      m_flashlight.diffuse = m_flashlight.color;
+      m_flashlight.specular = m_flashlight.color;
+      m_flashlight.atten_constant = 1.0f;
+      m_flashlight.atten_linear = 0.022f;
+      m_flashlight.atten_quadratic = 0.0019f;
 
 
 
@@ -4609,20 +4609,20 @@ class TestModelLoading {
         m_shader_program.SetUniform1f("bulb.atten_quadratic", m_bulb.atten_quadratic);
 
       //   // setting spotlight
-      //   m_flashlight.pos = m_camera.GetPosition();
-      //   m_flashlight.direction = m_camera.cameraFront;
+        m_flashlight.pos = m_camera.GetPosition();
+        m_flashlight.direction = m_camera.cameraFront;
 
-      //   m_shader_program.SetUniformVec3f("flashlight.pos", m_flashlight.pos);
-      //   m_shader_program.SetUniformVec3f("flashlight.direction", m_flashlight.direction);
-      //   m_shader_program.SetUniformVec3f("flashlight.ambient", m_flashlight.ambient);
-      //   m_shader_program.SetUniformVec3f("flashlight.diffuse", m_flashlight.diffuse);
-      //   m_shader_program.SetUniformVec3f("flashlight.specular", m_flashlight.specular);
-      //   m_shader_program.SetUniformVec3f("flashlight.color", m_flashlight.color);
-      //   m_shader_program.SetUniform1f("flashlight.atten_constant", m_flashlight.atten_constant);
-      //   m_shader_program.SetUniform1f("flashlight.atten_linear", m_flashlight.atten_linear);
-      //   m_shader_program.SetUniform1f("flashlight.atten_quadratic", m_flashlight.atten_quadratic);
-      //   m_shader_program.SetUniform1f("flashlight.cutOff", glm::cos(glm::radians(12.5f)));
-      //   m_shader_program.SetUniform1f("flashlight.outerCutOff", glm::cos(glm::radians(15.5f)));
+        m_shader_program.SetUniformVec3f("flashlight.pos", m_flashlight.pos);
+        m_shader_program.SetUniformVec3f("flashlight.direction", m_flashlight.direction);
+        m_shader_program.SetUniformVec3f("flashlight.ambient", m_flashlight.ambient);
+        m_shader_program.SetUniformVec3f("flashlight.diffuse", m_flashlight.diffuse);
+        m_shader_program.SetUniformVec3f("flashlight.specular", m_flashlight.specular);
+        m_shader_program.SetUniformVec3f("flashlight.color", m_flashlight.color);
+        m_shader_program.SetUniform1f("flashlight.atten_constant", m_flashlight.atten_constant);
+        m_shader_program.SetUniform1f("flashlight.atten_linear", m_flashlight.atten_linear);
+        m_shader_program.SetUniform1f("flashlight.atten_quadratic", m_flashlight.atten_quadratic);
+        m_shader_program.SetUniform1f("flashlight.cutOff", glm::cos(glm::radians(12.5f)));
+        m_shader_program.SetUniform1f("flashlight.outerCutOff", glm::cos(glm::radians(15.5f)));
 
 
 
