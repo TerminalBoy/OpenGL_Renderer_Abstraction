@@ -4304,6 +4304,7 @@ class TestModelLoading {
     	float atten_constant;
     	float atten_linear;
     	float atten_quadratic;
+      bool enabled;
     };
 
     struct Spotlight {
@@ -4491,6 +4492,7 @@ class TestModelLoading {
 
 
       // initializing bulb
+      m_bulb.enabled = true;
       m_bulb.pos = m_light_source_translation;      
       m_bulb.scale = glm::vec3(0.5f);
       m_bulb.mat_model = glm::mat4(1);
@@ -4603,6 +4605,7 @@ class TestModelLoading {
 
 
       //   // setting point light
+        m_shader_program.SetUniform1i("bulb.enabled", m_bulb.enabled);
         m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
         m_shader_program.SetUniformVec3f("bulb.ambient", m_bulb.ambient);
         m_shader_program.SetUniformVec3f("bulb.diffuse", m_bulb.diffuse);
@@ -4684,6 +4687,12 @@ class TestModelLoading {
       if (ImGui::IsKeyPressed(ImGuiKey_F, false)){
         m_flashlight.enabled = !m_flashlight.enabled;
       }
+      
+      // bulb on/off control
+      if (ImGui::IsKeyPressed(ImGuiKey_B, false)){
+        m_bulb.enabled = !m_bulb.enabled;
+      }
+
     }
 
     void OnImGuiRender(){

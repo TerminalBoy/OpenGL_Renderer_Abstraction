@@ -33,6 +33,7 @@ struct PointLight {
 	float atten_constant;
 	float atten_linear;
 	float atten_quadratic;
+	bool enabled;
 };
 
 struct Spotlight {
@@ -105,6 +106,7 @@ vec3 Perform_PointLighting(in PointLight f_light,
 
 
 
+	if (!f_light.enabled) return vec3(0.0);
 	//ambient
 	vec3 ambient = f_light.ambient * vec3(texture(texture_diffuse1, f_texcoords));
 
