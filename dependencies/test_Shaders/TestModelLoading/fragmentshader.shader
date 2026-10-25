@@ -19,6 +19,7 @@ struct DirectionalLight{
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+	bool enabled;
 };
 
 struct PointLight {
@@ -77,6 +78,7 @@ vec3 Perform_DirectionalLighting(in DirectionalLight f_light,
 															in vec2 f_texcoords,
 															in vec3 f_fragpos, 
 															in Camera f_camera) {
+	if (!f_light.enabled) return vec3(0.0);
 	//ambient
 	vec3 ambient = f_light.ambient * vec3(texture(texture_diffuse1, f_texcoords));
 

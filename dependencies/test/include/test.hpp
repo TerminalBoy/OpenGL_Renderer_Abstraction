@@ -4287,6 +4287,7 @@ class TestModelLoading {
     	glm::vec3 diffuse;
     	glm::vec3 specular;
       glm::vec3 color;
+      bool enabled;
     };
 
     struct PointLight {
@@ -4484,6 +4485,7 @@ class TestModelLoading {
       // }
 
       // // initializing sun
+      m_sun.enabled = true;
       // m_sun.direction = glm::vec3(1.f, 1.f, -1.f);
       // m_sun.color = glm::vec3(255.f/255.f, 229.f/255.f, 200.f/255.f);
       // m_sun.ambient = m_sun.color - glm::vec3(0.7); // darken the ambient
@@ -4596,6 +4598,7 @@ class TestModelLoading {
       //   m_shader_program.SetUniform1i("material.specular", 1); // texture slots
 
       //   // setting directional light
+      m_shader_program.SetUniform1i("sun.enabled", m_sun.enabled);
         m_shader_program.SetUniformVec3f("sun.direction", glm::vec3(-1.f, 1.f, 3.f));
         m_shader_program.SetUniformVec3f("sun.ambient", glm::vec3(0.1f));
         m_shader_program.SetUniformVec3f("sun.diffuse", glm::vec3(1.f));
@@ -4693,12 +4696,19 @@ class TestModelLoading {
         m_bulb.enabled = !m_bulb.enabled;
       }
 
+      // sun on/off control
+      if (ImGui::IsKeyPressed(ImGuiKey_U, false)){
+        m_sun.enabled = !m_sun.enabled;
+      }
+
     }
 
     void OnImGuiRender(){
       ImGui::Text("Press ESC to disable camera and control mouse cursor");
       ImGui::Text("Press F to toggle flashlight on/off");
       ImGui::Text("Press G to toggle bulb on/off");
+      ImGui::Text("Press U to toggle sun on/off");
+
       
 
     }
