@@ -47,6 +47,7 @@ struct Spotlight {
 	float atten_quadratic;
 	float cutOff;
 	float outerCutOff;
+	bool enabled;
 };
 
 
@@ -138,10 +139,12 @@ vec3 Perform_Spotlighting(in Spotlight f_light,
 															in vec2 f_texcoords,
 															in vec3 f_fragpos, 
 															in Camera f_camera){
-
+											
  
+	if (!f_light.enabled) return vec3(0.0);
 	//ambient
 	vec3 ambient = f_light.ambient * vec3(texture(texture_diffuse1, f_texcoords));
+	//vec3 ambient = vec3(0.0) * vec3(texture(texture_diffuse1, f_texcoords));
 
 	//diffuse
 	vec3 norm = normalize(f_normal);
@@ -174,6 +177,7 @@ vec3 Perform_Spotlighting(in Spotlight f_light,
 	float epsilon = f_light.cutOff - f_light.outerCutOff;
 	float intensity = clamp((theta - f_light.outerCutOff) / epsilon, 0.0, 1.0);
 
+	//ambient *= intensity; // leave commented out for more natural ambient
 	diffuse *= intensity;
 	specular *= intensity;
 

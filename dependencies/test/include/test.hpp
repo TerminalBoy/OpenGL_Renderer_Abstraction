@@ -4232,6 +4232,7 @@ namespace test {
 class TestModelLoading {
     int m_window_width{};
     int m_window_height{};
+    GLFWwindow* m_window;
     Camera m_camera;
     std::array<float, 6*6*(6+2)> m_Vertices{ //xyz, normals, Texture_xy
      -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
@@ -4317,6 +4318,7 @@ class TestModelLoading {
     	float atten_quadratic;
     	float cutOff;
     	float outerCutOff;
+      bool enabled;
     };
 
     // struct Material {
@@ -4450,7 +4452,8 @@ class TestModelLoading {
     static constexpr std::string_view NameString{"Model Loading"};
     
     TestModelLoading(GLFWwindow* window)
-    : m_camera(window),
+    : m_window(window),
+      m_camera(window),
       
       m_VertexShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestModelLoading/vertexshader.shader", m_VertexShaderSource)),
       m_FragmentShaderSource_read_status(ShaderInput::ReadFromFile("dependencies/test_Shaders/TestModelLoading/fragmentshader.shader", m_FragmentShaderSource)),
@@ -4502,6 +4505,7 @@ class TestModelLoading {
       m_bulb.atten_quadratic = 0.032f;
 
       // // initializing flashlight
+      m_flashlight.enabled = true;
       m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
       m_flashlight.color = glm::vec3(1.0f);
       m_flashlight.direction = m_camera.cameraFront; // !!!! TO BE DONE EVERY FRAME
@@ -4611,6 +4615,7 @@ class TestModelLoading {
       //   // setting spotlight
         m_flashlight.pos = m_camera.GetPosition();
         m_flashlight.direction = m_camera.cameraFront;
+        m_shader_program.SetUniform1i("flashlight.enabled", m_flashlight.enabled);
 
         m_shader_program.SetUniformVec3f("flashlight.pos", m_flashlight.pos);
         m_shader_program.SetUniformVec3f("flashlight.direction", m_flashlight.direction);
@@ -4674,10 +4679,17 @@ class TestModelLoading {
 
     void processInput(){
       m_camera.predefined_generic_WASD_control();
+      
+      // flashlight on/off control
+      if (ImGui::IsKeyPressed(ImGuiKey_F, false)){
+        m_flashlight.enabled = !m_flashlight.enabled;
+      }
     }
 
     void OnImGuiRender(){
       ImGui::Text("Press ESC to disable camera and control mouse cursor");
+      ImGui::Text("Press F to toggle flashlight on/off");
+      
 
     }
 
