@@ -4676,7 +4676,10 @@ class TestModelLoading {
       m_camera.predefined_generic_WASD_control();
     }
 
-    void OnImGuiRender(){}
+    void OnImGuiRender(){
+      ImGui::Text("Press ESC to disable camera and control mouse cursor");
+
+    }
 
     
   };
