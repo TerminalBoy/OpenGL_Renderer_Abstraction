@@ -194,7 +194,11 @@ vec3 Perform_Spotlighting(in Spotlight f_light,
 void main() {  
 
 	if (rendering_light_source){
-		FragColor = vec4(bulb.color, 1.0);
+		if (bulb.enabled){
+			FragColor = vec4(bulb.color, 1.0);
+		} else {
+			FragColor = vec4(bulb.color * vec3(0.2), 1.0);
+		}
 		return;
 	}
 
