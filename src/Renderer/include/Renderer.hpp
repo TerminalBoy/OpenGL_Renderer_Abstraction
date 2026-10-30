@@ -8,6 +8,7 @@
 #include <utility>
 #include <iterator>
 #include <memory>
+#include <filesystem>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <unordered_map>
@@ -67,6 +68,15 @@ expr_gl;                                                       \
 log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 } while(0)
 
+
+std::filesystem::path normalize_windows_linux_path(std::string path){
+  for (std::size_t i{}; i < path.size(); ++i) {
+    if (path[i] == '\\'){
+      path[i] = '/';
+    }
+  }
+  return std::filesystem::path(path).lexically_normal();
+}
 
 class Camera {
   GLFWwindow* window;
@@ -766,14 +776,14 @@ public:
   {}
 
   Texture(const std::string& path) 
-    : _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
+    : _id(0), filepath(normalize_windows_linux_path(path).string()), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
   {
 
     SetFile(path);
   }
 
   Texture(const std::string& path, const std::string& type) 
-    : _id(0), filepath(path), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr), type(type)
+    : _id(0), filepath(normalize_windows_linux_path(path).string()), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr), type(type)
   {
 
     SetFile(path);
@@ -816,11 +826,12 @@ public:
   }
 
   void SetFile(const std::string& path){
+    std::string lexical_path = normalize_windows_linux_path(path).string();
     stbi_set_flip_vertically_on_load(1);
-    local_buffer = stbi_load(path.c_str(), &width, &height, &bits_per_pixel, 4);
+    local_buffer = stbi_load(lexical_path.c_str(), &width, &height, &bits_per_pixel, 4);
 
     if (!local_buffer){
-      std::cerr << "Failed to load texture in stbi_image \n";
+      std::cerr << "Failed to load texture in stbi_image :" << lexical_path << std::endl;
       assert(0);
     }
 
@@ -840,7 +851,7 @@ public:
       stbi_image_free(local_buffer);
       local_buffer = nullptr;
       
-      std::cout << "Texture: " << path << " [" <<  width << "x" << height << "] | Decoded RGBA: " 
+      std::cout << "Texture: " << lexical_path << " [" <<  width << "x" << height << "] | Decoded RGBA: " 
       << (static_cast<std::size_t>(width) * static_cast<std::size_t>(height)  * 4) / (1024*1024) << " MiB \n";
 
     }
