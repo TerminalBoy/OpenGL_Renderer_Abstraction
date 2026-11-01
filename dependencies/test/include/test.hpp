@@ -5053,6 +5053,7 @@ class TestDepthTesting {
     }
 
     ~TestDepthTesting(){
+      VALIDATE_GL_(glDepthFunc(GL_LESS)); // restore default depth function
       std::cout << NameString << " Deconstructed\n";
     }
 
@@ -5198,6 +5199,42 @@ class TestDepthTesting {
       ImGui::Text("Press F to toggle flashlight on/off");
       // ImGui::Text("Press G to toggle bulb on/off");
       ImGui::Text("Press U to toggle sun on/off");
+
+      ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Spacing();
+
+      // DEPTH TESING TOGGLES
+
+      ImGui::Text("Depth Testing Toggles :");
+      ImGui::Spacing();
+
+      if(ImGui::Button("DepthFunc: GL_ALWAYS")){
+        VALIDATE_GL_(glDepthFunc(GL_ALWAYS));
+      } 
+      if(ImGui::Button("DepthFunc: GL_NEVER")){
+        VALIDATE_GL_(glDepthFunc(GL_NEVER));
+      }
+      if(ImGui::Button("DepthFunc: GL_LESS")){
+        VALIDATE_GL_(glDepthFunc(GL_LESS));
+      }
+      if(ImGui::Button("DepthFunc: GL_EQUAL")){
+        VALIDATE_GL_(glDepthFunc(GL_EQUAL));
+      }
+      if(ImGui::Button("DepthFunc: GL_LEQUAL")){
+        VALIDATE_GL_(glDepthFunc(GL_LEQUAL));
+      }
+      if(ImGui::Button("DepthFunc: GL_GREATER")){
+        VALIDATE_GL_(glDepthFunc(GL_GREATER));
+      }
+      if(ImGui::Button("DepthFunc: GL_NOTEQUAL")){
+        VALIDATE_GL_(glDepthFunc(GL_NOTEQUAL));
+      }
+      if(ImGui::Button("DepthFunc: GL_GEQUAL")){
+        VALIDATE_GL_(glDepthFunc(GL_GEQUAL));
+      }
+
 
       
 
