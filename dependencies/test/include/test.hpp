@@ -4928,6 +4928,8 @@ class TestDepthTesting {
     bool m_VertexShaderSource_read_status;
     bool m_FragmentShaderSource_read_status;
 
+    bool visualize_depth_buffer = false;
+
     const char* m_v_src = m_VertexShaderSource.c_str();
     const char* m_f_src = m_FragmentShaderSource.c_str();
 
@@ -5235,7 +5237,20 @@ class TestDepthTesting {
         VALIDATE_GL_(glDepthFunc(GL_GEQUAL));
       }
 
-
+      ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Spacing();
+      
+      if(!visualize_depth_buffer && ImGui::Button("Visualize Depth Buffer")){
+        visualize_depth_buffer = true;
+        m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
+      }
+      
+      if(visualize_depth_buffer && ImGui::Button("Disable Depth Buffer Visualization")){
+        visualize_depth_buffer = false;
+        m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
+      }
       
 
     }

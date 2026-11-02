@@ -71,7 +71,7 @@ uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 
 uniform bool rendering_light_source;
-
+uniform bool visualize_depth_buffer;
 
 vec3 Perform_DirectionalLighting(in DirectionalLight f_light, 
 															in vec3 f_normal,
@@ -199,6 +199,11 @@ void main() {
 		} else {
 			FragColor = vec4(bulb.color * vec3(0.2), 1.0);
 		}
+		return;
+	}
+
+	if(visualize_depth_buffer) {
+		FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
 		return;
 	}
 
