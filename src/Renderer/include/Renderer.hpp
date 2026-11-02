@@ -852,7 +852,7 @@ public:
       local_buffer = nullptr;
       
       std::cout << "Texture: " << lexical_path << " [" <<  width << "x" << height << "] | Decoded RGBA: " 
-      << (static_cast<std::size_t>(width) * static_cast<std::size_t>(height)  * 4) / (1024*1024) << " MiB \n";
+      << (static_cast<double>(width) * static_cast<double>(height)  * 4.0) / static_cast<double>(1024*1024) << " MiB \n";
 
     }
 
