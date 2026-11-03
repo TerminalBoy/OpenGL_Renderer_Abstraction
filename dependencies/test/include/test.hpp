@@ -4929,6 +4929,7 @@ class TestDepthTesting {
     bool m_FragmentShaderSource_read_status;
 
     bool visualize_depth_buffer = false;
+    bool linearize_depth_buffer = false;
 
     const char* m_v_src = m_VertexShaderSource.c_str();
     const char* m_f_src = m_FragmentShaderSource.c_str();
@@ -5242,16 +5243,25 @@ class TestDepthTesting {
       ImGui::Spacing();
       ImGui::Spacing();
       
-      if(!visualize_depth_buffer && ImGui::Button("Visualize Depth Buffer")){
+      if(!visualize_depth_buffer && ImGui::Button("Visualize Depth Buffer")) 
         visualize_depth_buffer = true;
-        m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
-      }
-      
-      if(visualize_depth_buffer && ImGui::Button("Disable Depth Buffer Visualization")){
+     
+      if(visualize_depth_buffer && ImGui::Button("Disable Depth Buffer Visualization"))
         visualize_depth_buffer = false;
-        m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
-      }
+        
       
+      if (visualize_depth_buffer) {
+        if (!linearize_depth_buffer && ImGui::Button("Linearize Depth Buffer [near ---> far]"))
+          linearize_depth_buffer = true;
+        
+        if (linearize_depth_buffer && ImGui::Button("Don't Linearize Depth Buffer [near ---> far]"))
+          linearize_depth_buffer = false;  
+      }
+
+     
+
+      m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
+      m_shader_program.SetUniform1i("linearize_depth_buffer", static_cast<int>(linearize_depth_buffer));
 
     }
 

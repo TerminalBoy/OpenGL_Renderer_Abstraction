@@ -72,6 +72,8 @@ uniform sampler2D texture_specular1;
 
 uniform bool rendering_light_source;
 uniform bool visualize_depth_buffer;
+uniform bool linearize_depth_buffer;
+
 
 vec3 Perform_DirectionalLighting(in DirectionalLight f_light, 
 															in vec3 f_normal,
@@ -189,7 +191,13 @@ vec3 Perform_Spotlighting(in Spotlight f_light,
 
 }
 
+float near = 1.0;
+float far = 100.0;
 
+float LinearizeDepth(float depth){
+	float z = depth * 2.0 - 1.0;
+	return (2.0 * near * far) / (far + near - z * (far - near));
+}
 
 void main() {  
 
@@ -203,7 +211,12 @@ void main() {
 	}
 
 	if(visualize_depth_buffer) {
-		FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
+		float depth;
+		
+		if(linearize_depth_buffer) depth = LinearizeDepth(gl_FragCoord.z) / far;
+		else depth = gl_FragCoord.z;
+
+		FragColor = vec4(vec3(depth), 1.0);
 		return;
 	}
 
