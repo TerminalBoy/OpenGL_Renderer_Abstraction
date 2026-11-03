@@ -1043,7 +1043,7 @@ class Model {
     std::cout << "[1] Before Assimp Import \n";
     
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate /*| aiProcess_FlipUVs*/);
     
     std::cout << "[2] After Assimp Import \n";
     
