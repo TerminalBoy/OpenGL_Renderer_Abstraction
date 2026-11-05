@@ -1260,13 +1260,29 @@ class Model {
   }
 
   // [OK]
-  void Draw(ShaderProgram& shader_program){
+  void Draw(ShaderProgram& BOUND_shader_program){
     for (std::size_t i{}; i < m_meshes.size(); ++i){
-      m_meshes[i].PrepareDraw(shader_program);
+      m_meshes[i].PrepareDraw(BOUND_shader_program);
       m_meshes[i].Draw();
     }
   }
 
+  glm::vec3 FindAABBcenter(){
+    glm::vec3 MinBounds{std::numeric_limits<float>::max()}; //min bounds start from max
+    glm::vec3 MaxBounds{std::numeric_limits<float>::lowest()}; //max bounds start from min
+    // iterate over all the postion vertexes
+
+    for(std::size_t i{}; i < m_meshes.size(); ++i){
+
+      for(std::size_t j{}; j < m_meshes[i].m_vertices.size(); ++j){
+        MinBounds = glm::min(MinBounds, m_meshes[i].m_vertices[j].position);
+        MaxBounds = glm::max(MaxBounds, m_meshes[i].m_vertices[j].position);
+      }
+
+    }
+    // AABB center formula [(P(max) + P(min)) / 2]
+    return (MaxBounds + MinBounds) * 0.5f;
+  }
 
 };
 
