@@ -78,6 +78,29 @@ std::filesystem::path normalize_windows_linux_path(std::string path){
   return std::filesystem::path(path).lexically_normal();
 }
 
+
+namespace ShaderInput {
+
+  bool ReadFromFile(const std::string& path, std::string& destination_string) {
+    std::ifstream shader_file(path);
+
+    if (!shader_file) {
+      std::cout << "Error Opening file: " << path << std::endl;
+      assert(0);
+      return false;
+    }
+
+    std::string line;
+
+    while (std::getline(shader_file, line)) {
+      destination_string += line + '\n';
+    }
+
+    return true;
+  }
+
+}
+
 class Camera {
   GLFWwindow* window;
   bool take_input = false;
@@ -511,7 +534,21 @@ public:
   
   
   ShaderVertex(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
+    assert(str_array_size <= 1 && "More than 1 element in array of const char* is not yet supported in shader compilation");
     _id = CreateShader(GL_VERTEX_SHADER, shader_src_string_array, str_array_size);
+  }
+
+  ShaderVertex(std::filesystem::path VertexShaderPath){
+    //assert(str_array_size <= 1 && "More than 1 element in array of const char* is not yet supported in shader compilation");
+    std::string lexical_normal_path = VertexShaderPath.lexically_normal().string();
+    std::string src;
+    
+    ShaderInput::ReadFromFile(lexical_normal_path, src);
+    
+    const char* src_c_str = src.c_str();
+    const char** src_c_str_array = &src_c_str;
+
+    _id = CreateShader(GL_VERTEX_SHADER, src_c_str_array, 1);
   }
 
   void CompileShader_seperately(const char* const* const shader_src_string_array, std::size_t str_array_size) {
@@ -556,7 +593,21 @@ public:
   }
 
   ShaderFragment(const char* const* const shader_src_string_array, std::size_t str_array_size = 1) {
+    assert(str_array_size <= 1 && "More than 1 element in array of const char* is not yet supported in shader compilation");
     _id = CreateShader(GL_FRAGMENT_SHADER, shader_src_string_array, str_array_size);
+  }
+
+  ShaderFragment(std::filesystem::path VertexShaderPath){
+    //assert(str_array_size <= 1 && "More than 1 element in array of const char* is not yet supported in shader compilation");
+    std::string lexical_normal_path = VertexShaderPath.lexically_normal().string();
+    std::string src;
+    
+    ShaderInput::ReadFromFile(lexical_normal_path, src);
+    
+    const char* src_c_str = src.c_str();
+    const char** src_c_str_array = &src_c_str;
+
+    _id = CreateShader(GL_FRAGMENT_SHADER, src_c_str_array, 1);
   }
 
   void CompileShader_seperately(const char* const* const shader_src_string_array, std::size_t str_array_size) {
@@ -1219,24 +1270,3 @@ class Model {
 
 };
 
-
-namespace ShaderInput {
-
-  bool ReadFromFile(const std::string& path, std::string& destination_string) {
-    std::ifstream shader_file(path);
-
-    if (!shader_file) {
-      std::cout << "Error Opening file: " << path << std::endl;
-      return false;
-    }
-
-    std::string line;
-
-    while (std::getline(shader_file, line)) {
-      destination_string += line + '\n';
-    }
-
-    return true;
-  }
-
-}
