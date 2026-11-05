@@ -77,7 +77,8 @@ int main() {
     test::TestLighting_Flashlight,
     test::TestLighting_MultipleLights,
     test::TestModelLoading,
-    test::TestDepthTesting
+    test::TestDepthTesting,
+    test::TestStencilTesting
     > 
     menu(window);
 
