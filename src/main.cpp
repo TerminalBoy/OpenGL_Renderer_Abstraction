@@ -78,7 +78,8 @@ int main() {
     test::TestLighting_MultipleLights,
     test::TestModelLoading,
     test::TestDepthTesting,
-    test::TestStencilTesting
+    test::TestStencilTesting,
+    test::TestBlending
     > 
     menu(window);
 

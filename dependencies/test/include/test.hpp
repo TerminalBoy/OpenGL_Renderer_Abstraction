@@ -5850,6 +5850,541 @@ class TestDepthTesting {
 
 
 
+
+  class TestBlending {
+    int m_window_width{};
+    int m_window_height{};
+    GLFWwindow* m_window;
+    Camera m_camera;
+    std::array<float, 6*6*(6+2)> m_Vertices{ //xyz, normals, Texture_xy
+     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
+     -0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
+     
+     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
+      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+     -0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
+    
+     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, -0.5f,     -1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+     -0.5f, -0.5f, 0.5f,     -1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+
+      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, -0.5f,      1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, -0.5f, 0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
+
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      1.0f, 1.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
+      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
+     -0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
+    
+     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f,
+      0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 1.0f,
+      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+     -0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       0.0f, 0.0f,
+     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f
+
+    };
+    
+    
+    struct DirectionalLight{
+    	glm::vec3 direction;
+
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+      glm::vec3 color;
+      bool enabled;
+    };
+
+    struct PointLight {
+    	glm::vec3 scale;
+      glm::mat4 mat_model;
+      
+      glm::vec3 pos;
+
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+
+    	glm::vec3 color;
+
+    	float atten_constant;
+    	float atten_linear;
+    	float atten_quadratic;
+      bool enabled;
+    };
+
+    struct Spotlight {
+    	glm::vec3 pos;
+    	glm::vec3 color;
+    	glm::vec3 direction;
+    	glm::vec3 ambient;
+    	glm::vec3 diffuse;
+    	glm::vec3 specular;
+    	float atten_constant;
+    	float atten_linear;
+    	float atten_quadratic;
+    	float cutOff;
+    	float outerCutOff;
+      bool enabled;
+    };
+
+    enum class Model3d {
+      None,
+      Grass,
+      Window
+    };
+
+    Model3d CurrentModel = Model3d::None;
+
+    glm::mat4 m_proj;
+    // std::vector<Material> m_cubes;
+
+    DirectionalLight m_sun;
+    PointLight m_bulb;
+    Spotlight m_flashlight;
+
+    glm::vec3 m_light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
+    std::string m_VertexShaderSource;
+    std::string m_FragmentShaderSource;
+
+    bool visualize_depth_buffer = false;
+    bool linearize_depth_buffer = false;
+
+    ShaderVertex m_vertex_shader;
+    ShaderFragment m_fragment_shader;
+    ShaderFragment m_grassfragment_shader;
+    // ShaderVertex m_outlinevertex_shader;
+    // ShaderFragment m_outlinefragment_shader;
+    
+    ShaderProgram m_shader_program;
+    ShaderProgram m_outlineshader_program;
+    ShaderProgram m_grassshader_program;
+
+
+    VertexArray m_v_arr;
+    VertexBuffer m_v_buff;
+    
+    Model Container1;
+    Model Container2;
+    Model Plane;
+    Model Grass;
+    Model BlendingScene;
+    public:
+    static constexpr std::string_view NameString{"Blending (transparency)"};
+    
+    TestBlending(GLFWwindow* window)
+    : m_window(window),
+      m_camera(window),
+      
+      m_vertex_shader("dependencies/test_Shaders/TestBlending/vertexshader.shader"),
+      m_fragment_shader("dependencies/test_Shaders/TestBlending/fragmentshader.shader"),
+      m_grassfragment_shader("dependencies/test_Shaders/TestBlending/GrassFragmentShader.shader"),
+      
+      // m_outlinevertex_shader("dependencies/test_Shaders/TestBlending/outlinevertexshader.shader"),
+      // m_outlinefragment_shader("dependencies/test_Shaders/TestBlending/outlinefragmentshader.shader"),
+
+      m_shader_program(m_vertex_shader, m_fragment_shader),
+      m_grassshader_program(m_vertex_shader, m_grassfragment_shader),
+
+      // m_outlineshader_program(m_outlinevertex_shader, m_outlinefragment_shader),
+      
+      Container1("Assets/3D/Blending/Container1.obj"),
+      Container2("Assets/3D/Blending/Container2.obj"),
+      Plane("Assets/3D/Blending/Plane.obj"),
+      Grass("Assets/3D/Blending/Grass.obj"),
+      BlendingScene("Assets/3D/Blending/Window_And_Objects.obj")
+
+    {
+      std::cout << NameString << " Constructed\n";
+
+      glfwGetWindowSize(window, &m_window_width, &m_window_height);
+      m_proj = glm::perspective(glm::radians(45.0f), static_cast<float>(m_window_width) / static_cast<float>(m_window_height), 0.1f, 100.0f);
+
+
+      //m_cube = Material(Material::Type::Neutral);
+      
+      // for (std::size_t i{}; i < m_cubes.size(); ++i){
+      //   m_cubes[i] = Material(Material::Type::Neutral);
+      //   m_cubes[i].pos =  cubePositions[i];
+      //   m_cubes[i].mat_model = glm::translate(m_cubes[i].mat_model, m_cubes[i].pos);
+      // }
+
+      // // initializing sun
+      m_sun.enabled = true;
+      // m_sun.direction = glm::vec3(1.f, 1.f, -1.f);
+      // m_sun.color = glm::vec3(255.f/255.f, 229.f/255.f, 200.f/255.f);
+      // m_sun.ambient = m_sun.color - glm::vec3(0.7); // darken the ambient
+      // m_sun.diffuse = m_sun.color;
+      // m_sun.specular = m_sun.color;
+
+
+      // initializing bulb
+      m_bulb.enabled = true;
+      m_bulb.pos = m_light_source_translation;      
+      m_bulb.scale = glm::vec3(0.5f);
+      m_bulb.mat_model = glm::mat4(1);
+      m_bulb.mat_model = glm::translate(m_bulb.mat_model, m_bulb.pos);
+      m_bulb.mat_model = glm::scale(m_bulb.mat_model, m_bulb.scale);
+      m_bulb.color = glm::vec3(1.0f);
+      m_bulb.ambient = m_bulb.color - glm::vec3(0.9);
+      m_bulb.diffuse = m_bulb.color;
+      m_bulb.specular = m_bulb.color;
+      m_bulb.atten_constant = 1.0f;
+      m_bulb.atten_linear = 0.09f;
+      m_bulb.atten_quadratic = 0.032f;
+
+      // // initializing flashlight
+      m_flashlight.enabled = true;
+      m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
+      m_flashlight.color = glm::vec3(1.0f);
+      m_flashlight.direction = m_camera.cameraFront; // !!!! TO BE DONE EVERY FRAME
+      m_flashlight.ambient = m_flashlight.color - glm::vec3(0.95f);
+      m_flashlight.diffuse = m_flashlight.color;
+      m_flashlight.specular = m_flashlight.color;
+      m_flashlight.atten_constant = 1.0f;
+      m_flashlight.atten_linear = 0.022f;
+      m_flashlight.atten_quadratic = 0.0019f;
+
+
+
+      m_v_arr.bind();
+      m_v_buff.bind(GL_ARRAY_BUFFER);
+      m_v_buff.set_data(GL_ARRAY_BUFFER, m_Vertices, GL_STATIC_DRAW);
+
+      m_v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 0);
+      m_v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 3 * sizeof(float));
+      m_v_arr.push_arrtib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 6 * sizeof(float));
+
+      m_v_arr.enable(0);
+      m_v_arr.enable(1);
+      m_v_arr.enable(2);
+      
+      m_shader_program.Bind();
+      m_shader_program.SetIgnoreNonExistentUniform(true);
+      // m_diffuse_map.Bind(0);
+      // m_specular_map.Bind(1);
+      
+      m_camera.SetCameraEnabled();
+      m_camera.SetDragStyleCamera();
+      m_camera.SetCursorVisible(); // we want the cursor to be visible for a drag style camera
+      //m_camera.SetCursorInvisible(); 
+      // allow proper keyboard and mouse sharing with imgui
+      m_camera.SetMouseSharedWithImGui();
+      m_camera.SetKeyboardSharedWithImGui();
+
+      m_camera.cameraPos = glm::vec3(0.0f, 3.0f, 5.58f);
+      //m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
+      
+      //m_camera.pitch = 12.9f; 
+      //m_camera.yaw = 50.83f; 
+
+      // VALIDATE_GL_(glEnable(GL_STENCIL_TEST));
+      // VALIDATE_GL_(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
+
+      VALIDATE_GL_(glEnable(GL_BLEND));
+      VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+      
+    }
+
+    ~TestBlending(){
+      //VALIDATE_GL_(glDepthFunc(GL_LESS)); // restore default depth function
+      std::cout << NameString << " Deconstructed\n";
+    }
+
+    void OnOpenGLRender(){
+      
+      
+      m_camera.OnOpenGLRender();
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+
+      glm::mat4 view = m_camera.GetViewMatrix();
+      // DisableGLErrorPrinting();
+      // for (std::size_t i{}; i < m_cubes.size(); ++i)
+      // { //cube 
+
+      
+      // m_shader_program.SetUniform1i("rendering_light_source", 0);
+      m_shader_program.Bind();
+      m_shader_program.SetIgnoreNonExistentUniform(true);
+      m_shader_program.SetUniform1i("rendering_light_source", 0);
+
+      m_shader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
+      m_shader_program.SetUniformMat4f("view", view);
+      m_shader_program.SetUniformMat4f("projection", m_proj);
+
+      //   //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
+      //   //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
+      //   //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
+        
+      //   // setting materials
+      //   m_shader_program.SetUniformVec3f("material.color", m_cubes[i].color);
+      //   m_shader_program.SetUniform1f("material.specular_power", m_cubes[i].specular_power);
+      //   m_shader_program.SetUniform1i("material.diffuse", 0); // texture slots
+      //   m_shader_program.SetUniform1i("material.specular", 1); // texture slots
+
+      //   // setting directional light
+      m_shader_program.SetUniform1i("sun.enabled", m_sun.enabled);
+        m_shader_program.SetUniformVec3f("sun.direction", glm::vec3(-1.f, 1.f, 3.f));
+        m_shader_program.SetUniformVec3f("sun.ambient", glm::vec3(0.1f));
+        m_shader_program.SetUniformVec3f("sun.diffuse", glm::vec3(1.f));
+        m_shader_program.SetUniformVec3f("sun.specular", glm::vec3(1.f));
+        m_shader_program.SetUniformVec3f("sun.color", glm::vec3(1.f));
+
+
+
+      //   // setting point light
+        m_shader_program.SetUniform1i("bulb.enabled", 0); // will be disabled for this scene
+        m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
+        m_shader_program.SetUniformVec3f("bulb.ambient", m_bulb.ambient);
+        m_shader_program.SetUniformVec3f("bulb.diffuse", m_bulb.diffuse);
+        m_shader_program.SetUniformVec3f("bulb.specular", m_bulb.specular);
+        m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
+        m_shader_program.SetUniform1f("bulb.atten_constant", m_bulb.atten_constant);
+        m_shader_program.SetUniform1f("bulb.atten_linear", m_bulb.atten_linear);
+        m_shader_program.SetUniform1f("bulb.atten_quadratic", m_bulb.atten_quadratic);
+
+      //   // setting spotlight
+        m_flashlight.pos = m_camera.GetPosition();
+        m_flashlight.direction = m_camera.cameraFront;
+        m_shader_program.SetUniform1i("flashlight.enabled", m_flashlight.enabled);
+
+        m_shader_program.SetUniformVec3f("flashlight.pos", m_flashlight.pos);
+        m_shader_program.SetUniformVec3f("flashlight.direction", m_flashlight.direction);
+        m_shader_program.SetUniformVec3f("flashlight.ambient", m_flashlight.ambient);
+        m_shader_program.SetUniformVec3f("flashlight.diffuse", m_flashlight.diffuse);
+        m_shader_program.SetUniformVec3f("flashlight.specular", m_flashlight.specular);
+        m_shader_program.SetUniformVec3f("flashlight.color", m_flashlight.color);
+        m_shader_program.SetUniform1f("flashlight.atten_constant", m_flashlight.atten_constant);
+        m_shader_program.SetUniform1f("flashlight.atten_linear", m_flashlight.atten_linear);
+        m_shader_program.SetUniform1f("flashlight.atten_quadratic", m_flashlight.atten_quadratic);
+        m_shader_program.SetUniform1f("flashlight.cutOff", glm::cos(glm::radians(12.5f)));
+        m_shader_program.SetUniform1f("flashlight.outerCutOff", glm::cos(glm::radians(15.5f)));
+
+
+
+
+      //   // setting camera
+      m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+
+      //   // m_shader_program.SetUniform1f("light.atten_constant", 1.0f);
+      //   // // m_shader_program.SetUniform1f("light.atten_linear", 0.09f);
+      //   // // m_shader_program.SetUniform1f("light.atten_quadratic", 0.032f);
+      //   // m_shader_program.SetUniform1f("light.atten_linear", 0.022f);
+      //   // m_shader_program.SetUniform1f("light.atten_quadratic", 0.0019f);
+
+
+        
+      //   VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
+      // m_outlineshader_program.SetIgnoreNonExistentUniform(true);  
+      
+      // VALIDATE_GL_(glStencilMask(0x00));
+      Plane.Draw(m_shader_program);
+
+      // VALIDATE_GL_(glStencilFunc(GL_ALWAYS, 1, 0xFF));
+      // VALIDATE_GL_(glStencilMask(0xFF));
+      
+      switch (CurrentModel) {
+
+        case Model3d::Window:
+          m_shader_program.Bind();
+          // Container1.Draw(m_shader_program);
+          // Container2.Draw(m_shader_program);
+          BlendingScene.Draw(m_shader_program);
+          m_shader_program.UnBind();
+        break;
+
+        
+        case Model3d::Grass:
+          m_grassshader_program.Bind();
+          m_grassshader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
+          m_grassshader_program.SetUniformMat4f("view", view);
+          m_grassshader_program.SetUniformMat4f("projection", m_proj);
+          Grass.Draw(m_grassshader_program);
+          m_grassshader_program.UnBind();
+        break;
+
+        
+        default:
+        
+        break;
+      }
+
+      
+      
+
+      // VALIDATE_GL_(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
+      // VALIDATE_GL_(glStencilMask(0x00));
+      // VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
+      // // draw 2 scaled up containers
+      // m_outlineshader_program.Bind();
+      // m_outlineshader_program.SetUniformMat4f("model", glm::mat4(1.f));
+      // m_outlineshader_program.SetUniformMat4f("view", view);
+      // m_outlineshader_program.SetUniformMat4f("projection", m_proj);
+      // m_outlineshader_program.SetUniform1f("scaleFactor", 1.2f);
+      
+      // m_outlineshader_program.SetUniformVec3f("AABBcenter", Container1.FindAABBcenter());
+      // Container1.Draw(m_outlineshader_program);
+
+      // m_outlineshader_program.SetUniformVec3f("AABBcenter", Container2.FindAABBcenter());
+      // Container2.Draw(m_outlineshader_program);
+
+      // VALIDATE_GL_(glStencilMask(0xFF));
+      // VALIDATE_GL_(glStencilFunc(GL_ALWAYS, 1, 0xFF));
+      // VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
+      // m_outlineshader_program.UnBind();
+      
+      // m_shader_program.Bind();
+
+      // }
+
+      // { // light 
+
+      //   m_shader_program.Bind();
+      //   m_shader_program.SetUniform1i("rendering_light_source", 1);
+      //   m_shader_program.SetUniformMat4f("model", glm::mat4(0.f));
+      //   m_shader_program.SetUniformMat4f("view", view);
+      //   m_shader_program.SetUniformMat4f("projection", m_proj);
+      //   //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
+      //   //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
+      //   //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
+      //   //m_shader_program.SetUniformVec3f("material.color", m_cube.color);
+      //   //m_shader_program.SetUniform1f("material.specular_power", m_cube.specular_power);
+
+      //   m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
+      //   m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
+
+      //   m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
+        
+      //   m_v_arr.bind();
+      //   VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
+      //   m_v_arr.Unbind();
+      // }
+
+      
+
+
+
+      // EnableGLErrorPrinting();
+    }
+
+    void processInput(){
+      m_camera.predefined_generic_WASD_control();
+      
+      // flashlight on/off control
+      if (ImGui::IsKeyPressed(ImGuiKey_F, false)){
+        m_flashlight.enabled = !m_flashlight.enabled;
+      }
+      
+      // // bulb on/off control
+      // if (ImGui::IsKeyPressed(ImGuiKey_B, false)){
+      //   m_bulb.enabled = !m_bulb.enabled;
+      // }
+
+      // sun on/off control
+      if (ImGui::IsKeyPressed(ImGuiKey_U, false)){
+        m_sun.enabled = !m_sun.enabled;
+      }
+
+    }
+
+    void OnImGuiRender(){
+      ImGui::Text("Press ESC to disable camera and control mouse cursor");
+      ImGui::Text("Press F to toggle flashlight on/off");
+      // ImGui::Text("Press G to toggle bulb on/off");
+      ImGui::Text("Press U to toggle sun on/off");
+
+      ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Spacing();
+
+      ImGui::Text("3D Models:");
+
+      if(ImGui::Button("Grass")){
+        CurrentModel = Model3d::Grass;
+      }
+      if(ImGui::Button("Window")){
+        CurrentModel = Model3d::Window;
+      }
+      // STENCIL TESING TOGGLES
+
+      // ImGui::Text("Stencil Testing Toggles :");
+      // ImGui::Spacing();
+
+      // if(ImGui::Button("StencilFunc: GL_ALWAYS")){
+      //   VALIDATE_GL_(glDepthFunc(GL_ALWAYS));
+      // } 
+      // if(ImGui::Button("DepthFunc: GL_NEVER")){
+      //   VALIDATE_GL_(glDepthFunc(GL_NEVER));
+      // }
+      // if(ImGui::Button("DepthFunc: GL_LESS")){
+      //   VALIDATE_GL_(glDepthFunc(GL_LESS));
+      // }
+      // if(ImGui::Button("DepthFunc: GL_EQUAL")){
+      //   VALIDATE_GL_(glDepthFunc(GL_EQUAL));
+      // }
+      // if(ImGui::Button("DepthFunc: GL_LEQUAL")){
+      //   VALIDATE_GL_(glDepthFunc(GL_LEQUAL));
+      // }
+      // if(ImGui::Button("DepthFunc: GL_GREATER")){
+      //   VALIDATE_GL_(glDepthFunc(GL_GREATER));
+      // }
+      // if(ImGui::Button("DepthFunc: GL_NOTEQUAL")){
+      //   VALIDATE_GL_(glDepthFunc(GL_NOTEQUAL));
+      // }
+      // if(ImGui::Button("DepthFunc: GL_GEQUAL")){
+      //   VALIDATE_GL_(glDepthFunc(GL_GEQUAL));
+      // }
+
+      // ImGui::Spacing();
+      // ImGui::Spacing();
+      // ImGui::Spacing();
+      // ImGui::Spacing();
+      
+      // if(!visualize_depth_buffer && ImGui::Button("Visualize Depth Buffer")) 
+      //   visualize_depth_buffer = true;
+     
+      // if(visualize_depth_buffer && ImGui::Button("Disable Depth Buffer Visualization"))
+      //   visualize_depth_buffer = false;
+        
+      
+      // if (visualize_depth_buffer) {
+      //   if (!linearize_depth_buffer && ImGui::Button("Linearize Depth Buffer [near ---> far]"))
+      //     linearize_depth_buffer = true;
+        
+      //   if (linearize_depth_buffer && ImGui::Button("Don't Linearize Depth Buffer [near ---> far]"))
+      //     linearize_depth_buffer = false;  
+      // }
+
+     
+
+      // m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
+      // m_shader_program.SetUniform1i("linearize_depth_buffer", static_cast<int>(linearize_depth_buffer));
+
+    }
+
+    
+  };
+
+
+
   template <typename... Tests>
   class TestMenu {
 
