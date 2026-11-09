@@ -6197,7 +6197,6 @@ class TestDepthTesting {
       // m_outlineshader_program.SetIgnoreNonExistentUniform(true);  
       
       // VALIDATE_GL_(glStencilMask(0x00));
-      VALIDATE_GL_(glDepthMask(GL_TRUE)); // depth writing on for opaque objects
       Plane.Draw(m_shader_program);
 
       // VALIDATE_GL_(glStencilFunc(GL_ALWAYS, 1, 0xFF));
@@ -6207,20 +6206,14 @@ class TestDepthTesting {
 
         case Model3d::Window:
           m_shader_program.Bind();
-          
-          VALIDATE_GL_(glDepthMask(GL_TRUE));
           Sphere.Draw(m_shader_program);
-
-          VALIDATE_GL_(glDepthMask(GL_FALSE));
-          
-          TransparentWindows.Draw(m_shader_program);
-          
+          TransparentWindows.DrawTransparent(m_shader_program);
           m_shader_program.UnBind();
         break;
 
         
         case Model3d::Grass:
-          VALIDATE_GL_(glDepthMask(GL_TRUE));
+          
           m_grassshader_program.Bind();
           m_grassshader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
           m_grassshader_program.SetUniformMat4f("view", view);
@@ -6235,8 +6228,6 @@ class TestDepthTesting {
         break;
       }
 
-      VALIDATE_GL_(glDepthMask(GL_TRUE));
-      
 
       // VALIDATE_GL_(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
       // VALIDATE_GL_(glStencilMask(0x00));

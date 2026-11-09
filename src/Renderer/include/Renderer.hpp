@@ -1266,6 +1266,16 @@ class Model {
       m_meshes[i].Draw();
     }
   }
+  
+  void DrawTransparent(ShaderProgram& BOUND_shader_program){
+    VALIDATE_GL_(glDepthMask(GL_FALSE)); // disabling depth writing while drawing transparent models/meshes
+    for (std::size_t i{}; i < m_meshes.size(); ++i){
+      m_meshes[i].PrepareDraw(BOUND_shader_program);
+      m_meshes[i].Draw();
+    }
+    VALIDATE_GL_(glDepthMask(GL_TRUE)); // enabling depth writing after drawing transparent models/meshes
+  }
+
 
   glm::vec3 FindAABBcenter(){
     glm::vec3 MinBounds{std::numeric_limits<float>::max()}; //min bounds start from max
