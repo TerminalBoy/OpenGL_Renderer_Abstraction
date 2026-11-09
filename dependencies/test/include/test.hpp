@@ -5985,7 +5985,8 @@ class TestDepthTesting {
     Model Container2;
     Model Plane;
     Model Grass;
-    Model BlendingScene;
+    Model TransparentWindows;
+    Model Sphere;
     public:
     static constexpr std::string_view NameString{"Blending (transparency)"};
     
@@ -6009,7 +6010,8 @@ class TestDepthTesting {
       Container2("Assets/3D/Blending/Container2.obj"),
       Plane("Assets/3D/Blending/Plane.obj"),
       Grass("Assets/3D/Blending/Grass.obj"),
-      BlendingScene("Assets/3D/Blending/Window_And_Objects.obj")
+      TransparentWindows("Assets/3D/Blending/Transparent_Windows.obj"),
+      Sphere("Assets/3D/Blending/Sphere.obj")
 
     {
       std::cout << NameString << " Constructed\n";
@@ -6195,6 +6197,7 @@ class TestDepthTesting {
       // m_outlineshader_program.SetIgnoreNonExistentUniform(true);  
       
       // VALIDATE_GL_(glStencilMask(0x00));
+      VALIDATE_GL_(glDepthMask(GL_TRUE)); // depth writing on for opaque objects
       Plane.Draw(m_shader_program);
 
       // VALIDATE_GL_(glStencilFunc(GL_ALWAYS, 1, 0xFF));
@@ -6204,14 +6207,20 @@ class TestDepthTesting {
 
         case Model3d::Window:
           m_shader_program.Bind();
-          // Container1.Draw(m_shader_program);
-          // Container2.Draw(m_shader_program);
-          BlendingScene.Draw(m_shader_program);
+          
+          VALIDATE_GL_(glDepthMask(GL_TRUE));
+          Sphere.Draw(m_shader_program);
+
+          VALIDATE_GL_(glDepthMask(GL_FALSE));
+          
+          TransparentWindows.Draw(m_shader_program);
+          
           m_shader_program.UnBind();
         break;
 
         
         case Model3d::Grass:
+          VALIDATE_GL_(glDepthMask(GL_TRUE));
           m_grassshader_program.Bind();
           m_grassshader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
           m_grassshader_program.SetUniformMat4f("view", view);
@@ -6226,7 +6235,7 @@ class TestDepthTesting {
         break;
       }
 
-      
+      VALIDATE_GL_(glDepthMask(GL_TRUE));
       
 
       // VALIDATE_GL_(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
