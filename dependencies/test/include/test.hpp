@@ -5969,13 +5969,11 @@ class TestDepthTesting {
 
     ShaderVertex m_vertex_shader;
     ShaderFragment m_fragment_shader;
-    ShaderFragment m_grassfragment_shader;
-    // ShaderVertex m_outlinevertex_shader;
-    // ShaderFragment m_outlinefragment_shader;
+    ShaderFragment m_transparencyfragment_shader;
+    
     
     ShaderProgram m_shader_program;
-    ShaderProgram m_outlineshader_program;
-    ShaderProgram m_grassshader_program;
+    ShaderProgram m_transparencyshader_program;
 
 
     VertexArray m_v_arr;
@@ -5996,13 +5994,13 @@ class TestDepthTesting {
       
       m_vertex_shader("dependencies/test_Shaders/TestBlending/vertexshader.shader"),
       m_fragment_shader("dependencies/test_Shaders/TestBlending/fragmentshader.shader"),
-      m_grassfragment_shader("dependencies/test_Shaders/TestBlending/GrassFragmentShader.shader"),
+      m_transparencyfragment_shader("dependencies/test_Shaders/TestBlending/transparency_fragmentshader.shader"),
       
       // m_outlinevertex_shader("dependencies/test_Shaders/TestBlending/outlinevertexshader.shader"),
       // m_outlinefragment_shader("dependencies/test_Shaders/TestBlending/outlinefragmentshader.shader"),
 
       m_shader_program(m_vertex_shader, m_fragment_shader),
-      m_grassshader_program(m_vertex_shader, m_grassfragment_shader),
+      m_transparencyshader_program(m_vertex_shader, m_transparencyfragment_shader),
 
       // m_outlineshader_program(m_outlinevertex_shader, m_outlinefragment_shader),
       
@@ -6125,6 +6123,7 @@ class TestDepthTesting {
       // m_shader_program.SetUniform1i("rendering_light_source", 0);
       m_shader_program.Bind();
       m_shader_program.SetIgnoreNonExistentUniform(true);
+      m_transparencyshader_program.SetIgnoreNonExistentUniform(true);
       m_shader_program.SetUniform1i("rendering_light_source", 0);
 
       m_shader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
@@ -6205,21 +6204,24 @@ class TestDepthTesting {
       switch (CurrentModel) {
 
         case Model3d::Window:
-          m_shader_program.Bind();
           Sphere.Draw(m_shader_program);
-          TransparentWindows.DrawTransparent(m_shader_program);
           m_shader_program.UnBind();
+          m_transparencyshader_program.Bind();
+
+          m_transparencyshader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
+          m_transparencyshader_program.SetUniformMat4f("view", view);
+          m_transparencyshader_program.SetUniformMat4f("projection", m_proj);
+
+          TransparentWindows.DrawTransparent(m_shader_program);
+          m_transparencyshader_program.UnBind();
+          m_shader_program.Bind();
         break;
 
         
         case Model3d::Grass:
           
-          m_grassshader_program.Bind();
-          m_grassshader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
-          m_grassshader_program.SetUniformMat4f("view", view);
-          m_grassshader_program.SetUniformMat4f("projection", m_proj);
-          Grass.Draw(m_grassshader_program);
-          m_grassshader_program.UnBind();
+          m_shader_program.SetUniform1i("alpha_discard", static_cast<int>(true));
+          Grass.Draw(m_shader_program);
         break;
 
         

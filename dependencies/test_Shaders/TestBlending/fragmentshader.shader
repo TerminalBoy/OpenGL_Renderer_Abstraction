@@ -71,9 +71,7 @@ uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 
 uniform bool rendering_light_source;
-uniform bool visualize_depth_buffer;
-uniform bool linearize_depth_buffer;
-uniform bool rendering_outlines;
+uniform bool alpha_discard;
 
 
 vec3 Perform_DirectionalLighting(in DirectionalLight f_light, 
@@ -211,90 +209,18 @@ void main() {
 	// 	return;
 	// }
 
-	// if(visualize_depth_buffer) {
-	// 	float depth;
-		
-	// 	if(linearize_depth_buffer) depth = LinearizeDepth(gl_FragCoord.z) / far;
-	// 	else depth = gl_FragCoord.z;
+	if (alpha_discard) {
+		if(texture(texture_diffuse1, TexCoords).a < 1.0){
+			discard;
+		}
+	}
 
-	// 	FragColor = vec4(vec3(depth), 1.0);
-	// 	return;
-	// }
+	vec3 result_directional = Perform_DirectionalLighting(sun, Normal, TexCoords, FragPos, camera);
+	vec3 result_point =  Perform_PointLighting(bulb, Normal, TexCoords, FragPos, camera);
+	vec3 result_spot = Perform_Spotlighting(flashlight, Normal, TexCoords, FragPos, camera);
+	vec3 result = result_directional + result_point + result_spot;
 
-	// if(rendering_outlines){
-	// 	FragColor = vec4(0.04, 0.28, 0.26, 1.0);
-	// 	return;
-	// }
-
-	// vec3 result_directional = Perform_DirectionalLighting(sun, Normal, TexCoords, FragPos, camera);
-	// vec3 result_point =  Perform_PointLighting(bulb, Normal, TexCoords, FragPos, camera);
-	// vec3 result_spot = Perform_Spotlighting(flashlight, Normal, TexCoords, FragPos, camera);
-	// vec3 result = result_directional + result_point + result_spot;
-	vec4 texcolor = texture(texture_diffuse1, TexCoords);
-	// if (texcolor.a < 1.0)
-	//  discard;
-	FragColor = texcolor;
-  //FragColor = vec4(1.0);
-
-	// if (rendering_light_source) {
-	// 	FragColor = vec4(vec3(1.0, 1.0, 1.0), 1.0);
-	// 	return;	
-	// }
-
-
-	// //ambient
-	// vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
-
-	// //diffuse
-	// vec3 norm = normalize(Normal);
-	// vec3 lightDir = normalize(light.pos - FragPos);
-	// float diff= max(dot(norm, lightDir), 0.0);
-	// vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
-
-	// //specular
-	// vec3 viewDir = normalize(camera.pos - FragPos);
-	// vec3 reflectionDir = reflect(-lightDir, norm);
-	// float spec = pow(max(dot(viewDir, reflectionDir), 0.0), material.specular_power);
-	// vec3 specular = light.specular * (spec * vec3(texture(material.specular, TexCoords)));
-	
-	// //attenuation
-	// float distance = length(light.pos - FragPos);
-	// float attenuation = 
-	// 	1.0 / (light.atten_constant + (light.atten_linear * distance) + (light.atten_quadratic * distance * distance));
-	
-	
-	
-	// vec3 result;
-
-	// ambient *= attenuation;
-	// diffuse *= attenuation;
-	// specular *= attenuation;
-
+	FragColor = vec4(result, 1.0);
 
   
-	
-	// float theta = dot(lightDir, normalize(-light.direction));
-	// float epsilon = light.cutOff - light.outerCutOff;
-	// float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-
-	// diffuse *= intensity;
-	// specular *= intensity;
-
-	// if (theta > light.outerCutOff) {
-	// 	result = (ambient + diffuse + specular);
-
-	// } else {
-	// 	result = ambient;
-	// }
-
-
-
-
-	// vec3 result_directional = Perform_DirectionalLighting(sun, Normal, material, TexCoords, FragPos, camera);
-	// vec3 result_point = Perform_PointLighting(bulb, Normal, material, TexCoords, FragPos, camera);
-	// vec3 result_spot = Perform_Spotlighting(flashlight, Normal, material, TexCoords, FragPos, camera);
-
-	// vec3 result_ =  result_directional + result_point + result_spot;
-
-	// FragColor = vec4(result_, 1.0);  
 }	
