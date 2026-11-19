@@ -388,7 +388,28 @@ unsigned int CreateShaderProgram(unsigned int VertexShader, unsigned int Fragmen
 }
 
 
+class FrameBuffer {
+  unsigned int FBO{};
+  public:
 
+  // not copyable
+
+  FrameBuffer(const FrameBuffer& other) = delete;
+  FrameBuffer operator=(const FrameBuffer& other) = delete;
+
+  FrameBuffer(FrameBuffer&& other) noexcept {
+
+  }
+
+  FrameBuffer& operator=(FrameBuffer&& other) noexcept {
+    if (this != &other) {
+
+    }
+    return *this;
+  }
+
+
+};
 
 class VertexArray {
 private:
