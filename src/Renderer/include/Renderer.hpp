@@ -397,15 +397,34 @@ class FrameBuffer {
   FrameBuffer(const FrameBuffer& other) = delete;
   FrameBuffer operator=(const FrameBuffer& other) = delete;
 
-  FrameBuffer(FrameBuffer&& other) noexcept {
+  FrameBuffer(FrameBuffer&& other) noexcept 
+  : FBO(std::exchange(other.FBO, 0))
+  {
 
   }
 
   FrameBuffer& operator=(FrameBuffer&& other) noexcept {
     if (this != &other) {
-
+      VALIDATE_GL_(glDeleteFramebuffers(1, &FBO)); // delete current as another will be assigned
+      FBO = std::exchange(other.FBO, 0);
     }
     return *this;
+  }
+
+  FrameBuffer() {
+    VALIDATE_GL_(glGenFramebuffers(1, &FBO));
+  }
+
+  ~FrameBuffer() {
+    VALIDATE_GL_(glDeleteFramebuffers(1, &FBO));
+  }
+
+  void Bind(){
+    VALIDATE_GL_(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
+  }
+
+  void UnBind(){
+    VALIDATE_GL_(glBindFramebuffer(GL_FRAMEBUFFER, 0));
   }
 
 
