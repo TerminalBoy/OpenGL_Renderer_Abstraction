@@ -413,6 +413,7 @@ class FrameBuffer {
 
   FrameBuffer() {
     VALIDATE_GL_(glGenFramebuffers(1, &FBO));
+    Bind();
   }
 
   ~FrameBuffer() {
@@ -427,6 +428,48 @@ class FrameBuffer {
     VALIDATE_GL_(glBindFramebuffer(GL_FRAMEBUFFER, 0));
   }
 
+
+};
+
+class RenderBuffer {
+  private:
+  unsigned int _id{};
+
+  public:
+
+  // make non colyable
+  RenderBuffer(const RenderBuffer& other) = delete;
+  RenderBuffer operator=(const RenderBuffer& other) = delete;
+
+  // make move only
+
+  RenderBuffer(RenderBuffer&& other) 
+  : _id(std::exchange(other._id, 0))
+  {}
+
+  RenderBuffer& operator=(RenderBuffer&& other){
+    if (this != &other){
+      VALIDATE_GL_(glDeleteRenderbuffers(1, &_id)); // delete current render buffer as it will be swapped with new 
+      _id = std::exchange(other._id, 0);
+    }
+    return *this;
+  }
+
+  unsigned int GetId(){
+    return _id;
+  }
+
+  void Bind(){
+    VALIDATE_GL_(glBindRenderbuffer(GL_RENDERBUFFER, _id));
+  }
+  
+  void UnBind(){
+    VALIDATE_GL_(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+  }
+
+  void AllocateStorage(std::int32_t width, std::int32_t height) {
+    VALIDATE_GL_(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height));
+  }
 
 };
 
@@ -864,19 +907,21 @@ public:
 
   Texture()
   : _id(0), filepath(""), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr) 
-  {}
+  {
+    VALIDATE_GL_(glGenTextures(1, &_id));
+  }
 
   Texture(const std::string& path) 
     : _id(0), filepath(normalize_windows_linux_path(path).string()), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr)
   {
-
+    VALIDATE_GL_(glGenTextures(1, &_id));
     SetFile(path);
   }
 
   Texture(const std::string& path, const std::string& type) 
     : _id(0), filepath(normalize_windows_linux_path(path).string()), width(0), height(0), bits_per_pixel(0),  local_buffer(nullptr), type(type)
   {
-
+    VALIDATE_GL_(glGenTextures(1, &_id));
     SetFile(path);
   }
 
@@ -926,14 +971,18 @@ public:
       assert(0);
     }
 
-    VALIDATE_GL_(glGenTextures(1, &_id));
+    
     VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
+    
+    // prameters, set once, global. Not attached to the texture handle
 
     VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
     VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    
+    // ==========================================================================
+
+
     VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer));
     
     VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
@@ -949,6 +998,27 @@ public:
 
   }
 
+  void AllocateOnlyStorage(std::int32_t width, std::int32_t height){
+    if (_id != 0) return; // already has a texture allocated
+
+    Explicit_Bind_Only();
+    DefaultParams();
+
+    VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
+    UnBind();
+  }
+
+  void DefaultParams() {
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+  }
+
+  void Explicit_Bind_Only() {
+    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, _id));
+  }
+
   void Bind(unsigned int slot = 0) {	
     
     VALIDATE_GL_(glActiveTexture(GL_TEXTURE0 + slot));
@@ -962,6 +1032,10 @@ public:
 
   static void UnBindAll() {
     VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+  }
+
+  unsigned int GetId(){
+    return _id;
   }
 
 };

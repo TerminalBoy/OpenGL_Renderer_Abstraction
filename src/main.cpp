@@ -79,7 +79,8 @@ int main() {
     test::TestModelLoading,
     test::TestDepthTesting,
     test::TestStencilTesting,
-    test::TestBlending
+    test::TestBlending /*, 
+    test::TestBlendingWBOIT*/
     > 
     menu(window);
 
