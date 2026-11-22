@@ -81,6 +81,8 @@ int main() {
     test::TestStencilTesting,
     test::TestBlending /*, 
     test::TestBlendingWBOIT*/
+    ,
+    test::TestPostProcessing
     > 
     menu(window);
 
