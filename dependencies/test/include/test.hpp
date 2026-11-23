@@ -7021,6 +7021,10 @@ class TestDepthTesting {
     Model Grass;
     Model Sphere;
 
+    FrameBuffer m_PostProcessFrameBuffer;
+    Texture m_PostProcessTexture;
+    RenderBuffer m_PostProcessRenderBuffer; 
+
     public:
     static constexpr std::string_view NameString{"Post Processing"};
     
@@ -7047,6 +7051,32 @@ class TestDepthTesting {
 
       m_sun.enabled = true;
 
+      // COMMENTS ARE ONLY FOR MY UNDERSTANDING, as i am currently learing this
+
+      //FrameBuffer configuration
+
+      m_PostProcessFrameBuffer.Bind(); // bind the custom framebuffer
+      
+      m_PostProcessTexture.Bind();
+      m_PostProcessTexture.AllocateOnlyStorage(m_window_width, m_window_height); // allocate gpu storage for a texture of size of (m_window_width * m_window_height)
+      m_PostProcessTexture.UnBind();
+      
+      m_PostProcessRenderBuffer.Bind();
+      m_PostProcessRenderBuffer.AllocateOnlyStorage(m_window_width, m_window_height, GL_DEPTH24_STENCIL8);
+      m_PostProcessRenderBuffer.UnBind();
+
+      // attaching the texture to framebuffer as a color attachment
+      VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_PostProcessTexture.GetId(), 0));
+
+      //attaching the renderbuffer to the framebuffer object as a depth stencil attachment
+      VALIDATE_GL_(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_PostProcessRenderBuffer.GetId()));
+
+      // check if framebuffer is complete:
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cout << "ERROR::FRAMEBUFFER:: FrameBuffer imcomplete, inspect code" << std::endl;
+        }
+
+      m_PostProcessFrameBuffer.UnBind(); // unbind the custom framebuffer;
 
       // // initializing flashlight
       m_flashlight.enabled = true;
@@ -7140,8 +7170,10 @@ class TestDepthTesting {
 
       //   // setting camera
       m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
-
+      
+      //alplha discard is enabled
       m_shader_program.SetUniform1i("alpha_discard", static_cast<int>(true));
+      
       Plane.Draw(m_shader_program);
       
       Container1.Draw(m_shader_program);

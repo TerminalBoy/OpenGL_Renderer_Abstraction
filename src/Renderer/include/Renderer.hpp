@@ -413,7 +413,7 @@ class FrameBuffer {
 
   FrameBuffer() {
     VALIDATE_GL_(glGenFramebuffers(1, &FBO));
-    Bind();
+    //Bind();
   }
 
   ~FrameBuffer() {
@@ -455,6 +455,14 @@ class RenderBuffer {
     return *this;
   }
 
+  RenderBuffer(){
+    VALIDATE_GL_(glGenRenderbuffers(1, &_id));
+  }
+
+  ~RenderBuffer(){
+    VALIDATE_GL_(glDeleteRenderbuffers(1, &_id));
+  }
+
   unsigned int GetId(){
     return _id;
   }
@@ -467,8 +475,11 @@ class RenderBuffer {
     VALIDATE_GL_(glBindRenderbuffer(GL_RENDERBUFFER, 0));
   }
 
-  void AllocateStorage(std::int32_t width, std::int32_t height) {
-    VALIDATE_GL_(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height));
+  
+  void AllocateOnlyStorage(std::int32_t width, std::int32_t height, GLenum COMPONENT) { 
+    //Bind();
+    VALIDATE_GL_(glRenderbufferStorage(GL_RENDERBUFFER, COMPONENT, width, height));
+    //UnBind();
   }
 
 };
@@ -985,7 +996,7 @@ public:
 
     VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer));
     
-    VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
+    //VALIDATE_GL_(glBindTexture(GL_TEXTURE_2D, 0));
     
     if (local_buffer) {
       stbi_image_free(local_buffer);
@@ -999,13 +1010,13 @@ public:
   }
 
   void AllocateOnlyStorage(std::int32_t width, std::int32_t height){
-    if (_id != 0) return; // already has a texture allocated
+    //if (_id != 0) return; // already has a texture allocated
 
     Explicit_Bind_Only();
     DefaultParams();
 
     VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
-    UnBind();
+    //UnBind();
   }
 
   void DefaultParams() {
