@@ -589,6 +589,7 @@ namespace test {
       texture.Bind();
       shader_program.SetUniform1i("u_Texture", 0);
 
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -601,6 +602,7 @@ namespace test {
     void OnOpenGLRender() {
       VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+      
 
 
       {
@@ -789,6 +791,7 @@ namespace test {
       texture.Bind();
       shader_program.SetUniform1i("u_Texture", 0);
 
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -1016,7 +1019,7 @@ namespace test {
       texture.Bind();
       shader_program.SetUniform1i("u_Texture", 0);
 
-
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
     }
 
     ~TestWalkAround_Multiple3DCube() {
@@ -1220,6 +1223,7 @@ namespace test {
 
       model_light = glm::translate(model_light, light_source_translation);
       model_light = glm::scale(model_light, glm::vec3(0.5f, 0.5f, 0.5f));
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
     }
 
     void OnOpenGLRender(){
@@ -1423,6 +1427,8 @@ namespace test {
 
       model_light = glm::translate(model_light, light_source_translation);
       model_light = glm::scale(model_light, glm::vec3(0.5f, 0.5f, 0.5f));
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
     }
 
     void OnOpenGLRender(){
@@ -1643,6 +1649,7 @@ namespace test {
 
       model_light = glm::translate(model_light, light_source_translation);
       model_light = glm::scale(model_light, glm::vec3(0.5f, 0.5f, 0.5f));
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
     }
 
     void OnOpenGLRender(){
@@ -1968,6 +1975,7 @@ namespace test {
       // allow proper keyboard and mouse sharing with imgui
       camera.SetMouseSharedWithImGui();
       camera.SetKeyboardSharedWithImGui();
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -2337,6 +2345,8 @@ namespace test {
       m_camera.pitch = 12.9f; 
       m_camera.yaw = 50.83f; 
 
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
+
     }
 
     ~TestLighting_DiffuseMap(){
@@ -2655,6 +2665,8 @@ namespace test {
       m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
       m_camera.pitch = 12.9f; 
       m_camera.yaw = 50.83f; 
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -2998,6 +3010,8 @@ namespace test {
       m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
       m_camera.pitch = 12.9f; 
       m_camera.yaw = 50.83f; 
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -3343,6 +3357,8 @@ namespace test {
       m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
       m_camera.pitch = 12.9f; 
       m_camera.yaw = 50.83f; 
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -3693,6 +3709,8 @@ namespace test {
       m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
       m_camera.pitch = 12.9f; 
       m_camera.yaw = 50.83f; 
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -4105,6 +4123,8 @@ namespace test {
       m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
       m_camera.pitch = 12.9f; 
       m_camera.yaw = 50.83f; 
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
 
     }
 
@@ -4558,7 +4578,7 @@ class TestModelLoading {
       //m_camera.pitch = 12.9f; 
       //m_camera.yaw = 50.83f; 
 
-
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
       
     }
 
@@ -5051,7 +5071,7 @@ class TestDepthTesting {
       //m_camera.pitch = 12.9f; 
       //m_camera.yaw = 50.83f; 
 
-
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
       
     }
 
@@ -5599,6 +5619,7 @@ class TestDepthTesting {
       //m_camera.yaw = 50.83f; 
 
       VALIDATE_GL_(glEnable(GL_STENCIL_TEST));
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
       VALIDATE_GL_(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
       
     }
@@ -6099,6 +6120,7 @@ class TestDepthTesting {
       // VALIDATE_GL_(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 
       VALIDATE_GL_(glEnable(GL_BLEND));
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
       VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
       
     }
@@ -6665,6 +6687,7 @@ class TestDepthTesting {
       // VALIDATE_GL_(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 
       VALIDATE_GL_(glEnable(GL_BLEND));
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
       VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
       
     }
@@ -6960,6 +6983,17 @@ class TestDepthTesting {
     GLFWwindow* m_window;
     Camera m_camera;
        
+    std::array<float, 4*6> m_NormalizedScreenSpace {
+      // screen x,y  |  tex x,y 
+      -1.0f,  1.0f,    0.0f, 1.0f,
+      -1.0f, -1.0f,    0.0f, 0.0f,
+       1.0f,  1.0f,    1.0f, 1.0f,
+
+       1.0f,  1.0f,    1.0f, 1.0f,
+      -1.0f, -1.0f,    0.0f, 0.0f,
+       1.0f, -1.0f,    1.0f, 0.0f,
+    };
+
     struct DirectionalLight{
     	glm::vec3 direction;
 
@@ -7025,6 +7059,14 @@ class TestDepthTesting {
     Texture m_PostProcessTexture;
     RenderBuffer m_PostProcessRenderBuffer; 
 
+    VertexBuffer m_ScreenSpaceVB;
+    VertexArray m_ScreenSpaceVA;
+
+    ShaderVertex m_PostProcessVertexShader;
+    ShaderFragment m_PostProcessFragmentShader;
+
+    ShaderProgram m_PostProcessShaderProgram;
+
     public:
     static constexpr std::string_view NameString{"Post Processing"};
     
@@ -7036,6 +7078,11 @@ class TestDepthTesting {
       m_fragment_shader("dependencies/test_Shaders/TestPostProcessing/fragmentshader.shader"),
     
       m_shader_program(m_vertex_shader, m_fragment_shader),
+
+      m_PostProcessVertexShader("dependencies/test_Shaders/TestPostProcessing/PostProcessVertexShader.shader"),
+      m_PostProcessFragmentShader("dependencies/test_Shaders/TestPostProcessing/PostProcessFragmentShader.shader"),
+
+      m_PostProcessShaderProgram(m_PostProcessVertexShader, m_PostProcessFragmentShader),
       
       Container1("Assets/3D/TestPostProcessing/Container1.obj"),
       Container2("Assets/3D/TestPostProcessing/Container2.obj"),
@@ -7078,6 +7125,19 @@ class TestDepthTesting {
 
       m_PostProcessFrameBuffer.UnBind(); // unbind the custom framebuffer;
 
+      m_ScreenSpaceVA.bind();
+
+      m_ScreenSpaceVB.bind(GL_ARRAY_BUFFER);
+      m_ScreenSpaceVB.set_data(GL_ARRAY_BUFFER, m_NormalizedScreenSpace, GL_STATIC_DRAW);
+
+      m_ScreenSpaceVA.push_arrtib_pointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, sizeof(float)*0);
+      m_ScreenSpaceVA.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, sizeof(float)*2);
+
+      m_ScreenSpaceVA.enable(0);
+      m_ScreenSpaceVA.enable(1);
+
+
+
       // // initializing flashlight
       m_flashlight.enabled = true;
       m_flashlight.pos = m_camera.GetPosition(); // !!!! TO BE DONE EVERY FRAME
@@ -7104,6 +7164,8 @@ class TestDepthTesting {
 
       // VALIDATE_GL_(glEnable(GL_BLEND));
       // VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
       
     }
 
@@ -7116,7 +7178,6 @@ class TestDepthTesting {
       
       
       m_camera.OnOpenGLRender();
-      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
       glm::mat4 view = m_camera.GetViewMatrix();
       
@@ -7174,6 +7235,10 @@ class TestDepthTesting {
       //alplha discard is enabled
       m_shader_program.SetUniform1i("alpha_discard", static_cast<int>(true));
       
+      // rendering to the custom framebuffer PASS 1
+      m_PostProcessFrameBuffer.Bind();
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+
       Plane.Draw(m_shader_program);
       
       Container1.Draw(m_shader_program);
@@ -7181,6 +7246,30 @@ class TestDepthTesting {
       Sphere.Draw(m_shader_program);
       
       Grass.Draw(m_shader_program);
+
+      // rendering to the screen PASS 2
+      m_PostProcessFrameBuffer.UnBind();
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));      
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+
+      
+
+
+      m_PostProcessShaderProgram.Bind();
+      m_PostProcessTexture.Bind(0);
+
+      m_PostProcessShaderProgram.SetUniform1i("screentexture", 0);
+      m_ScreenSpaceVA.bind();
+      VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
+      VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_NormalizedScreenSpace.size() / 4));
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
+      m_ScreenSpaceVA.Unbind();
+      
+      m_PostProcessTexture.UnBind();
+      
+      m_PostProcessShaderProgram.UnBind();
+
+
 
     }
 
