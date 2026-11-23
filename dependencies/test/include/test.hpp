@@ -7311,6 +7311,11 @@ class TestDepthTesting {
       ImGui::Spacing();
       ImGui::Spacing();
 
+
+      ImGui::Text("Select a Post Processing mode :");
+
+      ImGui::Spacing();
+      
       if(ImGui::Button("None / Original")) {
         m_PostProcessMode = PostProcessMode::None;
       }
@@ -7329,6 +7334,8 @@ class TestDepthTesting {
       if(ImGui::Button("Edge Detection")) {
         m_PostProcessMode = PostProcessMode::EdgeDetection;
       }
+
+
 
     }
 
