@@ -7037,6 +7037,17 @@ class TestDepthTesting {
       bool enabled;
     };
 
+    enum class PostProcessMode{
+      None = 0, 
+      Inversion = 1, 
+      Grayscale = 2, 
+      Kernel = 3, 
+      Blur = 4, 
+      EdgeDetection = 5
+    };
+
+    PostProcessMode m_PostProcessMode = PostProcessMode::None; 
+
     glm::mat4 m_proj;
 
 
@@ -7259,6 +7270,7 @@ class TestDepthTesting {
       m_PostProcessTexture.Bind(0);
 
       m_PostProcessShaderProgram.SetUniform1i("screentexture", 0);
+      m_PostProcessShaderProgram.SetUniform1i("PostProcessMode", static_cast<int>(m_PostProcessMode));
       m_ScreenSpaceVA.bind();
       VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
       VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_NormalizedScreenSpace.size() / 4));
@@ -7298,6 +7310,25 @@ class TestDepthTesting {
       ImGui::Spacing();
       ImGui::Spacing();
       ImGui::Spacing();
+
+      if(ImGui::Button("None / Original")) {
+        m_PostProcessMode = PostProcessMode::None;
+      }
+      if(ImGui::Button("Negative / Inversion")) {
+        m_PostProcessMode = PostProcessMode::Inversion;
+      }
+      if(ImGui::Button("Grayscale")) {
+        m_PostProcessMode = PostProcessMode::Grayscale;
+      }
+      if(ImGui::Button("Kernel")) {
+        m_PostProcessMode = PostProcessMode::Kernel;
+      }
+      if(ImGui::Button("Blur")) {
+        m_PostProcessMode = PostProcessMode::Blur;
+      }
+      if(ImGui::Button("Edge Detection")) {
+        m_PostProcessMode = PostProcessMode::EdgeDetection;
+      }
 
     }
 
