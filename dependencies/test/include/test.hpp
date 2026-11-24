@@ -6415,51 +6415,6 @@ class TestDepthTesting {
     int m_window_height{};
     GLFWwindow* m_window;
     Camera m_camera;
-    std::array<float, 6*6*(6+2)> m_Vertices{ //xyz, normals, Texture_xy
-     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
-      0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      1.0f, 0.0f,
-      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
-      0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      1.0f, 1.0f,
-     -0.5f, 0.5f, -0.5f,      0.0f, 0.0f, -1.0f,      0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,     0.0f, 0.0f, -1.0f,      0.0f, 0.0f,
-     
-     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
-      0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
-      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
-      0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
-     -0.5f, 0.5f,  0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 1.0f,
-     -0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 1.0f,       0.0f, 0.0f,
-    
-     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-     -0.5f, 0.5f, -0.5f,     -1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,    -1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-     -0.5f, -0.5f, 0.5f,     -1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
-     -0.5f, 0.5f, 0.5f,      -1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-
-      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-      0.5f, 0.5f, -0.5f,      1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-      0.5f, -0.5f, 0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
-      0.5f, 0.5f, 0.5f,       1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-
-     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      1.0f, 1.0f,
-      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
-      0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      1.0f, 0.0f,
-     -0.5f, -0.5f, 0.5f,      0.0f, -1.0f, 0.0f,      0.0f, 0.0f,
-     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f, 0.0f,      0.0f, 1.0f,
-    
-     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f,
-      0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 1.0f,
-      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
-      0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
-     -0.5f, 0.5f, 0.5f,       0.0f, 1.0f, 0.0f,       0.0f, 0.0f,
-     -0.5f, 0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       0.0f, 1.0f
-
-    };
-    
     
     struct DirectionalLight{
     	glm::vec3 direction;
@@ -6513,36 +6468,17 @@ class TestDepthTesting {
     Model3d CurrentModel = Model3d::None;
 
     glm::mat4 m_proj;
-    // std::vector<Material> m_cubes;
-
+    
     DirectionalLight m_sun;
     PointLight m_bulb;
     Spotlight m_flashlight;
 
-    glm::vec3 m_light_source_translation = glm::vec3(1.5f, 0.8f, -3.f);
-    std::string m_VertexShaderSource;
-    std::string m_FragmentShaderSource;
-
-    bool visualize_depth_buffer = false;
-    bool linearize_depth_buffer = false;
-
     ShaderVertex m_vertex_shader;
     ShaderFragment m_fragment_shader;
     ShaderFragment m_transparencyfragment_shader;
-    
-    
+        
     ShaderProgram m_shader_program;
     ShaderProgram m_transparencyshader_program;
-
-
-    VertexArray m_v_arr;
-    VertexBuffer m_v_buff;
-
-    FrameBuffer m_accumFrameBuffer;
-    Texture m_accumTexture;
-    
-    unsigned int m_accumRenderBuffer; // class soon
-    GLenum drawBuffer[1] = { GL_COLOR_ATTACHMENT0 }; // class (maybe) soon, or ill find a better soliuton
 
     Model Container1;
     Model Container2;
@@ -6583,28 +6519,6 @@ class TestDepthTesting {
       m_proj = glm::perspective(glm::radians(45.0f), static_cast<float>(m_window_width) / static_cast<float>(m_window_height), 0.1f, 100.0f);
 
 
-      // intitalizaing accumulation texture
-      m_accumFrameBuffer.Bind();
-      m_accumTexture.AllocateOnlyStorage(m_window_width, m_window_height);
-
-      //attaching texture to framebuffer // as a color attachment
-
-      VALIDATE_GL_(
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_accumTexture.GetId(), 0)
-      );
-
-      // creating renderbuffer
-      VALIDATE_GL_(glGenRenderbuffers(1, &m_accumRenderBuffer));
-      VALIDATE_GL_(glBindRenderbuffer(GL_RENDERBUFFER, m_accumRenderBuffer));
-
-      VALIDATE_GL_(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_window_width, m_window_height));
-
-      //attaching the created renderbuffer to framebuffer
-      VALIDATE_GL_(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_accumRenderBuffer));
-
-
-
-
 
       //m_cube = Material(Material::Type::Neutral);
       
@@ -6616,27 +6530,7 @@ class TestDepthTesting {
 
       // // initializing sun
       m_sun.enabled = true;
-      // m_sun.direction = glm::vec3(1.f, 1.f, -1.f);
-      // m_sun.color = glm::vec3(255.f/255.f, 229.f/255.f, 200.f/255.f);
-      // m_sun.ambient = m_sun.color - glm::vec3(0.7); // darken the ambient
-      // m_sun.diffuse = m_sun.color;
-      // m_sun.specular = m_sun.color;
 
-
-      // initializing bulb
-      m_bulb.enabled = true;
-      m_bulb.pos = m_light_source_translation;      
-      m_bulb.scale = glm::vec3(0.5f);
-      m_bulb.mat_model = glm::mat4(1);
-      m_bulb.mat_model = glm::translate(m_bulb.mat_model, m_bulb.pos);
-      m_bulb.mat_model = glm::scale(m_bulb.mat_model, m_bulb.scale);
-      m_bulb.color = glm::vec3(1.0f);
-      m_bulb.ambient = m_bulb.color - glm::vec3(0.9);
-      m_bulb.diffuse = m_bulb.color;
-      m_bulb.specular = m_bulb.color;
-      m_bulb.atten_constant = 1.0f;
-      m_bulb.atten_linear = 0.09f;
-      m_bulb.atten_quadratic = 0.032f;
 
       // // initializing flashlight
       m_flashlight.enabled = true;
@@ -6651,19 +6545,6 @@ class TestDepthTesting {
       m_flashlight.atten_quadratic = 0.0019f;
 
 
-
-      m_v_arr.bind();
-      m_v_buff.bind(GL_ARRAY_BUFFER);
-      m_v_buff.set_data(GL_ARRAY_BUFFER, m_Vertices, GL_STATIC_DRAW);
-
-      m_v_arr.push_arrtib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 0);
-      m_v_arr.push_arrtib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 3 * sizeof(float));
-      m_v_arr.push_arrtib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) *  8, 6 * sizeof(float));
-
-      m_v_arr.enable(0);
-      m_v_arr.enable(1);
-      m_v_arr.enable(2);
-      
       m_shader_program.Bind();
       m_shader_program.SetIgnoreNonExistentUniform(true);
       // m_diffuse_map.Bind(0);
@@ -6678,13 +6559,6 @@ class TestDepthTesting {
       m_camera.SetKeyboardSharedWithImGui();
 
       m_camera.cameraPos = glm::vec3(0.0f, 3.0f, 5.58f);
-      //m_camera.cameraPos = glm::vec3(-2.55f, -1.30f, -5.58f);
-      
-      //m_camera.pitch = 12.9f; 
-      //m_camera.yaw = 50.83f; 
-
-      // VALIDATE_GL_(glEnable(GL_STENCIL_TEST));
-      // VALIDATE_GL_(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 
       VALIDATE_GL_(glEnable(GL_BLEND));
       VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
@@ -6704,12 +6578,7 @@ class TestDepthTesting {
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
       glm::mat4 view = m_camera.GetViewMatrix();
-      // DisableGLErrorPrinting();
-      // for (std::size_t i{}; i < m_cubes.size(); ++i)
-      // { //cube 
 
-      
-      // m_shader_program.SetUniform1i("rendering_light_source", 0);
       m_shader_program.Bind();
       m_shader_program.SetIgnoreNonExistentUniform(true);
       m_transparencyshader_program.SetIgnoreNonExistentUniform(true);
@@ -6718,16 +6587,6 @@ class TestDepthTesting {
       m_shader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
       m_shader_program.SetUniformMat4f("view", view);
       m_shader_program.SetUniformMat4f("projection", m_proj);
-
-      //   //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
-      //   //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
-      //   //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
-        
-      //   // setting materials
-      //   m_shader_program.SetUniformVec3f("material.color", m_cubes[i].color);
-      //   m_shader_program.SetUniform1f("material.specular_power", m_cubes[i].specular_power);
-      //   m_shader_program.SetUniform1i("material.diffuse", 0); // texture slots
-      //   m_shader_program.SetUniform1i("material.specular", 1); // texture slots
 
       //   // setting directional light
       m_shader_program.SetUniform1i("sun.enabled", m_sun.enabled);
@@ -6773,23 +6632,11 @@ class TestDepthTesting {
       //   // setting camera
       m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
 
-      //   // m_shader_program.SetUniform1f("light.atten_constant", 1.0f);
-      //   // // m_shader_program.SetUniform1f("light.atten_linear", 0.09f);
-      //   // // m_shader_program.SetUniform1f("light.atten_quadratic", 0.032f);
-      //   // m_shader_program.SetUniform1f("light.atten_linear", 0.022f);
-      //   // m_shader_program.SetUniform1f("light.atten_quadratic", 0.0019f);
-
-
         
-      //   VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
-      // m_outlineshader_program.SetIgnoreNonExistentUniform(true);  
       
-      // VALIDATE_GL_(glStencilMask(0x00));
+      
       Plane.Draw(m_shader_program);
 
-      // VALIDATE_GL_(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-      // VALIDATE_GL_(glStencilMask(0xFF));
-      
       switch (CurrentModel) {
 
         case Model3d::Window:
@@ -6820,59 +6667,6 @@ class TestDepthTesting {
       }
 
 
-      // VALIDATE_GL_(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
-      // VALIDATE_GL_(glStencilMask(0x00));
-      // VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
-      // // draw 2 scaled up containers
-      // m_outlineshader_program.Bind();
-      // m_outlineshader_program.SetUniformMat4f("model", glm::mat4(1.f));
-      // m_outlineshader_program.SetUniformMat4f("view", view);
-      // m_outlineshader_program.SetUniformMat4f("projection", m_proj);
-      // m_outlineshader_program.SetUniform1f("scaleFactor", 1.2f);
-      
-      // m_outlineshader_program.SetUniformVec3f("AABBcenter", Container1.FindAABBcenter());
-      // Container1.Draw(m_outlineshader_program);
-
-      // m_outlineshader_program.SetUniformVec3f("AABBcenter", Container2.FindAABBcenter());
-      // Container2.Draw(m_outlineshader_program);
-
-      // VALIDATE_GL_(glStencilMask(0xFF));
-      // VALIDATE_GL_(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-      // VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
-      // m_outlineshader_program.UnBind();
-      
-      // m_shader_program.Bind();
-
-      // }
-
-      // { // light 
-
-      //   m_shader_program.Bind();
-      //   m_shader_program.SetUniform1i("rendering_light_source", 1);
-      //   m_shader_program.SetUniformMat4f("model", glm::mat4(0.f));
-      //   m_shader_program.SetUniformMat4f("view", view);
-      //   m_shader_program.SetUniformMat4f("projection", m_proj);
-      //   //m_shader_program.SetUniformVec3f("material.ambient", m_cube.ambient);
-      //   //m_shader_program.SetUniformVec3f("material.diffuse", m_cube.diffuse);
-      //   //m_shader_program.SetUniformVec3f("material.specular", m_cube.specular);
-      //   //m_shader_program.SetUniformVec3f("material.color", m_cube.color);
-      //   //m_shader_program.SetUniform1f("material.specular_power", m_cube.specular_power);
-
-      //   m_shader_program.SetUniformVec3f("bulb.color", m_bulb.color);
-      //   m_shader_program.SetUniformVec3f("bulb.pos", m_bulb.pos);
-
-      //   m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
-        
-      //   m_v_arr.bind();
-      //   VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8));
-      //   m_v_arr.Unbind();
-      // }
-
-      
-
-
-
-      // EnableGLErrorPrinting();
     }
 
     void processInput(){
@@ -6883,11 +6677,6 @@ class TestDepthTesting {
         m_flashlight.enabled = !m_flashlight.enabled;
       }
       
-      // // bulb on/off control
-      // if (ImGui::IsKeyPressed(ImGuiKey_B, false)){
-      //   m_bulb.enabled = !m_bulb.enabled;
-      // }
-
       // sun on/off control
       if (ImGui::IsKeyPressed(ImGuiKey_U, false)){
         m_sun.enabled = !m_sun.enabled;
@@ -6916,59 +6705,11 @@ class TestDepthTesting {
       }
       // STENCIL TESING TOGGLES
 
-      // ImGui::Text("Stencil Testing Toggles :");
-      // ImGui::Spacing();
-
-      // if(ImGui::Button("StencilFunc: GL_ALWAYS")){
-      //   VALIDATE_GL_(glDepthFunc(GL_ALWAYS));
-      // } 
-      // if(ImGui::Button("DepthFunc: GL_NEVER")){
-      //   VALIDATE_GL_(glDepthFunc(GL_NEVER));
-      // }
-      // if(ImGui::Button("DepthFunc: GL_LESS")){
-      //   VALIDATE_GL_(glDepthFunc(GL_LESS));
-      // }
-      // if(ImGui::Button("DepthFunc: GL_EQUAL")){
-      //   VALIDATE_GL_(glDepthFunc(GL_EQUAL));
-      // }
-      // if(ImGui::Button("DepthFunc: GL_LEQUAL")){
-      //   VALIDATE_GL_(glDepthFunc(GL_LEQUAL));
-      // }
-      // if(ImGui::Button("DepthFunc: GL_GREATER")){
-      //   VALIDATE_GL_(glDepthFunc(GL_GREATER));
-      // }
-      // if(ImGui::Button("DepthFunc: GL_NOTEQUAL")){
-      //   VALIDATE_GL_(glDepthFunc(GL_NOTEQUAL));
-      // }
-      // if(ImGui::Button("DepthFunc: GL_GEQUAL")){
-      //   VALIDATE_GL_(glDepthFunc(GL_GEQUAL));
-      // }
-
       // ImGui::Spacing();
       // ImGui::Spacing();
       // ImGui::Spacing();
       // ImGui::Spacing();
       
-      // if(!visualize_depth_buffer && ImGui::Button("Visualize Depth Buffer")) 
-      //   visualize_depth_buffer = true;
-     
-      // if(visualize_depth_buffer && ImGui::Button("Disable Depth Buffer Visualization"))
-      //   visualize_depth_buffer = false;
-        
-      
-      // if (visualize_depth_buffer) {
-      //   if (!linearize_depth_buffer && ImGui::Button("Linearize Depth Buffer [near ---> far]"))
-      //     linearize_depth_buffer = true;
-        
-      //   if (linearize_depth_buffer && ImGui::Button("Don't Linearize Depth Buffer [near ---> far]"))
-      //     linearize_depth_buffer = false;  
-      // }
-
-     
-
-      // m_shader_program.SetUniform1i("visualize_depth_buffer", static_cast<int>(visualize_depth_buffer));
-      // m_shader_program.SetUniform1i("linearize_depth_buffer", static_cast<int>(linearize_depth_buffer));
-
     }
 
     
