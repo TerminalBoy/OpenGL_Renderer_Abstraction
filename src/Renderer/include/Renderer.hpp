@@ -69,6 +69,16 @@ log_gl_errors(#expr_gl, __LINE__, __FILE__);                   \
 } while(0)
 
 
+#define ENABLE_FORCE_DRAW_OVER_EVERYTHING_ \
+VALIDATE_GL_(glDisable(GL_BLEND));         \
+VALIDATE_GL_(glDisable(GL_DEPTH_TEST));    
+
+
+#define DISABLE_FORCE_DRAW_OVER_EVERYTHING_ \
+VALIDATE_GL_(glEnable(GL_BLEND));         \
+VALIDATE_GL_(glEnable(GL_DEPTH_TEST));    
+
+
 std::filesystem::path normalize_windows_linux_path(std::string path){
   for (std::size_t i{}; i < path.size(); ++i) {
     if (path[i] == '\\'){
@@ -363,6 +373,7 @@ unsigned int CreateShader(unsigned int shader_type_gl, char const* const* const 
   if (!success) {
     VALIDATE_GL_(glGetShaderInfoLog(shader, 512, nullptr, infolog));
     std::cout << "Error compiling shader: \n" << infolog << std::endl;
+    std::cout << "The Shader: \n\n " << *shader_src_string_array << std::endl << std::endl; 
   }
 
   return shader;
@@ -1016,6 +1027,16 @@ public:
     DefaultParams();
 
     VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
+    //UnBind();
+  }
+
+  void AllocateOnlyStorage_RGBA16F(std::int32_t width, std::int32_t height){
+    //if (_id != 0) return; // already has a texture allocated
+
+    Explicit_Bind_Only();
+    DefaultParams();
+
+    VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
     //UnBind();
   }
 
