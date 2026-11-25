@@ -6416,6 +6416,17 @@ class TestDepthTesting {
     GLFWwindow* m_window;
     Camera m_camera;
     
+    std::array<float, 4*6> m_NormalizedScreenSpace {
+      // screen x,y  |  tex x,y 
+      -1.0f,  1.0f,    0.0f, 1.0f,
+      -1.0f, -1.0f,    0.0f, 0.0f,
+       1.0f,  1.0f,    1.0f, 1.0f,
+
+       1.0f,  1.0f,    1.0f, 1.0f,
+      -1.0f, -1.0f,    0.0f, 0.0f,
+       1.0f, -1.0f,    1.0f, 0.0f,
+    };
+
     struct DirectionalLight{
     	glm::vec3 direction;
 
@@ -6486,6 +6497,31 @@ class TestDepthTesting {
     Model Grass;
     Model TransparentWindows;
     Model Sphere;
+
+    FrameBuffer m_accumFB; // accumulation framebuffer
+    Texture m_accumColorContributionAndAlphaTX; // will accumulate both color contibution and alpha
+    Texture m_accumAlphaRevelageTX; // will accumulate the alpha revelage [Currently 4 channels, will optimize to 1 channel later]
+
+    ShaderVertex m_accumVertexShader;
+
+    // ShaderVertex m_accumVertexShader;
+    ShaderFragment m_accumContributionColorAndAlphaFragmentShader;
+
+    // ShaderVertex m_accumVertexShader;
+    ShaderFragment m_accumAlphaRevelageFragmentShader;
+
+    ShaderProgram m_accumContributionColorAndAlpha_ShaderProgram;
+    ShaderProgram m_accumAlphaRevelage_ShaderProgram;
+
+    VertexArray m_ScreenSpaceVA;
+    VertexBuffer m_ScreenSpaceVB;
+    
+    ShaderVertex m_ScreenSpaceVS;
+    ShaderFragment m_WBOIT_FS;
+    ShaderProgram m_WBOIT_ShaderProgram;
+
+
+
     public:
     static constexpr std::string_view NameString{"Blending (Weighted Blended Order Independent Transparency)"};
     
@@ -6495,16 +6531,22 @@ class TestDepthTesting {
       
       m_vertex_shader("dependencies/test_Shaders/TestBlendingWBOIT/vertexshader.shader"),
       m_fragment_shader("dependencies/test_Shaders/TestBlendingWBOIT/fragmentshader.shader"),
-      m_transparencyfragment_shader("dependencies/test_Shaders/TestBlendingWBOIT/transparency_fragmentshader.shader"),
       
-      // m_outlinevertex_shader("dependencies/test_Shaders/TestBlending/outlinevertexshader.shader"),
-      // m_outlinefragment_shader("dependencies/test_Shaders/TestBlending/outlinefragmentshader.shader"),
-
       m_shader_program(m_vertex_shader, m_fragment_shader),
-      m_transparencyshader_program(m_vertex_shader, m_transparencyfragment_shader),
-
-      // m_outlineshader_program(m_outlinevertex_shader, m_outlinefragment_shader),
       
+      m_accumVertexShader("dependencies/test_Shaders/TestBlendingWBOIT/accum_vertexshader.shader"),
+
+      m_accumContributionColorAndAlphaFragmentShader("dependencies/test_Shaders/TestBlendingWBOIT/accumColorContributionAndAlpha_fragmentshader.shader"),
+      m_accumAlphaRevelageFragmentShader("dependencies/test_Shaders/TestBlendingWBOIT/accumAlphaRevelage_fragmentshader.shader"),
+
+      m_accumContributionColorAndAlpha_ShaderProgram(m_accumVertexShader, m_accumContributionColorAndAlphaFragmentShader),
+      m_accumAlphaRevelage_ShaderProgram(m_accumVertexShader, m_accumAlphaRevelageFragmentShader),
+
+      m_ScreenSpaceVS("dependencies/test_Shaders/TestBlendingWBOIT/ScreenSpaceVS.shader"),
+      m_WBOIT_FS("dependencies/test_Shaders/TestBlendingWBOIT/WBOIT_FS.shader"),
+
+      m_WBOIT_ShaderProgram(m_ScreenSpaceVS, m_WBOIT_FS),
+
       Container1("Assets/3D/Blending/Container1.obj"),
       Container2("Assets/3D/Blending/Container2.obj"),
       Plane("Assets/3D/Blending/Plane.obj"),
@@ -6518,15 +6560,50 @@ class TestDepthTesting {
       glfwGetWindowSize(window, &m_window_width, &m_window_height);
       m_proj = glm::perspective(glm::radians(45.0f), static_cast<float>(m_window_width) / static_cast<float>(m_window_height), 0.1f, 100.0f);
 
-
-
-      //m_cube = Material(Material::Type::Neutral);
+      // framebuffer for accumulation:
+      m_accumFB.Bind();
       
-      // for (std::size_t i{}; i < m_cubes.size(); ++i){
-      //   m_cubes[i] = Material(Material::Type::Neutral);
-      //   m_cubes[i].pos =  cubePositions[i];
-      //   m_cubes[i].mat_model = glm::translate(m_cubes[i].mat_model, m_cubes[i].pos);
-      // }
+      m_accumColorContributionAndAlphaTX.Bind();
+      m_accumColorContributionAndAlphaTX.AllocateOnlyStorage_RGBA16F(m_window_width, m_window_height);
+      m_accumColorContributionAndAlphaTX.UnBind();
+
+      m_accumAlphaRevelageTX.Bind();
+      m_accumAlphaRevelageTX.AllocateOnlyStorage_RGBA16F(m_window_width, m_window_height);
+      m_accumAlphaRevelageTX.UnBind();
+
+
+      // attaching the color and alpha accumulation texture to framebuffer as a color attachment
+      VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_accumColorContributionAndAlphaTX.GetId(), 0));
+
+      //attaching the alpha revelage accumulation texture to the framebuffer object as a color attachment
+      VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_accumAlphaRevelageTX.GetId(), 0));
+      
+      // configuring the drawbuffers for multiple render targets
+      GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+      VALIDATE_GL_(glDrawBuffers(2, attachments));
+
+      // enable blending to actually accumulate
+      VALIDATE_GL_(glEnable(GL_BLEND));
+
+      // check if framebuffer is complete:
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cout << "ERROR::FRAMEBUFFER:: FrameBuffer imcomplete, inspect code" << std::endl;
+        }
+
+      m_accumFB.UnBind();
+
+      m_ScreenSpaceVA.bind();
+      m_ScreenSpaceVB.bind(GL_ARRAY_BUFFER);
+      m_ScreenSpaceVB.set_data(GL_ARRAY_BUFFER, m_NormalizedScreenSpace, GL_STATIC_DRAW);
+      
+      m_ScreenSpaceVA.push_arrtib_pointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, sizeof(float)* 0);
+      m_ScreenSpaceVA.push_arrtib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, sizeof(float)* 2);
+
+      m_ScreenSpaceVA.enable(0);
+      m_ScreenSpaceVA.enable(1);
+      
+      m_ScreenSpaceVA.Unbind();
+
 
       // // initializing sun
       m_sun.enabled = true;
@@ -6573,9 +6650,13 @@ class TestDepthTesting {
 
     void OnOpenGLRender(){
       
+      // restore blending
+
+      VALIDATE_GL_(glBlendEquation(GL_FUNC_ADD));
+      VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
       
       m_camera.OnOpenGLRender();
-      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+      
 
       glm::mat4 view = m_camera.GetViewMatrix();
 
@@ -6633,39 +6714,111 @@ class TestDepthTesting {
       m_shader_program.SetUniformVec3f("camera.pos", m_camera.GetPosition());
 
         
-      
-      
+      // drawing opaque scenes
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.f));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
       Plane.Draw(m_shader_program);
+      m_shader_program.SetUniform1i("alpha_discard", 1);
+      Grass.Draw(m_shader_program);
+      m_shader_program.SetUniform1i("alpha_discard", 0);
+      Sphere.Draw(m_shader_program);
+      //TransparentWindows.DrawTransparent(m_shader_program);
+      
+      m_shader_program.UnBind();
 
-      switch (CurrentModel) {
 
-        case Model3d::Window:
-          Sphere.Draw(m_shader_program);
-          m_shader_program.UnBind();
-          m_transparencyshader_program.Bind();
 
-          m_transparencyshader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
-          m_transparencyshader_program.SetUniformMat4f("view", view);
-          m_transparencyshader_program.SetUniformMat4f("projection", m_proj);
 
-          TransparentWindows.DrawTransparent(m_shader_program);
-          m_transparencyshader_program.UnBind();
-          m_shader_program.Bind();
-        break;
+      // now we need to draw the transparent objects on the accumulation framebuffer
+      m_accumFB.Bind();
+      //m_accumFB.UnBind(); // forcing draw on the default frambuffer
+    
+      GLfloat accumContributionAndAlphaClear[] = {0.0f, 0.0f, 0.0f, 0.0f};
+      GLfloat accumAlphaRevelageClear[] = {0.0f, 0.0f, 0.0f, 1.0f};
 
-        
-        case Model3d::Grass:
-          
-          m_shader_program.SetUniform1i("alpha_discard", static_cast<int>(true));
-          Grass.Draw(m_shader_program);
-        break;
+      VALIDATE_GL_(glClearBufferfv(GL_COLOR, 0, accumContributionAndAlphaClear));
+      VALIDATE_GL_(glClearBufferfv(GL_COLOR, 1, accumAlphaRevelageClear));
+      
+      // rendering pass 1 CONFIG
+      m_accumContributionColorAndAlpha_ShaderProgram.Bind();
+      
+      m_accumContributionColorAndAlpha_ShaderProgram.SetIgnoreNonExistentUniform(true);
+      m_accumContributionColorAndAlpha_ShaderProgram.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
+      m_accumContributionColorAndAlpha_ShaderProgram.SetUniformMat4f("view", view);
+      m_accumContributionColorAndAlpha_ShaderProgram.SetUniformMat4f("projection", m_proj);
+      
+      // rendering pass 1, accumulation of color contibution and alpha
+      // additive blending: ...
+      //
 
-        
-        default:
-        
-        break;
-      }
+      VALIDATE_GL_(glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD));
+      VALIDATE_GL_(glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE));
+      
+      TransparentWindows.DrawTransparent(m_accumContributionColorAndAlpha_ShaderProgram);
+      
 
+      m_accumContributionColorAndAlpha_ShaderProgram.UnBind();
+
+
+
+      // rendering pass 2 CONFIG
+      m_accumAlphaRevelage_ShaderProgram.Bind();
+
+      m_accumAlphaRevelage_ShaderProgram.SetIgnoreNonExistentUniform(true);
+      m_accumAlphaRevelage_ShaderProgram.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
+      m_accumAlphaRevelage_ShaderProgram.SetUniformMat4f("view", view);
+      m_accumAlphaRevelage_ShaderProgram.SetUniformMat4f("projection", m_proj);
+      
+      
+      // rendering pass 2, accumulation of alpha revelage
+      // multiplicative blending: ...
+      //
+      VALIDATE_GL_(glBlendEquation(GL_FUNC_ADD));
+      VALIDATE_GL_(glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA));
+      TransparentWindows.DrawTransparent(m_accumAlphaRevelage_ShaderProgram);
+
+      
+      m_accumAlphaRevelage_ShaderProgram.UnBind();
+      // accumulation step done
+      // bind the screen framebuffer
+      m_accumFB.UnBind();
+      
+      // restore blending
+
+      VALIDATE_GL_(glBlendEquation(GL_FUNC_ADD));
+      VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+      // now we need to sample the accumulated values and perform WBOIT equation on it to produce a final transparent color for the pixel
+ 
+      m_WBOIT_ShaderProgram.Bind();
+      m_WBOIT_ShaderProgram.SetIgnoreNonExistentUniform(true);
+      
+      m_accumColorContributionAndAlphaTX.Bind(0);
+      m_accumAlphaRevelageTX.Bind(1);
+
+      m_WBOIT_ShaderProgram.SetUniform1i("accumColorContributionAndAlpha", 0);
+      m_WBOIT_ShaderProgram.SetUniform1i("accumAlphaRevelage", 1);
+      
+      m_ScreenSpaceVA.bind();
+      VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
+      
+      // VALIDATE_GL_(glDisable(GL_BLEND)); // temp
+      
+      VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_NormalizedScreenSpace.size() / 4));
+      
+      // VALIDATE_GL_(glEnable(GL_BLEND)); // temp
+
+
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
+      m_ScreenSpaceVA.Unbind();
+
+      m_accumColorContributionAndAlphaTX.UnBind();
+      m_accumAlphaRevelageTX.UnBind();
+
+      m_WBOIT_ShaderProgram.UnBind();
+
+
+      // All done. WBOIT shall work now
 
     }
 
@@ -6695,21 +6848,14 @@ class TestDepthTesting {
       ImGui::Spacing();
       ImGui::Spacing();
 
-      ImGui::Text("3D Models:");
+      // ImGui::Text("3D Models:");
 
-      if(ImGui::Button("Grass")){
-        CurrentModel = Model3d::Grass;
-      }
-      if(ImGui::Button("Window")){
-        CurrentModel = Model3d::Window;
-      }
-      // STENCIL TESING TOGGLES
-
-      // ImGui::Spacing();
-      // ImGui::Spacing();
-      // ImGui::Spacing();
-      // ImGui::Spacing();
-      
+      // if(ImGui::Button("Grass")){
+      //   CurrentModel = Model3d::Grass;
+      // }
+      // if(ImGui::Button("Window")){
+      //   CurrentModel = Model3d::Window;
+      // }
     }
 
     
