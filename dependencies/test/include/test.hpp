@@ -6494,8 +6494,12 @@ class TestDepthTesting {
     Model Sphere;
 
     FrameBuffer m_accumFB; // accumulation framebuffer
+    FrameBuffer m_OpaqueFB; // opaue rendering framebuffer
+
     Texture m_accumColorContributionAndAlphaTX; // will accumulate both color contibution and alpha
     Texture m_accumAlphaRevelageTX; // will accumulate the alpha revelage [Currently 4 channels, will optimize to 1 channel later]
+    Texture m_OpaqueSceneTX; // the normal opaque scene into a texture
+    Texture m_OpaqueDepthStencilTX; // will store the depth and stencil buffer for opaque rendering, will also be used for transparent rending
 
     ShaderProgram m_accumContributionColorAndAlpha_ShaderProgram;
     ShaderProgram m_accumAlphaRevelage_ShaderProgram;
@@ -6542,9 +6546,15 @@ class TestDepthTesting {
       glfwGetWindowSize(window, &m_window_width, &m_window_height);
       m_proj = glm::perspective(glm::radians(45.0f), static_cast<float>(m_window_width) / static_cast<float>(m_window_height), 0.1f, 100.0f);
 
-      // framebuffer for accumulation:
-      m_accumFB.Bind();
-      
+      // allocationg storage for the respective texture buffers
+      m_OpaqueDepthStencilTX.Bind();
+      m_OpaqueDepthStencilTX.AllocateOnlyStorage_DEPTH24STENCIL8(m_window_width, m_window_height);
+      m_OpaqueDepthStencilTX.UnBind();
+
+      m_OpaqueSceneTX.Bind();
+      m_OpaqueSceneTX.AllocateOnlyStorage(m_window_width, m_window_height);
+      m_OpaqueSceneTX.UnBind();
+
       m_accumColorContributionAndAlphaTX.Bind();
       m_accumColorContributionAndAlphaTX.AllocateOnlyStorage_RGBA16F(m_window_width, m_window_height);
       m_accumColorContributionAndAlphaTX.UnBind();
@@ -6554,26 +6564,53 @@ class TestDepthTesting {
       m_accumAlphaRevelageTX.UnBind();
 
 
+      
+      // framebuffer for opaque rendering
+      m_OpaqueFB.Bind();
+
+      // attaching the opaque scene color attachment to the opaque fbo
+      VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_OpaqueSceneTX.GetId(), 0));
+
+      // attaching the depth stencil attachment to the opaque fbo
+      VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_OpaqueDepthStencilTX.GetId(), 0));
+
+      // check if framebuffer is complete:
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cout << "ERROR::FRAMEBUFFER(m_OpaqueFB):: FrameBuffer imcomplete, inspect code" << std::endl;
+        }
+
+      m_OpaqueFB.UnBind();
+      
+      
+      // framebuffer for accumulation:
+      m_accumFB.Bind();
+
       // attaching the color and alpha accumulation texture to framebuffer as a color attachment
       VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_accumColorContributionAndAlphaTX.GetId(), 0));
 
       //attaching the alpha revelage accumulation texture to the framebuffer object as a color attachment
       VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_accumAlphaRevelageTX.GetId(), 0));
       
+      // attaching the depth stencil attachment to the accumultion fbo (same used by opaque fbo)
+      VALIDATE_GL_(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_OpaqueDepthStencilTX.GetId(), 0));
+
+
       // configuring the drawbuffers for multiple render targets
       GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
       VALIDATE_GL_(glDrawBuffers(2, attachments));
 
-      // enable blending to actually accumulate
-      VALIDATE_GL_(glEnable(GL_BLEND));
-
       // check if framebuffer is complete:
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-          std::cout << "ERROR::FRAMEBUFFER:: FrameBuffer imcomplete, inspect code" << std::endl;
+          std::cout << "ERROR::FRAMEBUFFER(m_accumFB):: FrameBuffer imcomplete, inspect code" << std::endl;
         }
 
       m_accumFB.UnBind();
 
+      // enable blending to actually accumulate
+      VALIDATE_GL_(glEnable(GL_BLEND));
+
+
+      
       m_ScreenSpaceVA.bind();
       m_ScreenSpaceVB.bind(GL_ARRAY_BUFFER);
       m_ScreenSpaceVB.set_data(GL_ARRAY_BUFFER, m_NormalizedScreenSpace, GL_STATIC_DRAW);
