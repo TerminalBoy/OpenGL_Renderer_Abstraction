@@ -6508,6 +6508,7 @@ class TestDepthTesting {
     VertexBuffer m_ScreenSpaceVB;
     
     ShaderProgram m_WBOIT_ShaderProgram;
+    ShaderProgram m_Blit_ShaderProgram;
 
 
 
@@ -6532,6 +6533,9 @@ class TestDepthTesting {
 
       m_WBOIT_ShaderProgram("dependencies/test_Shaders/TestBlendingWBOIT/ScreenSpaceVS.shader", 
                             "dependencies/test_Shaders/TestBlendingWBOIT/WBOIT_FS.shader"),
+
+      m_Blit_ShaderProgram("dependencies/test_Shaders/TestBlendingWBOIT/ScreenSpaceVS.shader",
+                                    "dependencies/test_Shaders/TestBlendingWBOIT/ScreenSpaceFS.shader"),
 
       Container1("Assets/3D/Blending/Container1.obj"),
       Container2("Assets/3D/Blending/Container2.obj"),
@@ -6670,9 +6674,7 @@ class TestDepthTesting {
     void OnOpenGLRender(){
       
       // restore blending
-
-      VALIDATE_GL_(glBlendEquation(GL_FUNC_ADD));
-      VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+      DEFAULT_GL_BLENDING_
       
       m_camera.OnOpenGLRender();
       
@@ -6733,7 +6735,9 @@ class TestDepthTesting {
 
         
       // drawing opaque scenes
-      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.f));
+      m_OpaqueFB.Bind();
+
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.0f));
       VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
       Plane.Draw(m_shader_program);
       m_shader_program.SetUniform1i("alpha_discard", 1);
@@ -6743,7 +6747,7 @@ class TestDepthTesting {
       //TransparentWindows.DrawTransparent(m_shader_program);
       
       m_shader_program.UnBind();
-
+      m_OpaqueFB.UnBind();
 
 
 
@@ -6800,7 +6804,31 @@ class TestDepthTesting {
       // accumulation step done
       // bind the screen framebuffer
       m_accumFB.UnBind();
+
+      // drawing opaque scene to screen
+      DEFAULT_GL_BLENDING_
+
+      VALIDATE_GL_(glClearColor(0.1f, 0.1f, 0.1f, 1.0f));
+      VALIDATE_GL_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+
+      m_Blit_ShaderProgram.Bind();
+      m_OpaqueSceneTX.Bind();
+      m_Blit_ShaderProgram.SetUniform1i("sourcetexture", 0);
+
+      m_ScreenSpaceVA.bind();
+      VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
+      VALIDATE_GL_(glDisable(GL_BLEND));
+
+      VALIDATE_GL_(glDrawArrays(GL_TRIANGLES, 0, m_NormalizedScreenSpace.size() / 4));
       
+      VALIDATE_GL_(glEnable(GL_DEPTH_TEST));
+      VALIDATE_GL_(glEnable(GL_BLEND));
+      m_ScreenSpaceVA.Unbind();
+
+      m_OpaqueSceneTX.UnBind();
+      m_Blit_ShaderProgram.UnBind();
+
+
       // restore blending
 
       VALIDATE_GL_(glBlendEquation(GL_FUNC_ADD));
