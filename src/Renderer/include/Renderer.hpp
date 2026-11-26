@@ -394,7 +394,12 @@ unsigned int CreateShaderProgram(unsigned int VertexShader, unsigned int Fragmen
   if (!success) {
     VALIDATE_GL_(glGetProgramInfoLog(ShaderProgram, 512, nullptr, infolog));
     std::cout << "Error linking : \n" << infolog << std::endl;
+    return 0;
   }
+
+  VALIDATE_GL_(glDetachShader(ShaderProgram, VertexShader));
+  VALIDATE_GL_(glDetachShader(ShaderProgram, FragmentShader));
+  
   return ShaderProgram;
 }
 
@@ -817,10 +822,18 @@ public:
     _id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
   }
 
+  ShaderProgram(const std::filesystem::path& VertexShaderPath, const std::filesystem::path& FragmentShaderPath){
+    ShaderVertex vertex_shader(VertexShaderPath.string());
+    ShaderFragment fragment_shader(FragmentShaderPath.string());
+    _id = CreateShaderProgram(vertex_shader.id(), fragment_shader.id());
+  }
+
+  private:
   void CreateProgram_seperately(const ShaderVertex& VertexShader, const ShaderFragment& FragmentShader) {
     assert(_id == 0 && "_id already containts a different shader program");
     _id = CreateShaderProgram(VertexShader.id(), FragmentShader.id());
   }
+  public:
 
   void Bind() {
     VALIDATE_GL_(glUseProgram(_id));

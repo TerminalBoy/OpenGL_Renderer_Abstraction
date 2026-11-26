@@ -6483,13 +6483,8 @@ class TestDepthTesting {
     DirectionalLight m_sun;
     PointLight m_bulb;
     Spotlight m_flashlight;
-
-    ShaderVertex m_vertex_shader;
-    ShaderFragment m_fragment_shader;
-    ShaderFragment m_transparencyfragment_shader;
-        
+     
     ShaderProgram m_shader_program;
-    ShaderProgram m_transparencyshader_program;
 
     Model Container1;
     Model Container2;
@@ -6502,22 +6497,12 @@ class TestDepthTesting {
     Texture m_accumColorContributionAndAlphaTX; // will accumulate both color contibution and alpha
     Texture m_accumAlphaRevelageTX; // will accumulate the alpha revelage [Currently 4 channels, will optimize to 1 channel later]
 
-    ShaderVertex m_accumVertexShader;
-
-    // ShaderVertex m_accumVertexShader;
-    ShaderFragment m_accumContributionColorAndAlphaFragmentShader;
-
-    // ShaderVertex m_accumVertexShader;
-    ShaderFragment m_accumAlphaRevelageFragmentShader;
-
     ShaderProgram m_accumContributionColorAndAlpha_ShaderProgram;
     ShaderProgram m_accumAlphaRevelage_ShaderProgram;
 
     VertexArray m_ScreenSpaceVA;
     VertexBuffer m_ScreenSpaceVB;
     
-    ShaderVertex m_ScreenSpaceVS;
-    ShaderFragment m_WBOIT_FS;
     ShaderProgram m_WBOIT_ShaderProgram;
 
 
@@ -6529,23 +6514,20 @@ class TestDepthTesting {
     : m_window(window),
       m_camera(window),
       
-      m_vertex_shader("dependencies/test_Shaders/TestBlendingWBOIT/vertexshader.shader"),
-      m_fragment_shader("dependencies/test_Shaders/TestBlendingWBOIT/fragmentshader.shader"),
+      m_shader_program("dependencies/test_Shaders/TestBlendingWBOIT/vertexshader.shader", 
+                      "dependencies/test_Shaders/TestBlendingWBOIT/fragmentshader.shader"),
       
-      m_shader_program(m_vertex_shader, m_fragment_shader),
+
+      m_accumContributionColorAndAlpha_ShaderProgram("dependencies/test_Shaders/TestBlendingWBOIT/accum_vertexshader.shader",
+                                                     "dependencies/test_Shaders/TestBlendingWBOIT/accumColorContributionAndAlpha_fragmentshader.shader"),
       
-      m_accumVertexShader("dependencies/test_Shaders/TestBlendingWBOIT/accum_vertexshader.shader"),
+      
+      m_accumAlphaRevelage_ShaderProgram("dependencies/test_Shaders/TestBlendingWBOIT/accum_vertexshader.shader",
+                                         "dependencies/test_Shaders/TestBlendingWBOIT/accumAlphaRevelage_fragmentshader.shader"),
 
-      m_accumContributionColorAndAlphaFragmentShader("dependencies/test_Shaders/TestBlendingWBOIT/accumColorContributionAndAlpha_fragmentshader.shader"),
-      m_accumAlphaRevelageFragmentShader("dependencies/test_Shaders/TestBlendingWBOIT/accumAlphaRevelage_fragmentshader.shader"),
 
-      m_accumContributionColorAndAlpha_ShaderProgram(m_accumVertexShader, m_accumContributionColorAndAlphaFragmentShader),
-      m_accumAlphaRevelage_ShaderProgram(m_accumVertexShader, m_accumAlphaRevelageFragmentShader),
-
-      m_ScreenSpaceVS("dependencies/test_Shaders/TestBlendingWBOIT/ScreenSpaceVS.shader"),
-      m_WBOIT_FS("dependencies/test_Shaders/TestBlendingWBOIT/WBOIT_FS.shader"),
-
-      m_WBOIT_ShaderProgram(m_ScreenSpaceVS, m_WBOIT_FS),
+      m_WBOIT_ShaderProgram("dependencies/test_Shaders/TestBlendingWBOIT/ScreenSpaceVS.shader", 
+                            "dependencies/test_Shaders/TestBlendingWBOIT/WBOIT_FS.shader"),
 
       Container1("Assets/3D/Blending/Container1.obj"),
       Container2("Assets/3D/Blending/Container2.obj"),
@@ -6662,7 +6644,6 @@ class TestDepthTesting {
 
       m_shader_program.Bind();
       m_shader_program.SetIgnoreNonExistentUniform(true);
-      m_transparencyshader_program.SetIgnoreNonExistentUniform(true);
       m_shader_program.SetUniform1i("rendering_light_source", 0);
 
       m_shader_program.SetUniformMat4f("model", glm::translate(glm::mat4(1.f), glm::vec3(0.0f)));
