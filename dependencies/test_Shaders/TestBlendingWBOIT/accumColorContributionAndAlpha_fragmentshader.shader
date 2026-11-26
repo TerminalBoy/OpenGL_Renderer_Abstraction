@@ -7,6 +7,10 @@ in vec3 FragPos;
 
 uniform sampler2D texture_diffuse1;
 
+
+// The weighing function, equation no. (7) from the 
+// McGuire and Bavoil Weighted Blended Order-Independent Transparency research paper, 
+// from the Journal of Computer Graphics Techniques Vol.2, No. 2, 2013, http://jcgt.org
 float weight(float z, float a){
   float result = 0;
   result = a * clamp(
