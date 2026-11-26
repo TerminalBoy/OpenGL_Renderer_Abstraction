@@ -78,6 +78,9 @@ VALIDATE_GL_(glDisable(GL_DEPTH_TEST));
 VALIDATE_GL_(glEnable(GL_BLEND));         \
 VALIDATE_GL_(glEnable(GL_DEPTH_TEST));    
 
+#define DEFAULT_GL_BLENDING_                 \
+VALIDATE_GL_(glBlendEquation(GL_FUNC_ADD));  \
+VALIDATE_GL_(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 std::filesystem::path normalize_windows_linux_path(std::string path){
   for (std::size_t i{}; i < path.size(); ++i) {
