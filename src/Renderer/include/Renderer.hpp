@@ -1053,6 +1053,16 @@ public:
     //UnBind();
   }
 
+  void AllocateOnlyStorage_DEPTH24STENCIL8(std::int32_t width, std::int32_t height){
+    //if (_id != 0) return; // already has a texture allocated
+
+    Explicit_Bind_Only();
+    DefaultParams();
+
+    VALIDATE_GL_(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr));
+    //UnBind();
+  }
+
   void DefaultParams() {
     VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     VALIDATE_GL_(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
