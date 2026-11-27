@@ -15,7 +15,7 @@ float weight(float z, float a){
   float result = 0;
   result = a * clamp(
     10 / (
-        0.00001, + 
+        0.00001 + 
         pow(abs(z) / 5.0, 2.0) +
         pow(abs(z) / 200.0, 6.0)
       ),
